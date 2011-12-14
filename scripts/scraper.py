@@ -37,11 +37,13 @@ def deputies():
         url = dict(items[0].a.attrs)['href']
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         email = items[2].a.text
+        website = dict(items[3].a.attrs)['href'] if items[3].a else None
         Deputy.objects.create(full_name=full_name,
                               party=party,
                               url=url,
+                              websites=[website] if website else [],
                               emails=[email])
-        print 'adding new deputy', full_name, party, email, url
+        print 'adding new deputy', full_name, party, email, url, website if website else None
 
 def run():
     deputies()
