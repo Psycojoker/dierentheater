@@ -5,6 +5,7 @@ class Deputy(models.Model):
     full_name = models.CharField(max_length=1337)
     emails = ListField()
     party = models.ForeignKey('Party')
+    url = models.CharField(max_length=1337)
     #lachambre_id = models.IntegerField(max_length=1337)
     #first_name = models.CharField(max_length=1337)
     #last_name = models.CharField(max_length=1337)

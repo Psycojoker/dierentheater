@@ -34,10 +34,14 @@ def deputies():
     for dep in soup.findAll('table')[4].findAll('tr'):
         items = dep.findAll('td')
         full_name = re.sub('  +', ' ', items[0].a.text)
+        url = dict(items[0].a.attrs)['href']
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         email = items[2].a.text
-        Deputy.objects.create(full_name=full_name, party=party, emails=[email])
-        print 'adding new deputy', full_name, party, email
+        Deputy.objects.create(full_name=full_name,
+                              party=party,
+                              url=url,
+                              emails=[email])
+        print 'adding new deputy', full_name, party, email, url
 
 def run():
     deputies()
