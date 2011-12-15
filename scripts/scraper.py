@@ -27,8 +27,7 @@ def read_or_dl(url, name):
     return BeautifulSoup(text)
 
 def clean():
-    Deputy.objects.all().delete()
-    Party.objects.all().delete()
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, MainDocument))
 
 def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
