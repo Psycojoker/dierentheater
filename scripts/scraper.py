@@ -51,7 +51,7 @@ def deputies_list():
                               websites=[website] if website else [],
                               lachambre_id=lachambre_id,
                               emails=[email])
-        print 'adding new deputy', lachambre_id, full_name, party, email, url, website if website else None
+        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
 def each_deputies():
     for deputy in Deputy.objects.all():
