@@ -12,6 +12,10 @@ class Deputy(models.Model):
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
 
+    class Meta:
+        ordering = ['full_name']
+
+
 class Party(models.Model):
     name = models.CharField(max_length=1337)
     url = models.URLField()
