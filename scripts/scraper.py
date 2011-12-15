@@ -52,6 +52,7 @@ def deputies_list():
         print 'adding new deputy', lachambre_id, full_name, party, email, url, website if website else None
 
 def deputies():
+    clean()
     deputies_list()
 
 def run():
