@@ -1,7 +1,7 @@
 # -*- coding:Utf-8 -*-
 import re
 from os.path import exists
-from urllib2 import urlopen
+from urllib import urlopen
 from BeautifulSoup import BeautifulSoup
 
 from deputies.models import Deputy, Party, CommissionMembership
