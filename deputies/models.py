@@ -10,7 +10,7 @@ class Deputy(models.Model):
     lachambre_id = models.CharField(max_length=1337, unique=True)
     language = models.CharField(max_length=1337)
     cv = models.CharField(max_length=1337)
-    commissions = ListField(EmbeddedModelField('Commission'))
+    commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
 
     def __unicode__(self):
@@ -27,6 +27,7 @@ class Party(models.Model):
     def __unicode__(self):
         return self.name
 
-class Commission(models.Model):
+class CommissionMembership(models.Model):
     name = models.CharField(max_length=1337)
     role = models.CharField(max_length=1337)
+    url = models.URLField()

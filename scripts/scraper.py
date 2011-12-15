@@ -3,7 +3,7 @@ from os.path import exists
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party, Commission
+from deputies.models import Deputy, Party, CommissionMembership
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -70,7 +70,7 @@ def each_deputies():
                 if item.name == 'h5':
                     role = item.text[6:-1]
                 elif item.name == 'div':
-                    deputy.commissions.append(Commission.objects.create(name=item.a.text, role=role))
+                    deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=href(item.a)))
                     print "add commission", role, item.a.text
             item = item.nextSibling
         deputy.save()
