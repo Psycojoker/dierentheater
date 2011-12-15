@@ -25,13 +25,13 @@ class Deputy(models.Model):
     documents_rapporter_url = models.URLField()
     documents_rapporter_list = ListField(EmbeddedModelField('Document'))
 
-    questions_written_url = ListField(EmbeddedModelField('Question'))
+    questions_written_url = models.URLField()
     questions_written_list = ListField(EmbeddedModelField('Question'))
 
-    questions_oral_plenary_url = ListField(EmbeddedModelField('Question'))
+    questions_oral_plenary_url = models.URLField()
     questions_oral_plenary_list = ListField(EmbeddedModelField('Question'))
 
-    questions_oral_commission_url = ListField(EmbeddedModelField('Question'))
+    questions_oral_commission_url = models.URLField()
     questions_oral_commission_list = ListField(EmbeddedModelField('Question'))
 
     def __unicode__(self):
