@@ -8,6 +8,7 @@ class Deputy(models.Model):
     url = models.CharField(max_length=1337)
     websites = ListField()
     lachambre_id = models.CharField(max_length=1337, unique=True)
+    language = models.CharField(max_length=1337)
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)

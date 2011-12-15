@@ -5,6 +5,8 @@ from BeautifulSoup import BeautifulSoup
 
 from deputies.models import Deputy, Party
 
+LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+
 def href(a):
     return dict(a.attrs)['href']
 
@@ -51,9 +53,18 @@ def deputies_list():
                               emails=[email])
         print 'adding new deputy', lachambre_id, full_name, party, email, url, website if website else None
 
+def each_deputies():
+    for deputy in Deputy.objects.all():
+        print "parsing", deputy.full_name, deputy.url
+        soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
+        deputy.language = soup.i.parent.text.split(":")[1]
+        deputy.save()
+
+
 def deputies():
     clean()
     deputies_list()
+    each_deputies()
 
 def run():
     deputies()
