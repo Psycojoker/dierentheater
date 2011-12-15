@@ -58,6 +58,7 @@ def each_deputies():
         print "parsing", deputy.full_name, deputy.url
         soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
         deputy.language = soup.i.parent.text.split(":")[1]
+        deputy.cv = re.sub('  +', ' ', soup.findAll('table')[5].p.text)
         deputy.save()
 
 
