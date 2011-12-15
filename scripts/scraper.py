@@ -28,7 +28,7 @@ def clean():
     Deputy.objects.all().delete()
     Party.objects.all().delete()
 
-def deputies():
+def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
 
     for dep in soup.findAll('table')[4].findAll('tr'):
@@ -44,6 +44,9 @@ def deputies():
                               websites=[website] if website else [],
                               emails=[email])
         print 'adding new deputy', full_name, party, email, url, website if website else None
+
+def deputies():
+    deputies_list()
 
 def run():
     deputies()
