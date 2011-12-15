@@ -61,3 +61,7 @@ class Document(models.Model):
 class Question(models.Model):
     url = models.URLField()
     type = models.CharField(max_length=1337)
+
+class Analysis(models.Model):
+    url = models.URLField()
+    type = models.CharField(max_length=1337)

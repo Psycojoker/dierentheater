@@ -4,7 +4,7 @@ from os.path import exists
 from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -32,7 +32,7 @@ def read_or_dl(url, name):
     return BeautifulSoup(text)
 
 def clean():
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis))
 
 def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
@@ -95,6 +95,14 @@ def get_deputy_questions(url, deputy, type):
         print "add", type, i.tr('td')[1].text.strip()
         getattr(deputy, "questions_%s_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
 
+def get_deputy_analysis(url, deputy, type):
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type))
+    setattr(deputy, "analysis_%s_url" % type, url)
+    setattr(deputy, "analysis_%s_list" % type, [])
+    for i in soupsoup('table')[3]('tr', valign="top"):
+        print "add", type, i.tr('td')[1].text.strip()
+        getattr(deputy, "analysis_%s_list" % type).append(Analysis.objects.create(url=i.a['href'], type=type))
+
 def deputy_documents(soup, deputy):
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
@@ -103,10 +111,13 @@ def deputy_documents(soup, deputy):
     get_deputy_documents(urls[2], deputy, "author", "next")
     get_deputy_documents(urls[3], deputy, "signator", "next")
     get_deputy_documents(urls[4], deputy, "rapporter")
-    get_deputy_written_questions(urls[5], deputy)
+    get_deputy_questions(urls[5], deputy, "written")
     # no one seems to do any interpellations nor motions or maybe the website is just broken
     get_deputy_questions(urls[8], deputy, "oral_plenary")
     get_deputy_questions(urls[9], deputy, "oral_commission")
+    get_deputy_analysis(urls[10], deputy, "legislatif_work")
+    get_deputy_analysis(urls[11], deputy, "parlimentary_control")
+    get_deputy_analysis(urls[12], deputy, "divers")
 
 def deputies():
     clean()
