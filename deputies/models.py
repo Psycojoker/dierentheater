@@ -25,14 +25,14 @@ class Deputy(models.Model):
     documents_rapporter_url = models.URLField()
     documents_rapporter_list = ListField(EmbeddedModelField('Document'))
 
-    written_questions_url = ListField(EmbeddedModelField('Question'))
-    written_questions_list = ListField(EmbeddedModelField('Question'))
+    questions_written_url = ListField(EmbeddedModelField('Question'))
+    questions_written_list = ListField(EmbeddedModelField('Question'))
 
-    oral_plenary_questions_url = ListField(EmbeddedModelField('Question'))
-    oral_plenary_questions_list = ListField(EmbeddedModelField('Question'))
+    questions_oral_plenary_url = ListField(EmbeddedModelField('Question'))
+    questions_oral_plenary_list = ListField(EmbeddedModelField('Question'))
 
-    oral_commission_questions_url = ListField(EmbeddedModelField('Question'))
-    oral_commission_questions_list = ListField(EmbeddedModelField('Question'))
+    questions_oral_commission_url = ListField(EmbeddedModelField('Question'))
+    questions_oral_commission_list = ListField(EmbeddedModelField('Question'))
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)

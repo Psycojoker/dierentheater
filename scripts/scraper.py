@@ -89,11 +89,11 @@ def get_deputy_documents(url, deputy, role, type=None):
 
 def get_deputy_questions(url, deputy, type):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type))
-    setattr(deputy, "%s_questions_url" % type, url)
-    setattr(deputy, "%s_questions_list" % type, [])
+    setattr(deputy, "questions_%s_url" % type, url)
+    setattr(deputy, "questions_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type, i.tr('td')[1].text.strip()
-        getattr(deputy, "%s_questions_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
+        getattr(deputy, "questions_%s_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
 
 def deputy_documents(soup, deputy):
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
