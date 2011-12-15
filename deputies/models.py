@@ -2,7 +2,7 @@ from django.db import models
 from djangotoolbox.fields import ListField
 
 class Deputy(models.Model):
-    full_name = models.CharField(max_length=1337)
+    full_name = models.CharField(max_length=1337, unique=True)
     emails = ListField()
     party = models.ForeignKey('Party')
     url = models.CharField(max_length=1337)
