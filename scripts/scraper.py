@@ -7,9 +7,6 @@ from deputies.models import Deputy, Party, CommissionMembership
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
-def href(a):
-    return dict(a.attrs)['href']
-
 def get_or_create(klass, _id=None, **kwargs):
     if _id is None:
         object = klass.objects.filter(**kwargs)
@@ -39,10 +36,10 @@ def deputies_list():
     for dep in soup.findAll('table')[4].findAll('tr'):
         items = dep.findAll('td')
         full_name = re.sub('  +', ' ', items[0].a.text)
-        url = href(items[0].a)
+        url = items[0].a['href']
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         email = items[2].a.text
-        website = href(items[3].a) if items[3].a else None
+        website = items[3].a['href'] if items[3].a else None
         # yes, one deputies key contains a O instead of an 0, I'm not joking
         lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
         Deputy.objects.create(full_name=full_name,
@@ -70,7 +67,7 @@ def each_deputies():
                 if item.name == 'h5':
                     role = item.text[6:-1]
                 elif item.name == 'div':
-                    deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=href(item.a)))
+                    deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
                     print "add commission", role, item.a.text
             item = item.nextSibling
         deputy.save()
