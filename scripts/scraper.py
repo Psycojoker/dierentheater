@@ -3,7 +3,7 @@ from os.path import exists
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party
+from deputies.models import Deputy, Party, Commission
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -59,8 +59,21 @@ def each_deputies():
         soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
         deputy.language = soup.i.parent.text.split(":")[1]
         deputy.cv = re.sub('  +', ' ', soup.findAll('table')[5].p.text)
-        deputy.save()
 
+        # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
+        # look at the bottom of each deputies' page
+        membership = soup.find('td', rowspan="1")
+        item = membership.h4
+        role = None
+        while item.nextSibling:
+            if hasattr(item, 'tag'):
+                if item.name == 'h5':
+                    role = item.text[6:-1]
+                elif item.name == 'div':
+                    deputy.commissions.append(Commission.objects.create(name=item.a.text, role=role))
+                    print "add commission", role, item.a.text
+            item = item.nextSibling
+        deputy.save()
 
 def deputies():
     clean()

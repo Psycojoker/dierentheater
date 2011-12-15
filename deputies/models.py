@@ -1,5 +1,5 @@
 from django.db import models
-from djangotoolbox.fields import ListField
+from djangotoolbox.fields import ListField, EmbeddedModelField
 
 class Deputy(models.Model):
     full_name = models.CharField(max_length=1337, unique=True)
@@ -10,6 +10,8 @@ class Deputy(models.Model):
     lachambre_id = models.CharField(max_length=1337, unique=True)
     language = models.CharField(max_length=1337)
     cv = models.CharField(max_length=1337)
+    commissions = ListField(EmbeddedModelField('Commission'))
+
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
@@ -24,3 +26,7 @@ class Party(models.Model):
 
     def __unicode__(self):
         return self.name
+
+class Commission(models.Model):
+    name = models.CharField(max_length=1337)
+    role = models.CharField(max_length=1337)
