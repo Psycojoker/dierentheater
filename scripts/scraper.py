@@ -33,8 +33,8 @@ def clean():
 def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
 
-    for dep in soup.findAll('table')[4].findAll('tr'):
-        items = dep.findAll('td')
+    for dep in soup('table')[4]('tr'):
+        items = dep('td')
         full_name = re.sub('  +', ' ', items[0].a.text)
         url = items[0].a['href']
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
@@ -55,7 +55,7 @@ def each_deputies():
         print "parsing", deputy.full_name, deputy.url
         soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
         deputy.language = soup.i.parent.text.split(":")[1]
-        deputy.cv = re.sub('  +', ' ', soup.findAll('table')[5].p.text)
+        deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
 
         # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
         # look at the bottom of each deputies' page
