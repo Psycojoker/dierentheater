@@ -7,9 +7,7 @@ class Deputy(models.Model):
     party = models.ForeignKey('Party')
     url = models.CharField(max_length=1337)
     websites = ListField()
-    #lachambre_id = models.IntegerField(max_length=1337)
-    #first_name = models.CharField(max_length=1337)
-    #last_name = models.CharField(max_length=1337)
+    lachambre_id = models.CharField(max_length=1337, unique=True)
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)

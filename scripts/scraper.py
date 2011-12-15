@@ -38,12 +38,15 @@ def deputies_list():
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         email = items[2].a.text
         website = dict(items[3].a.attrs)['href'] if items[3].a else None
+        # yes, one deputies key contains a O instead of an 0, I'm not joking
+        lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
         Deputy.objects.create(full_name=full_name,
                               party=party,
                               url=url,
                               websites=[website] if website else [],
+                              lachambre_id=lachambre_id,
                               emails=[email])
-        print 'adding new deputy', full_name, party, email, url, website if website else None
+        print 'adding new deputy', lachambre_id, full_name, party, email, url, website if website else None
 
 def deputies():
     deputies_list()
