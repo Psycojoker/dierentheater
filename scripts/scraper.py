@@ -104,6 +104,7 @@ def get_deputy_analysis(url, deputy, type):
         getattr(deputy, "analysis_%s_list" % type).append(Analysis.objects.create(url=i.a['href'], type=type))
 
 def deputy_documents(soup, deputy):
+    # here we are in the grey black box
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
     get_deputy_documents(urls[0], deputy, "author", "principal")
