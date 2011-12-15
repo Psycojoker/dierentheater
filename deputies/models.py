@@ -25,8 +25,14 @@ class Deputy(models.Model):
     documents_rapporter_url = models.URLField()
     documents_rapporter_list = ListField(EmbeddedModelField('Document'))
 
-    written_questions_url = ListField(EmbeddedModelField('WrittenQuestion'))
-    written_questions_list = ListField(EmbeddedModelField('WrittenQuestion'))
+    written_questions_url = ListField(EmbeddedModelField('Question'))
+    written_questions_list = ListField(EmbeddedModelField('Question'))
+
+    oral_plenary_questions_url = ListField(EmbeddedModelField('Question'))
+    oral_plenary_questions_list = ListField(EmbeddedModelField('Question'))
+
+    oral_commission_questions_url = ListField(EmbeddedModelField('Question'))
+    oral_commission_questions_list = ListField(EmbeddedModelField('Question'))
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
@@ -52,5 +58,6 @@ class Document(models.Model):
     url = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337, default=None, null=True)
 
-class WrittenQuestion(models.Model):
+class Question(models.Model):
     url = models.URLField()
+    type = models.CharField(max_length=1337)

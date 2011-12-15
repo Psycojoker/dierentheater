@@ -4,7 +4,7 @@ from os.path import exists
 from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, WrittenQuestion
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -32,7 +32,7 @@ def read_or_dl(url, name):
     return BeautifulSoup(text)
 
 def clean():
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, WrittenQuestion))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question))
 
 def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
@@ -87,14 +87,13 @@ def get_deputy_documents(url, deputy, role, type=None):
         print "add", type if type else '', role, i.tr('td')[1].text
         getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(Document.objects.create(url=i.a['href'], type=type))
 
-def get_deputy_written_questions(url, deputy):
-    save_text = "written questions"
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, save_text))
-    deputy.written_questions_url = url
-    deputy.written_questions_list = []
+def get_deputy_questions(url, deputy, type):
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type))
+    setattr(deputy, "%s_questions_url" % type, url)
+    setattr(deputy, "%s_questions_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", save_text, i.tr('td')[1].text.strip()
-        deputy.written_questions_list.append(WrittenQuestion.objects.create(url=i.a['href']))
+        print "add", type, i.tr('td')[1].text.strip()
+        getattr(deputy, "%s_questions_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
 
 def deputy_documents(soup, deputy):
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
@@ -106,6 +105,8 @@ def deputy_documents(soup, deputy):
     get_deputy_documents(urls[4], deputy, "rapporter")
     get_deputy_written_questions(urls[5], deputy)
     # no one seems to do any interpellations nor motions or maybe the website is just broken
+    get_deputy_questions(urls[8], deputy, "oral_plenary")
+    get_deputy_questions(urls[9], deputy, "oral_commission")
 
 def deputies():
     clean()
