@@ -25,6 +25,9 @@ class Deputy(models.Model):
     documents_rapporter_url = models.URLField()
     documents_rapporter_list = ListField(EmbeddedModelField('Document'))
 
+    written_questions_url = ListField(EmbeddedModelField('WrittenQuestion'))
+    written_questions_list = ListField(EmbeddedModelField('WrittenQuestion'))
+
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
 
@@ -48,3 +51,6 @@ class CommissionMembership(models.Model):
 class Document(models.Model):
     url = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337, default=None, null=True)
+
+class WrittenQuestion(models.Model):
+    url = models.URLField()
