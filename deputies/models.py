@@ -13,7 +13,17 @@ class Deputy(models.Model):
     commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
     documents_principal_author_url = models.URLField()
-    documents_principal_author_list = ListField(EmbeddedModelField('MainDocument'))
+    documents_principal_author_list = ListField(EmbeddedModelField('Document'))
+    documents_principal_signator_url = models.URLField()
+    documents_principal_signator_list = ListField(EmbeddedModelField('Document'))
+
+    documents_next_author_url = models.URLField()
+    documents_next_author_list = ListField(EmbeddedModelField('Document'))
+    documents_next_signator_url = models.URLField()
+    documents_next_signator_list = ListField(EmbeddedModelField('Document'))
+
+    documents_rapporter_url = models.URLField()
+    documents_rapporter_list = ListField(EmbeddedModelField('Document'))
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
@@ -35,5 +45,6 @@ class CommissionMembership(models.Model):
     role = models.CharField(max_length=1337)
     url = models.URLField()
 
-class MainDocument(models.Model):
+class Document(models.Model):
     url = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337, default=None, null=True)
