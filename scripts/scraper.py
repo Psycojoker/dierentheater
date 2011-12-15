@@ -58,73 +58,43 @@ def each_deputies():
     for deputy in Deputy.objects.all():
         print "parsing", deputy.full_name, deputy.url
         soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
-        deputy.language = soup.i.parent.text.split(":")[1]
-        deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
+        #deputy.language = soup.i.parent.text.split(":")[1]
+        #deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
 
         # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
         # look at the bottom of each deputies' page
-        membership = soup.find('td', rowspan="1")
-        item = membership.h4
-        role = None
-        while item.nextSibling:
-            if hasattr(item, 'tag'):
-                if item.name == 'h5':
-                    role = item.text[6:-1]
-                elif item.name == 'div':
-                    deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
-                    print "add commission", role, item.a.text
-            item = item.nextSibling
+        #membership = soup.find('td', rowspan="1")
+        #item = membership.h4
+        #role = None
+        #while item.nextSibling:
+            #if hasattr(item, 'tag'):
+                #if item.name == 'h5':
+                    #role = item.text[6:-1]
+                #elif item.name == 'div':
+                    #deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
+                    #print "add commission", role, item.a.text
+            #item = item.nextSibling
 
         deputy_documents(soup, deputy)
         deputy.save()
 
+def get_deputy_documents(url, deputy, role, type=None):
+    print "working on %s %sdocuments" % (role, type + " " if type else '') #, LACHAMBRE_PREFIX + lame_url(urls[index])
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role))
+    setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
+    setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
+    for i in soupsoup('table')[3]('tr', valign="top"):
+        print "add", type if type else '', role, i.tr('td')[1].text
+        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(Document.objects.create(url=i.a['href'], type=type))
+
 def deputy_documents(soup, deputy):
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
-    index = 0
-    print "working on main legislatif documents" #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "author main documents"))
-    deputy.documents_principal_author_url = urls[index]
-    deputy.documents_principal_author_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add main document", i.tr('td')[1].text
-        deputy.documents_principal_author_list.append(Document.objects.create(url=i.a['href'], type="principal"))
-
-    index += 1
-    print "working on main legislatif documents as signator" #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "signator main documents"))
-    deputy.documents_principal_signator_url = urls[index]
-    deputy.documents_principal_signator_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add main document", i.tr('td')[1].text
-        deputy.documents_principal_signator_list.append(Document.objects.create(url=i.a['href'], type="principal"))
-
-    index += 1
-    print "working on next legislatif documents" #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "author next documents"))
-    deputy.documents_next_author_url = urls[index]
-    deputy.documents_next_author_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add nex document", i.tr('td')[1].text
-        deputy.documents_next_author_list.append(Document.objects.create(url=i.a['href'], type="next"))
-
-    index += 1
-    print "working on next legislatif documents as signator" #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "signator next documents"))
-    deputy.documents_next_signator_url = urls[index]
-    deputy.documents_next_signator_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add main document", i.tr('td')[1].text
-        deputy.documents_next_signator_list.append(Document.objects.create(url=i.a['href'], type="next"))
-
-    index += 1
-    print "working on legislatif documents as rapporter" #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "rapporter documents"))
-    deputy.documents_next_signator_url = urls[index]
-    deputy.documents_next_signator_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add main document", i.tr('td')[1].text
-        deputy.documents_next_signator_list.append(Document.objects.create(url=i.a['href']))
+    get_deputy_documents(urls[0], deputy, "author", "principal")
+    get_deputy_documents(urls[1], deputy, "signator", "principal")
+    get_deputy_documents(urls[2], deputy, "author", "next")
+    get_deputy_documents(urls[3], deputy, "signator", "next")
+    get_deputy_documents(urls[4], deputy, "rapporter")
 
 def deputies():
     clean()
