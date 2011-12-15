@@ -1,3 +1,4 @@
+# -*- coding:Utf-8 -*-
 import re
 from os.path import exists
 from urllib2 import urlopen
