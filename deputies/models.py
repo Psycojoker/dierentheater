@@ -12,6 +12,8 @@ class Deputy(models.Model):
     cv = models.CharField(max_length=1337)
     commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
+    documents_principal_author_url = models.URLField()
+    documents_principal_author_list = ListField(EmbeddedModelField('MainDocument'))
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
@@ -27,7 +29,11 @@ class Party(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class CommissionMembership(models.Model):
     name = models.CharField(max_length=1337)
     role = models.CharField(max_length=1337)
     url = models.URLField()
+
+class MainDocument(models.Model):
+    url = models.CharField(max_length=1337)

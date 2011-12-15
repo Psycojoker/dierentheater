@@ -1,12 +1,16 @@
 # -*- coding:Utf-8 -*-
 import re
 from os.path import exists
-from urllib import urlopen
+from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party, CommissionMembership
+from deputies.models import Deputy, Party, CommissionMembership, MainDocument
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+
+def lame_url(url):
+    # convert super lame urls of lachambre.be into something uzable
+    return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
 
 def get_or_create(klass, _id=None, **kwargs):
     if _id is None:
@@ -70,7 +74,21 @@ def each_deputies():
                     deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
                     print "add commission", role, item.a.text
             item = item.nextSibling
+
+        deputy_documents(soup, deputy)
         deputy.save()
+
+def deputy_documents(soup, deputy):
+    urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
+
+    index = 0
+    print "working on main legislatif documents" #, LACHAMBRE_PREFIX + lame_url(urls[index])
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(urls[index]), '%s %s' % (deputy.full_name, "author main documents"))
+    deputy.documents_principal_author_url = urls[index]
+    deputy.documents_principal_author_list = []
+    for i in soupsoup('table')[3]('tr', valign="top"):
+        print "add main document", i.tr('td')[1].text
+        deputy.documents_principal_author_list.append(MainDocument.objects.create(url=i.a['href']))
 
 def deputies():
     clean()
