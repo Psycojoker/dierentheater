@@ -65,6 +65,9 @@ class Document(models.Model, Jsonify):
     type = models.CharField(max_length=1337, default=None, null=True)
     lachambre_id = models.IntegerField(unique=True)
 
+    class Meta:
+        ordering = ['lachambre_id']
+
 class Question(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
