@@ -116,6 +116,10 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
         getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(get_or_create(Document, _id="lachambre_id",
                                                                                                          lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
                                                                                                          url=i.a['href'],
+                                                                                                         titre=i.table('td')[1].text,
+                                                                                                         status=i.table('td')[5].text,
+                                                                                                         eurovoc_main_descriptor=i.table('td')[7].text,
+                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[9].text.split('|')),
                                                                                                          type=type))
 
 @hammer_time
