@@ -33,6 +33,7 @@ def read_or_dl(url, name, reset=False):
     return BeautifulSoup(text)
 
 def clean():
+    print "cleaning db"
     map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis))
 
 def deputies_list():
