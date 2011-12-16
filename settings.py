@@ -1,5 +1,9 @@
 # Django settings for dierentuin project.
 
+import os
+PROJECT_PATH = os.path.abspath(os.path.split(__file__)[0])
+PROJECT = os.path.split(PROJECT_PATH)[1]
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -99,9 +103,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'dierentuin.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    PROJECT_PATH + '/templates',
 )
 
 INSTALLED_APPS = (
