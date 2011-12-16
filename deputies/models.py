@@ -1,7 +1,12 @@
+from json import dumps
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField
 
-class Deputy(models.Model):
+class Jsonify(object):
+    def json(self):
+        return dumps(self.__class__.objects.filter(pk=self.pk).values()[0], indent=4)
+
+class Deputy(models.Model, Jsonify):
     full_name = models.CharField(max_length=1337, unique=True)
     emails = ListField()
     party = models.ForeignKey('Party')
@@ -41,7 +46,7 @@ class Deputy(models.Model):
         ordering = ['full_name']
 
 
-class Party(models.Model):
+class Party(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
     url = models.URLField()
 
@@ -49,19 +54,19 @@ class Party(models.Model):
         return self.name
 
 
-class CommissionMembership(models.Model):
+class CommissionMembership(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
     role = models.CharField(max_length=1337)
     url = models.URLField()
 
-class Document(models.Model):
+class Document(models.Model, Jsonify):
     url = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337, default=None, null=True)
 
-class Question(models.Model):
+class Question(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
 
-class Analysis(models.Model):
+class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
