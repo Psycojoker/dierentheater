@@ -5,7 +5,7 @@
 
 <ul>
 {% for deputy in object_list %}
-    <li>{{ deputy.full_name }}</li>
+    <li><a href="{% url deputies:deputy deputy.pk %}">{{ deputy.full_name }}</a></li>
 {% endfor %}
 </ul>
 
