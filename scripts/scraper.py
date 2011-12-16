@@ -119,17 +119,13 @@ def get_deputy_questions(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "questions_%s_url" % type, url)
     setattr(deputy, "questions_%s_list" % type, [])
-    try:
-        for i in soupsoup('table')[3]('tr', valign="top"):
-            print "add", type, i.tr('td')[1].text.strip()
-            getattr(deputy, "questions_%s_list" % type).append(get_or_create(Question,
-                                                                             _id="lachambre_id",
-                                                                             lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                                                             url=i.a['href'],
-                                                                             type=type))
-    except IndexError:
-        # Sonja Becq page often 404, dunno why
-        pass
+    for i in soupsoup('table')[3]('tr', valign="top"):
+        print "add", type, i.tr('td')[1].text.strip()
+        getattr(deputy, "questions_%s_list" % type).append(get_or_create(Question,
+                                                                         _id="lachambre_id",
+                                                                         lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                                                         url=i.a['href'],
+                                                                         type=type))
 
 @hammer_time
 def get_deputy_analysis(url, deputy, type, reset=False):
