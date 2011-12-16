@@ -8,6 +8,18 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
+def hammer_time(function):
+    "decorator to retry to download a page because La Chambre website sucks"
+    def wrap(*args, **kwargs):
+        reset = False
+        for i in xrange(4):
+            try:
+                return function(*args, reset=reset, **kwargs)
+            except (IndexError, AttributeError):
+                reset = True
+        print "WARNING, function keeps failling", function, args, kwargs
+    return wrap
+
 def lame_url(url):
     # convert super lame urls of lachambre.be into something uzable
     return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
@@ -57,48 +69,59 @@ def deputies_list():
         print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
 def each_deputies():
-    for deputy in Deputy.objects.all():
-        print "parsing", deputy.full_name, deputy.url
-        soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
-        deputy.language = soup.i.parent.text.split(":")[1]
-        deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
+    for index, deputy in enumerate(Deputy.objects.all()):
+        print index, deputy.full_name
+        parse_deputy(deputy)
 
-        # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
-        # look at the bottom of each deputies' page
-        membership = soup.find('td', rowspan="1")
-        item = membership.h4
-        role = None
-        while item.nextSibling:
-            if hasattr(item, 'tag'):
-                if item.name == 'h5':
-                    role = item.text[6:-1]
-                elif item.name == 'div':
-                    deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
-                    print "add commission", role, item.a.text
-            item = item.nextSibling
+@hammer_time
+def parse_deputy(deputy, reset=False):
+    soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
+    deputy.language = soup.i.parent.text.split(":")[1]
+    deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
 
-        deputy_documents(soup, deputy)
-        deputy.save()
+    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
+    # look at the bottom of each deputies' page
+    membership = soup.find('td', rowspan="1")
+    item = membership.h4
+    role = None
+    while item.nextSibling:
+        if hasattr(item, 'tag'):
+            if item.name == 'h5':
+                role = item.text[6:-1]
+            elif item.name == 'div':
+                deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
+                print "add commission", role, item.a.text
+        item = item.nextSibling
 
-def get_deputy_documents(url, deputy, role, type=None):
+    deputy_documents(soup, deputy)
+    deputy.save()
+
+@hammer_time
+def get_deputy_documents(url, deputy, role, type=None, reset=False):
     print "working on %s %sdocuments" % (role, type + " " if type else '') #, LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role))
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
     setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
     setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type if type else '', role, i.tr('td')[1].text
         getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(Document.objects.create(url=i.a['href'], type=type))
 
-def get_deputy_questions(url, deputy, type):
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type))
+@hammer_time
+def get_deputy_questions(url, deputy, type, reset=False):
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "questions_%s_url" % type, url)
     setattr(deputy, "questions_%s_list" % type, [])
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", type, i.tr('td')[1].text.strip()
-        getattr(deputy, "questions_%s_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
+    try:
+        for i in soupsoup('table')[3]('tr', valign="top"):
+            print "add", type, i.tr('td')[1].text.strip()
+            getattr(deputy, "questions_%s_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
+    except IndexError:
+        # Sonja Becq page often 404, dunno why
+        pass
 
-def get_deputy_analysis(url, deputy, type):
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type))
+@hammer_time
+def get_deputy_analysis(url, deputy, type, reset=False):
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "analysis_%s_url" % type, url)
     setattr(deputy, "analysis_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
