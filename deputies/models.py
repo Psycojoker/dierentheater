@@ -63,6 +63,9 @@ class CommissionMembership(models.Model, Jsonify):
 class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
 
+    class Meta:
+        ordering = ['lachambre_id']
+
 class Document(models.Model, Jsonify):
     url = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337, default=None, null=True)

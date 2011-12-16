@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Commissions</h2>
+<ul>
+{% for commission in object_list %}
+    <li><a href="{% url deputies:commission commission.id %}">{{ commission.lachambre_id }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
