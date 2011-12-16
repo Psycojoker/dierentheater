@@ -4,7 +4,7 @@ from os.path import exists
 from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -46,7 +46,7 @@ def read_or_dl(url, name, reset=False):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission))
 
 def deputies_list():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
@@ -90,12 +90,8 @@ def parse_deputy(deputy, reset=False):
                 role = item.text[6:-1]
             elif item.name == 'div':
                 print "linking deputy to commission", item.a.text
-                deputy.commissions.append(get_or_create(CommissionMembership,
-                                                        _id="lachambre_id",
-                                                        lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]),
-                                                        name=item.a.text,
-                                                        role=role,
-                                                        url=item.a['href']))
+                commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, name=item.a.text, role=role, url=item.a['href']))
         item = item.nextSibling
 
     deputy_documents(soup, deputy)

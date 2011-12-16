@@ -58,6 +58,9 @@ class CommissionMembership(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
     role = models.CharField(max_length=1337)
     url = models.URLField()
+    commission = models.ForeignKey('Commission')
+
+class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
 
 class Document(models.Model, Jsonify):
