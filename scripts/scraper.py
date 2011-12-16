@@ -109,7 +109,10 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
     setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type if type else '', role, i.tr('td')[1].text
-        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(Document.objects.create(url=i.a['href'], type=type))
+        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(get_or_create(Document, _id="lachambre_id",
+                                                                                                         lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
+                                                                                                         url=i.a['href'],
+                                                                                                         type=type))
 
 @hammer_time
 def get_deputy_questions(url, deputy, type, reset=False):
