@@ -78,6 +78,14 @@ def parse_deputy(deputy, reset=False):
     soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.language = soup.i.parent.text.split(":")[1]
     deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
+    if deputy.cv.encode("Utf-8").startswith("Députée"):
+        deputy.sex = "F"
+        print "F"
+    elif deputy.cv.encode("Utf-8").startswith("Député"):
+        deputy.sex = "M"
+        print "M"
+    else:
+        deputy.sex = None
 
     # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
     # look at the bottom of each deputies' page
