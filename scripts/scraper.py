@@ -23,8 +23,9 @@ def get_or_create(klass, _id=None, **kwargs):
         print "add new", klass.__name__, kwargs
         return klass.objects.create(**kwargs)
 
-def read_or_dl(url, name):
-    if exists('dump/%s' % name):
+def read_or_dl(url, name, reset=False):
+    print "parsing", url
+    if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name).read()
     else:
         text = urlopen(url).read()
