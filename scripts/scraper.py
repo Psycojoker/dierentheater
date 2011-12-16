@@ -122,7 +122,11 @@ def get_deputy_questions(url, deputy, type, reset=False):
     try:
         for i in soupsoup('table')[3]('tr', valign="top"):
             print "add", type, i.tr('td')[1].text.strip()
-            getattr(deputy, "questions_%s_list" % type).append(Question.objects.create(url=i.a['href'], type=type))
+            getattr(deputy, "questions_%s_list" % type).append(get_or_create(Question,
+                                                                             _id="lachambre_id",
+                                                                             lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                                                             url=i.a['href'],
+                                                                             type=type))
     except IndexError:
         # Sonja Becq page often 404, dunno why
         pass
