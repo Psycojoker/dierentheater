@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Analysiss</h2>
+<ul>
+{% for analysis in object_list %}
+    <li><a href="{% url deputies:analysis analysis.id %}">{{ analysis.lachambre_id }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

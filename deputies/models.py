@@ -80,3 +80,6 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
+    class Meta:
+        ordering = ['lachambre_id']
