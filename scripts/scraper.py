@@ -89,8 +89,13 @@ def parse_deputy(deputy, reset=False):
             if item.name == 'h5':
                 role = item.text[6:-1]
             elif item.name == 'div':
-                deputy.commissions.append(CommissionMembership.objects.create(name=item.a.text, role=role, url=item.a['href']))
-                print "add commission", role, item.a.text
+                print "linking deputy to commission", item.a.text
+                deputy.commissions.append(get_or_create(CommissionMembership,
+                                                        _id="lachambre_id",
+                                                        lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]),
+                                                        name=item.a.text,
+                                                        role=role,
+                                                        url=item.a['href']))
         item = item.nextSibling
 
     deputy_documents(soup, deputy)
