@@ -26,9 +26,22 @@ def remove_useless_informations(text):
             result.append(i)
     return "\n".join(result)
 
+def strip(text):
+    work = text.split("\n")
+    a = 0
+    while re.match("^ *$", work[a]):
+        a += 1
+
+    b = 0
+    while re.match("^ *$", work[b]):
+        b += 1
+
+    return "\n".join(text.split("\n")[a:-b])
+
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
+    text = strip(text)
     print text
 
 if __name__ == "__main__":
