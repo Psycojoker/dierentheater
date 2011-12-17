@@ -26,6 +26,8 @@ Now, install the dependacies (this can take a little bit of time):
 
     pip install -r requirements.txt
 
+# Usage
+
 To launch the scraping (this is *long*, do this in a screen):
 
     mkdir dump # only once
