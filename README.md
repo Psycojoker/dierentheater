@@ -14,6 +14,10 @@ You also need mongodb:
 
     sudo apt-get install mongodb
 
+And pdftotext:
+
+    sudo apt-get install xpdf-utils
+
 Once this is done create a virtualenv, for example:
 
     virtualenv --distribute --no-site-packages ve
