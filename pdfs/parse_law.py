@@ -38,11 +38,27 @@ def strip(text):
 
     return "\n".join(text.split("\n")[a:-b])
 
+def horizontal_split(text):
+    result = [[]]
+    blank_line = 0
+    for i in text.split("\n"):
+        if not re.match("^ *$", i):
+            result[-1].append(i)
+        else:
+            blank_line += 1
+            if blank_line == 3:
+                result.append([])
+                blank_line = 0
+    return filter(None, result)
+
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
     text = strip(text)
-    print text
+    text = horizontal_split(text)
+    for i in text:
+        print "-------------------------------------------------------------------------------------------------------------------------------"
+        print "\n".join(i)
 
 if __name__ == "__main__":
     parse("53K1961001.pdf")
