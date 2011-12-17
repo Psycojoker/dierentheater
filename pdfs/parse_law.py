@@ -20,6 +20,8 @@
 import os
 import re
 from json import dumps
+from json_diff import Comparator
+from StringIO import StringIO
 
 SEPARATOR = "-------------------------------------------------------------------------------------------------------------------------------"
 
@@ -200,7 +202,7 @@ def intelligent_parse(pdf_name):
         text.pop(0)
         store("articles", map(flaten_list, zip(*map(parse_two_columns_text, text))))
 
-    print dumps(document, indent=4)
+    return document
 
 def custom_parse(pdf_name):
     text = prepare_document(pdf_name)
@@ -234,4 +236,4 @@ def custom_parse(pdf_name):
 
 if __name__ == "__main__":
     #custom_parse("53K1961001.pdf")
-    intelligent_parse("53K1961001.pdf")
+    assert not Comparator(StringIO(dumps(intelligent_parse("53K1961001.pdf"))), open("testing", "r")).compare_dicts()
