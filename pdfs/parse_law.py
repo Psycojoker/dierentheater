@@ -137,7 +137,7 @@ def split_raw_paragraph(block):
 def parse_two_columns_text(text):
     return map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text)))
 
-def parse(pdf_name):
+def custom_parse(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
     text = strip(text)
@@ -172,4 +172,4 @@ def parse(pdf_name):
             print j
 
 if __name__ == "__main__":
-    parse("53K1961001.pdf")
+    custom_parse("53K1961001.pdf")
