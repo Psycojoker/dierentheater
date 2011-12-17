@@ -12,6 +12,8 @@ def remove_useless_informations(text):
     for i in text.split("\n")[1:]:
         if "DOC 53" in i:
             continue
+        if "\x0c" in i:
+            continue
         if re.match("^CHAMBRE .* ZITTINGSPERIODE$", i):
             continue
         if re.match("^ *\d\d\d\d *$", i):
