@@ -77,12 +77,12 @@ def split_horizontally(block):
 
 def rebuild_paragraphe(block):
     block = map(lambda x: x[:-1] if x[-1] == "-" else x, block)
-    return map(lambda x: x.strip(), block)
+    return " ".join(map(lambda x: x.strip(), block))
 
 def parse_abstract(abstract):
     # first line is useless
     abstract[0] = abstract[0].lower().strip()
-    return map(lambda x: x.capitalize() + ".", map(" ".join, map(rebuild_paragraphe, split_horizontally(abstract))))
+    return map(lambda x: x.capitalize() + ".", map(rebuild_paragraphe, split_horizontally(abstract)))
 
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
