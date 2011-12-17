@@ -3,6 +3,8 @@
 import os
 import re
 
+SEPARATOR = "-------------------------------------------------------------------------------------------------------------------------------"
+
 def pdf_to_text(pdf_name):
     os.system("pdftotext -layout %s" % pdf_name)
     return open(pdf_name.replace(".pdf", ".txt"), "r").read()
@@ -91,10 +93,17 @@ def parse(pdf_name):
     text = horizontal_split(text)
     text = remove_useless_blocks(text)
     for i in parse_abstract(text[0]):
-        print "-------------------------------------------------------------------------------------------------------------------------------"
+        print SEPARATOR
         print i
-    for i in text[1:]:
-        print "-------------------------------------------------------------------------------------------------------------------------------"
+    # text[1] is "RESUMER ..."
+    for i in map(rebuild_paragraphe, split_horizontally(text[2])):
+        print SEPARATOR
+        print i
+    # text[3] is party list
+    # text[4] is abbrevations
+    # text[5] is la chambre's address
+    for i in text[5:]:
+        print SEPARATOR
         print "\n".join(i)
 
 if __name__ == "__main__":
