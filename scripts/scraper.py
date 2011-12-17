@@ -139,15 +139,22 @@ def get_deputy_questions(url, deputy, type, reset=False):
                                                                departement=i.table('td')[3].text,
                                                                lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
                                                                deposition_date=re.sub("[^0-9/]", "", i.table('td')[7].contents[0]),
-                                                               eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[9].text.split('|')) if i.table('td')[8].text == u'Descripteurs Eurovoc :' else [],
-                                                               keywords=map(lambda x: x.strip(), i.table('td')[-1].text.split('|')) if len(i.table('td')) == 12 else [],
+                                                               eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[9].text.split('|')) if len(i.table('td')) >= 10 and i.table('td')[8].text == u'Descripteurs Eurovoc :' else [],
+                                                               keywords=map(lambda x: x.strip(), i.table('td')[-1].text.split('|')) if len(i.table('td')) >= 12 else [],
                                                                url=i.a['href'],
                                                                type=type))
             print deputy.questions_written_list
         else:
             getattr(deputy, "questions_%s_list" % type).append(get_or_create(Question,
                                                                              _id="lachambre_id",
+                                                                             title=i.table('td')[1].text,
+                                                                             reunion_type=i.table('td')[9].text,
+                                                                             reunion_date=i.table('td')[7].text,
+                                                                             session_id=i.table('td')[5].text,
+                                                                             pdf_url=i.table('td')[11].a["href"],
                                                                              lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                                                             eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[13].text.split('|')) if len(i.table('td')) >= 14 and i.table('td')[12].text == u'Descripteurs Eurovoc :' else [],
+                                                                             keywords=map(lambda x: x.strip(), i.table('td')[-1].text.split('|')) if len(i.table('td')) == 16 else [],
                                                                              url=i.a['href'],
                                                                              type=type))
 
