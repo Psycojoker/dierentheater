@@ -86,10 +86,10 @@ def remove_useless_blocks(text):
     return text
 
 def split_horizontally(block):
-    if not block:
-        return [], []
-
     left, right = [], []
+
+    if not block:
+        return left, right
 
     split_size = 2
 
@@ -213,8 +213,7 @@ def intelligent_parse(pdf_name):
         comments = []
         while "PROPOSITION DE LOI" not in text[0][0]:
             comments.append(text.pop(0))
-        #for i in comments:
-            #print i
+        comments.pop()
         store("comments", map(flaten_list, zip(*map(parse_two_columns_text, comments))))
 
     if "PROPOSITION DE LOI" in text[0][0]:
