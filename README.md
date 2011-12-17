@@ -55,6 +55,10 @@ To launch the dev server:
 
 - parse a law pdf to reconstruct structured informations
 
+# Public instance
+
+Not official-but-still-in-the-readme demo: http://dieren.vnurpa.ethylix.be
+
 # Licence
 
 agplv3+
