@@ -84,26 +84,31 @@ def remove_useless_blocks(text):
 def split_horizontally(block):
     left, right = [], []
 
-    # get the biggest withespace I can find in all sentences
-    split_size = 10
-    while False in map(lambda x: len(x) >= 2, map(lambda x: x.split(" "*split_size), filter(lambda x: len(x.split("  ")) >= 2, block))):
-        split_size -= 1
+    split_size = 2
 
-    # start to search at 1/4 index of the avg len of every sentences
-    split_index = (sum(map(lambda x: len(x), block)) / len(block)) / 4
-    for i in block:
+    searchable_area = filter(lambda x: len(filter(lambda x: x.strip(), x.split("   "))) == 2, block[:])
+    searchable_area = map(lambda x: x.decode("Utf-8"), searchable_area)
+    split_index = 7
+    good = False
+    while not good:
+        for i in searchable_area:
+            if i[split_index:split_index+2] != "  ":
+                split_index += 1
+                break
+        else:
+            print "good index found!", split_index
+            good = True
+        if split_index > max(map(lambda x: len(x), searchable_area)):
+            raise Exception
+
+    for i in map(lambda x: x.decode("Utf-8"), block):
         if len(filter(lambda x: x.strip(), i.split(" "*split_size))) == 2:
-            z = split_index
-            while i[z:z + split_size] != " "*split_size:
-                z += 1
-                if z == len(i):
-                    raise Exception
-            left.append(i[:z])
-            right.append(i[z+split_size:])
+            left.append(i[:split_index])
+            right.append(i[split_index+2:])
         else:
             left.append(i.rstrip())
 
-    return left, right
+    return map(lambda x: x.encode("Utf-8"), left), map(lambda x: x.encode("Utf-8"), right)
 
 def rebuild_paragraphe(block):
     # '-' are at the end of a line when a word is split in two
