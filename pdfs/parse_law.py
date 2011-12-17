@@ -147,13 +147,16 @@ def prepare_document(pdf_name):
     return text
 
 def intelligent_parse(pdf_name):
+    def store(key, data):
+        document["FR"][key] = data[0]
+        document["NL"][key] = data[1]
+
     text = prepare_document(pdf_name)
     document = {"FR": {}, "NL": {}}
 
     # abstract is always the first one
     abstract = parse_abstract(text[0])
-    document["FR"]["abstract"] = abstract[0]
-    document["NL"]["abstract"] = abstract[1]
+    store("abstract", abstract)
 
     # remove abstract
     text.pop(0)
