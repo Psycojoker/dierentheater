@@ -64,7 +64,7 @@ class Commission(models.Model, Jsonify):
         ordering = ['lachambre_id']
 
 class Document(models.Model, Jsonify):
-    titre = models.CharField(max_length=1337)
+    title = models.CharField(max_length=1337)
     url = models.CharField(max_length=1337)
     status = models.CharField(max_length=1337)
     eurovoc_main_descriptor = models.CharField(max_length=1337)
