@@ -51,12 +51,38 @@ def horizontal_split(text):
                 blank_line = 0
     return filter(None, result)
 
+def remove_useless_blocks(text):
+    # first one is "La Chambre blablabla"
+    # second one is the date, we have it on the website
+    # last one is the authors, also on the website
+    text = text[2:-1]
+    # author name, also on the website
+    text.pop(1)
+    return text
+
+def split_horizontally(block):
+    left, right = [], []
+    for i in block:
+        a, b = filter(lambda x: x.strip(), i.split("   "))
+        left.append(a)
+        right.append(b)
+    return left, right
+
+def parse_abstract(abstract):
+    # first line is useless
+    abstract[0] = abstract[0].lower().strip()
+    return map(lambda x: map(lambda y: y.strip(), x), split_horizontally(abstract))
+
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
     text = strip(text)
     text = horizontal_split(text)
-    for i in text:
+    text = remove_useless_blocks(text)
+    for i in parse_abstract(text[0]):
+        print "-------------------------------------------------------------------------------------------------------------------------------"
+        print " ".join(i)
+    for i in text[1:]:
         print "-------------------------------------------------------------------------------------------------------------------------------"
         print "\n".join(i)
 
