@@ -76,6 +76,11 @@ class Document(models.Model, Jsonify):
         ordering = ['lachambre_id']
 
 class Question(models.Model, Jsonify):
+    title = models.CharField(max_length=1337)
+    departement = models.CharField(max_length=1337)
+    eurovoc_descriptors = ListField()
+    deposition_date = models.CharField(max_length=1337)
+    keywords = ListField()
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
