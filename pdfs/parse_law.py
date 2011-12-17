@@ -154,19 +154,22 @@ def parse(pdf_name):
     # text[4] is abbrevations
     # text[5] is la chambre's address
     # text[6] is "DÉVELOPPEMENTS ..."
-    print SEPARATOR
-    for i in parse_two_columns_text(text[8]):
-        for j in i:
-            print SEPARATOR
-            print j
-    print SEPARATOR
-    for i in map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text[8]))):
-        for j in i:
-            print SEPARATOR
-            print j
-    for i in text[8:]:
+    for x in text[7:14]:
         print SEPARATOR
-        print "\n".join(i)
+        for i in parse_two_columns_text(x):
+            for j in i:
+                print SEPARATOR
+                print j
+    # text[15] is the authors
+    # text[16] is "PROPOSITION DE LOI ..."
+    for i in parse_two_columns_text(text[17]):
+        for j in i:
+            print SEPARATOR
+            print j
+    for i in parse_two_columns_text(text[18]):
+        for j in i:
+            print SEPARATOR
+            print j
 
 if __name__ == "__main__":
     parse("53K1961001.pdf")
