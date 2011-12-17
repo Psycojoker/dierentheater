@@ -207,7 +207,6 @@ def intelligent_parse(pdf_name):
         store("development", map(flaten_list, zip(*map(parse_two_columns_text, development))))
 
     if "COMMENTAIRE DES ARTICLES" in text[0][0]:
-        print "got comments on articles"
         text.pop(0)
 
         comments = []
