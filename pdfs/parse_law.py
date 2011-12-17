@@ -86,6 +86,9 @@ def remove_useless_blocks(text):
     return text
 
 def split_horizontally(block):
+    if not block:
+        return [], []
+
     left, right = [], []
 
     split_size = 2
