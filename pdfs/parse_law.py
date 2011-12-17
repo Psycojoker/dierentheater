@@ -81,7 +81,8 @@ def remove_useless_blocks(text):
     # last one is the authors, also on the website
     text = text[2:-1]
     # author name, also on the website
-    text.pop(1)
+    if "SAMENVATTING" not in text[1][0]:
+        text.pop(1)
     return text
 
 def split_horizontally(block):
