@@ -121,6 +121,23 @@ def parse_abstract(abstract):
     abstract[0] = abstract[0].lower().strip()
     return map(lambda x: x.capitalize() + ".", map(rebuild_paragraphe, split_horizontally(abstract)))
 
+def left_egualize(block):
+    while False not in map(lambda x: x[0] == " ", block):
+        block = map(lambda x: x[1:], block)
+    return block
+
+def split_raw_paragraph(block):
+    block = left_egualize(block)
+    result = [[]]
+    for i in block:
+        if i.startswith("  ") and result != [[]]:
+            result.append([])
+        result[-1].append(i)
+    return result
+
+def parse_two_columns_text(text):
+    return map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text)))
+
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
@@ -137,7 +154,18 @@ def parse(pdf_name):
     # text[3] is party list
     # text[4] is abbrevations
     # text[5] is la chambre's address
-    for i in text[5:]:
+    # text[6] is "DÉVELOPPEMENTS ..."
+    print SEPARATOR
+    for i in parse_two_columns_text(text[8]):
+        for j in i:
+            print SEPARATOR
+            print j
+    print SEPARATOR
+    for i in map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text[8]))):
+        for j in i:
+            print SEPARATOR
+            print j
+    for i in text[8:]:
         print SEPARATOR
         print "\n".join(i)
 
