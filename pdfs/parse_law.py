@@ -42,7 +42,7 @@ def horizontal_split(text):
     result = [[]]
     blank_line = 0
     for i in text.split("\n"):
-        if not re.match("^ *$", i):
+        if i.strip():
             result[-1].append(i)
         else:
             blank_line += 1
