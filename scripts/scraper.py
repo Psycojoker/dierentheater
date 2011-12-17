@@ -52,8 +52,9 @@ def clean():
     print "cleaning db"
     map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission))
 
-def deputies_list():
-    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
+@hammer_time
+def deputies_list(reset=False):
+    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
 
     for dep in soup('table')[4]('tr'):
         items = dep('td')
