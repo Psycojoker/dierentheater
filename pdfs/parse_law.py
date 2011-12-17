@@ -106,8 +106,10 @@ def split_horizontally(block):
     return left, right
 
 def rebuild_paragraphe(block):
-    block = map(lambda x: x[:-1] if x[-1] == "-" else x, block)
-    return " ".join(map(lambda x: x.strip(), block))
+    # '-' are at the end of a line when a word is split in two
+    # after " ".join we have some "- " resulting of the join of 2 parts of a word
+    # remove them
+    return " ".join(map(lambda x: x.strip(), block)).replace("- ", "")
 
 def parse_abstract(abstract):
     # first line is useless
