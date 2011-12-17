@@ -128,7 +128,11 @@ def parse_abstract(abstract):
     return map(lambda x: x.capitalize() + ".", map(rebuild_paragraphe, split_horizontally(abstract)))
 
 def left_egualize(block):
-    while False not in map(lambda x: x[0] == " ", block):
+    # if I got empty text just strip it
+    if not filter(lambda y: filter(lambda x: x.strip(), y), block):
+        return map(lambda x: x.strip(), block)
+
+    while False not in map(lambda x: x[0] == " ", filter(lambda x: x.strip(), block)):
         block = map(lambda x: x[1:], block)
     return block
 
