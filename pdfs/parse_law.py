@@ -161,6 +161,12 @@ def intelligent_parse(pdf_name):
     # remove abstract
     text.pop(0)
 
+    # if we have a summary
+    if "SAMENVATTING" in text[0][0]:
+        text.pop(0)
+        summary = map(rebuild_paragraphe, split_horizontally(text[0]))
+        store("summary", summary)
+
     for i in text:
         print [i]
 
