@@ -96,7 +96,6 @@ def split_horizontally(block):
                 split_index += 1
                 break
         else:
-            print "good index found!", split_index
             good = True
         if split_index > max(map(lambda x: len(x), searchable_area)):
             raise Exception
