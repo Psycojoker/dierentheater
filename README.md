@@ -1,6 +1,6 @@
 # Dieren Theater
 
-lachambre.be to json saucage machine.
+lachambre.be to json sausage machine.
 
 # Installation
 
@@ -22,7 +22,7 @@ Then activate it:
 
     source ve/bin/activate
 
-Now, install the dependacies (this can take a little bit of time):
+Now, install the dependencies (this can take a little bit of time):
 
     pip install -r requirements.txt
 
@@ -33,8 +33,8 @@ To launch the scraping (this is *long*, do this in a screen):
     mkdir dump # only once
     python manange.py runscript scrapers
 
-But aware that by default the parser store everypage he has encoutered in the
-folder dump but redownload it (for a maximum number of 2 more times) if it has
+But aware that by default the parser store every page he has encountered in the
+folder dump but re-download it (for a maximum number of 2 more times) if it has
 problems with it. If you want to reset the cache simply run:
 
     rm dump/*
