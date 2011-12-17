@@ -252,5 +252,8 @@ def custom_parse(pdf_name):
             print j
 
 if __name__ == "__main__":
-    #custom_parse("53K1961001.pdf")
-    assert not Comparator(StringIO(dumps(intelligent_parse("53K1961001.pdf"))), open("testing", "r")).compare_dicts()
+    for i in ("53K1961001", "53K1098001"):
+        try:
+            assert not Comparator(StringIO(dumps(intelligent_parse("%s.pdf" % i))), open("%s.json" % i, "r")).compare_dicts()
+        except AssertionError:
+            print Comparator(StringIO(dumps(intelligent_parse("%s.pdf" % i))), open("%s.json" % i, "r")).compare_dicts()
