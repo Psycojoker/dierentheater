@@ -19,6 +19,7 @@
 
 import os
 import re
+from json import dumps
 
 SEPARATOR = "-------------------------------------------------------------------------------------------------------------------------------"
 
@@ -145,6 +146,23 @@ def prepare_document(pdf_name):
     text = remove_useless_blocks(text)
     return text
 
+def intelligent_parse(pdf_name):
+    text = prepare_document(pdf_name)
+    document = {"FR": {}, "NL": {}}
+
+    # abstract is always the first one
+    abstract = parse_abstract(text[0])
+    document["FR"]["abstract"] = abstract[0]
+    document["NL"]["abstract"] = abstract[1]
+
+    # remove abstract
+    text.pop(0)
+
+    for i in text:
+        print [i]
+
+    print dumps(document, indent=4)
+
 def custom_parse(pdf_name):
     text = prepare_document(pdf_name)
     for i in parse_abstract(text[0]):
@@ -176,4 +194,5 @@ def custom_parse(pdf_name):
             print j
 
 if __name__ == "__main__":
-    custom_parse("53K1961001.pdf")
+    #custom_parse("53K1961001.pdf")
+    intelligent_parse("53K1961001.pdf")
