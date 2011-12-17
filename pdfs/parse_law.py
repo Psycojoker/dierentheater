@@ -146,6 +146,12 @@ def prepare_document(pdf_name):
     text = remove_useless_blocks(text)
     return text
 
+def is_party_list(block):
+    for i in block:
+        if ":" not in i:
+            return False
+    return True
+
 def intelligent_parse(pdf_name):
     def store(key, data):
         document["FR"][key] = data[0]
@@ -166,6 +172,11 @@ def intelligent_parse(pdf_name):
         text.pop(0)
         summary = map(rebuild_paragraphe, split_horizontally(text[0]))
         store("summary", summary)
+        text.pop(0)
+
+    if is_party_list(text[0]):
+        # if it's the party list, we will have the abbreviations and address also
+        text = text[3:]
 
     for i in text:
         print [i]
