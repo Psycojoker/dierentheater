@@ -143,7 +143,6 @@ def get_deputy_questions(url, deputy, type, reset=False):
                                                                keywords=map(lambda x: x.strip(), i.table('td')[-1].text.split('|')) if len(i.table('td')) >= 12 else [],
                                                                url=i.a['href'],
                                                                type=type))
-            print deputy.questions_written_list
         else:
             getattr(deputy, "questions_%s_list" % type).append(get_or_create(Question,
                                                                              _id="lachambre_id",
