@@ -22,6 +22,8 @@ def remove_useless_informations(text):
             continue
         if "Centrale drukkerij – Deze publicatie wordt uitsluitend gedrukt op FSC gecertiﬁceerd papier" in i:
             continue
+        if "Publications ofﬁcielles éditées par la Chambre des représentants" in i:
+            continue
         else:
             result.append(i)
     return "\n".join(result)
