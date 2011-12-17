@@ -152,6 +152,13 @@ def is_party_list(block):
             return False
     return True
 
+def flaten_list(a_list):
+    flat = []
+    for i in a_list:
+        for j in i:
+            flat.append(j)
+    return flat
+
 def intelligent_parse(pdf_name):
     def store(key, data):
         document["FR"][key] = data[0]
@@ -176,10 +183,22 @@ def intelligent_parse(pdf_name):
 
     if is_party_list(text[0]):
         # if it's the party list, we will have the abbreviations and address also
+        # and we don't care about those
         text = text[3:]
 
-    for i in text:
-        print [i]
+    if "TOELICHTING" in text[0][0]:
+        text.pop(0)
+        development = []
+        while "PROPOSITION DE LOI" not in text[0][0]:
+            development.append(text.pop(0))
+
+        # remove author signature
+        development.pop()
+        store("development", map(flaten_list, zip(*map(parse_two_columns_text, development))))
+
+    if "PROPOSITION DE LOI" in text[0][0]:
+        text.pop(0)
+        store("articles", map(flaten_list, zip(*map(parse_two_columns_text, text))))
 
     print dumps(document, indent=4)
 
