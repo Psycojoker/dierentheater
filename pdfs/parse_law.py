@@ -83,15 +83,26 @@ def remove_useless_blocks(text):
 
 def split_horizontally(block):
     left, right = [], []
+
+    # get the biggest withespace I can find in all sentences
+    split_size = 10
+    while False in map(lambda x: len(x) >= 2, map(lambda x: x.split(" "*split_size), filter(lambda x: len(x.split("  ")) >= 2, block))):
+        split_size -= 1
+
+    # start to search at 1/4 index of the avg len of every sentences
+    split_index = (sum(map(lambda x: len(x), block)) / len(block)) / 4
     for i in block:
-        if len(filter(lambda x: x.strip(), i.split("   "))) == 2:
-            a, b = filter(lambda x: x.strip(), i.split("   "))
-            left.append(a)
-            right.append(b)
+        if len(filter(lambda x: x.strip(), i.split(" "*split_size))) == 2:
+            z = split_index
+            while i[z:z + split_size] != " "*split_size:
+                z += 1
+                if z == len(i):
+                    raise Exception
+            left.append(i[:z])
+            right.append(i[z+split_size:])
         else:
-            # okay, here I assume that french will always be longer than nl,
-            # not sure if it's the best idea ever
-            left.append(i.strip())
+            left.append(i.rstrip())
+
     return left, right
 
 def rebuild_paragraphe(block):
