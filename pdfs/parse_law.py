@@ -137,12 +137,16 @@ def split_raw_paragraph(block):
 def parse_two_columns_text(text):
     return map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text)))
 
-def custom_parse(pdf_name):
+def prepare_document(pdf_name):
     text = pdf_to_text(pdf_name)
     text = remove_useless_informations(text)
     text = strip(text)
     text = horizontal_split(text)
     text = remove_useless_blocks(text)
+    return text
+
+def custom_parse(pdf_name):
+    text = prepare_document(pdf_name)
     for i in parse_abstract(text[0]):
         print SEPARATOR
         print i
