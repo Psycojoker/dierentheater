@@ -199,12 +199,23 @@ def intelligent_parse(pdf_name):
     if "TOELICHTING" in text[0][0]:
         text.pop(0)
         development = []
-        while "PROPOSITION DE LOI" not in text[0][0]:
+        while "PROPOSITION DE LOI" not in text[0][0] and "COMMENTAIRE DES ARTICLES" not in text[0][0]:
             development.append(text.pop(0))
 
         # remove author signature
         development.pop()
         store("development", map(flaten_list, zip(*map(parse_two_columns_text, development))))
+
+    if "COMMENTAIRE DES ARTICLES" in text[0][0]:
+        print "got comments on articles"
+        text.pop(0)
+
+        comments = []
+        while "PROPOSITION DE LOI" not in text[0][0]:
+            comments.append(text.pop(0))
+        #for i in comments:
+            #print i
+        store("comments", map(flaten_list, zip(*map(parse_two_columns_text, comments))))
 
     if "PROPOSITION DE LOI" in text[0][0]:
         text.pop(0)
