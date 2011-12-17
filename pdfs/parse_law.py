@@ -65,9 +65,14 @@ def remove_useless_blocks(text):
 def split_horizontally(block):
     left, right = [], []
     for i in block:
-        a, b = filter(lambda x: x.strip(), i.split("   "))
-        left.append(a)
-        right.append(b)
+        if len(filter(lambda x: x.strip(), i.split("   "))) == 2:
+            a, b = filter(lambda x: x.strip(), i.split("   "))
+            left.append(a)
+            right.append(b)
+        else:
+            # okay, here I assume that french will always be longer than nl,
+            # not sure if it's the best idea ever
+            left.append(i.strip())
     return left, right
 
 def rebuild_paragraphe(block):
