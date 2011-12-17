@@ -42,7 +42,10 @@ def read_or_dl(url, name, reset=False):
     else:
         text = urlopen(url).read()
         open('dump/%s' % name, "w").write(text)
-    return BeautifulSoup(text)
+    soup = BeautifulSoup(text)
+    if soup.title.text == "404 Not Found":
+        raise IndexError
+    return soup
 
 def clean():
     print "cleaning db"
