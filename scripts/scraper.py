@@ -15,7 +15,8 @@ def hammer_time(function):
         for i in xrange(4):
             try:
                 return function(*args, reset=reset, **kwargs)
-            except (IndexError, AttributeError, TypeError):
+            except (IndexError, AttributeError, TypeError), e:
+                print e
                 reset = True
         print "WARNING, function keeps failling", function, args, kwargs
     return wrap
