@@ -68,10 +68,14 @@ def split_horizontally(block):
         right.append(b)
     return left, right
 
+def rebuild_paragraphe(block):
+    block = map(lambda x: x[:-1] if x[-1] == "-" else x, block)
+    return map(lambda x: x.strip(), block)
+
 def parse_abstract(abstract):
     # first line is useless
     abstract[0] = abstract[0].lower().strip()
-    return map(lambda x: map(lambda y: y.strip(), x), split_horizontally(abstract))
+    return map(lambda x: x.capitalize() + ".", map(" ".join, map(rebuild_paragraphe, split_horizontally(abstract))))
 
 def parse(pdf_name):
     text = pdf_to_text(pdf_name)
@@ -81,7 +85,7 @@ def parse(pdf_name):
     text = remove_useless_blocks(text)
     for i in parse_abstract(text[0]):
         print "-------------------------------------------------------------------------------------------------------------------------------"
-        print " ".join(i)
+        print i
     for i in text[1:]:
         print "-------------------------------------------------------------------------------------------------------------------------------"
         print "\n".join(i)
