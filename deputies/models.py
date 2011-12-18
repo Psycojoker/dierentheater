@@ -101,6 +101,7 @@ class Question(models.Model, Jsonify):
     session_id = models.CharField(max_length=1337)
     eurovoc_descriptors = ListField()
     deposition_date = models.CharField(max_length=1337)
+    delay_date = models.CharField(max_length=1337, null=True)
     keywords = ListField()
     pdf_url = models.URLField()
     url = models.URLField()

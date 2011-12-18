@@ -168,6 +168,7 @@ def get_deputy_questions(url, deputy, type, reset=False):
                                                                departement=dico[u"Département"],
                                                                lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
                                                                deposition_date=dico[u"Date de dépôt"],
+                                                               delay_date=dico.get(u"Date de délai"),
                                                                eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
                                                                keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
                                                                url=i.a['href'],
