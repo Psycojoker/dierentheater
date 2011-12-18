@@ -110,6 +110,8 @@ class Question(models.Model, Jsonify):
     lachambre_id = models.CharField(max_length=1337)
 
 class Analysis(models.Model, Jsonify):
+    title = models.CharField(max_length=1337)
+    descriptor = models.CharField(max_length=1337)
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)

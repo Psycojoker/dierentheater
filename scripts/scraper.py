@@ -203,11 +203,16 @@ def get_deputy_analysis(url, deputy, type, reset=False):
     setattr(deputy, "analysis_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type, i.tr('td')[1].text.strip()
-        getattr(deputy, "analysis_%s_list" % type).append(get_or_create(Analysis,
-                                                                        _id="lachambre_id",
-                                                                        lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                                                        url=i.a['href'],
-                                                                        type=type))
+        dico = table2dic(i.table('td'))
+        print dico
+        getattr(deputy, "analysis_%s_list" % type).\
+                append(get_or_create(Analysis,
+                                     _id="lachambre_id",
+                                     lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                     title=dico["Titre"],
+                                     descripteurs=dico["Descripteurs"],
+                                     url=i.a['href'],
+                                     type=type))
 
 def deputy_documents(soup, deputy):
     # here we are in the grey black box
