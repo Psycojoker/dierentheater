@@ -1,11 +1,7 @@
 Parsing:
 
 Commissions:
-- get commissions id and use get_or_create to avoid duplications
 - parse eatch commission page to get the number of seats for each party
-
-Deputies data:
-- build first name and last name using the diff from the listing and its personnal page
 
 Documents:
 - parse each individual pages of every documents
