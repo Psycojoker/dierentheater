@@ -261,4 +261,8 @@ if __name__ == "__main__":
         try:
             assert not Comparator(StringIO(dumps(intelligent_parse("%s.pdf" % i))), open("%s.json" % i, "r")).compare_dicts()
         except AssertionError:
-            print Comparator(StringIO(dumps(intelligent_parse("%s.pdf" % i))), open("%s.json" % i, "r")).compare_dicts()
+            print dumps(Comparator(StringIO(dumps(intelligent_parse("%s.pdf" % i))), open("%s.json" % i, "r")).compare_dicts(), indent=4)
+            print dumps(Comparator(open("%s.json" % i, "r"), StringIO(dumps(intelligent_parse("%s.pdf" % i)))).compare_dicts(), indent=4)
+            raise
+
+    print dumps(intelligent_parse("53K1595001.pdf"), indent=4)
