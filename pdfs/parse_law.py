@@ -112,7 +112,12 @@ def split_horizontally(block):
             left.append(i[:split_index])
             right.append(i[split_index+2:])
         else:
-            left.append(i.rstrip())
+            left_spaces = len(i) - len(i.lstrip())
+
+            if left_spaces > 10:
+                right.append(i.rstrip())
+            else:
+                left.append(i.rstrip())
 
     return map(lambda x: x.encode("Utf-8"), left), map(lambda x: x.encode("Utf-8"), right)
 
