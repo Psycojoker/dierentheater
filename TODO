@@ -5,6 +5,4 @@ Commissions:
 - parse eatch commission page to get the number of seats for each party
 
 Deputies data:
-- for each dossiers get's it's id and avoid duplications
-- same for every other documents
 - build first name and last name using the diff from the listing and its personnal page
