@@ -97,7 +97,7 @@ def deputies_list(reset=False):
         print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
 def each_deputies():
-    for index, deputy in enumerate(Deputy.objects.all()):
+    for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
         parse_deputy(deputy)
 
