@@ -102,10 +102,8 @@ def parse_deputy(deputy, reset=False):
     deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
     if deputy.cv.encode("Utf-8").startswith("Députée"):
         deputy.sex = "F"
-        print "F"
     elif deputy.cv.encode("Utf-8").startswith("Député"):
         deputy.sex = "M"
-        print "M"
     else:
         deputy.sex = None
 
