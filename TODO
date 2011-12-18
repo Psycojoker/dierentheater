@@ -6,3 +6,8 @@ Commissions:
 
 Deputies data:
 - build first name and last name using the diff from the listing and its personnal page
+
+Documents:
+- parse each individual pages of every documents
+- have a script to download every document
+- try to parse every law texts
