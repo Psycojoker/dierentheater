@@ -212,7 +212,7 @@ def intelligent_parse(pdf_name):
         store("development", map(flaten_list, zip(*map(parse_two_columns_text, development))))
 
     if "COMMENTAIRE DES ARTICLES" in text[0][0]:
-        text.pop(0)
+        text[0].pop(0)
 
         comments = []
         while "PROPOSITION DE LOI" not in text[0][0]:
@@ -221,7 +221,7 @@ def intelligent_parse(pdf_name):
         store("comments", map(flaten_list, zip(*map(parse_two_columns_text, comments))))
 
     if "PROPOSITION DE LOI" in text[0][0]:
-        text.pop(0)
+        text[0].pop(0)
         store("articles", map(flaten_list, zip(*map(parse_two_columns_text, text))))
 
     return document
