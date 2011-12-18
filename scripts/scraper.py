@@ -154,7 +154,7 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
 
 #@hammer_time
 def get_deputy_written_questions(url, deputy, reset=False):
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
+    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
     deputy.questions_written_url = url
     deputy.questions_written_list = []
     for i in soupsoup('table')[3]('tr', valign="top"):
