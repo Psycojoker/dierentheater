@@ -239,7 +239,7 @@ def get_deputy_analysis(url, deputy, type, reset=False):
                                      _id="lachambre_id",
                                      lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
                                      title=dico["Titre"],
-                                     descripteurs=dico["Descripteurs"],
+                                     descriptor=dico["Descripteurs"],
                                      url=i.a['href'],
                                      type=type))
 
