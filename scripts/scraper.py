@@ -81,7 +81,7 @@ def deputies_list(reset=False):
 
     for dep in soup('table')[4]('tr'):
         items = dep('td')
-        full_name = re.sub('  +', ' ', items[0].a.text)
+        full_name = re.sub('  +', ' ', items[0].a.text).strip()
         url = items[0].a['href']
         party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         email = items[2].a.text
@@ -112,6 +112,35 @@ def parse_deputy(deputy, reset=False):
         deputy.sex = "M"
     else:
         deputy.sex = None
+
+    # stupid special case
+    if deputy.full_name == "Fernandez Fernandez Julie":
+        deputy.first_name = "Julie"
+        deputy.last_name = "Fernandez Fernandez"
+    elif deputy.full_name == "Dedecker Jean Marie":
+        deputy.first_name = "Jean Marie"
+        deputy.last_name = "Dedecker"
+    # here we guess the first and last name, for that we compare
+    # deputy.full_name that is in the form of "de Donnea
+    # François-Xavier" and the name of the deputy page which is in the
+    # form of "François-Xavier de Donnea"
+    elif len(deputy.full_name.split(" ")) > 2:
+        it = 0
+        while it < len(deputy.full_name.split(" ")):
+            if soup.h2.text.split(" ")[it] != deputy.full_name.split(" ")[-(it + 1)]:
+                break
+            it += 1
+            print it, soup.h2.text.split(" ")[it], deputy.full_name.split(" ")[-(it + 1)]
+        if not it:
+            raise Exception
+        deputy.first_name = " ".join(soup.h2.text.split(" ")[:it]).strip()
+        deputy.last_name = " ".join(soup.h2.text.split(" ")[it:]).strip()
+        print [deputy.first_name], [deputy.last_name]
+    else:
+        # if there is only 2 words just split this in 2
+        deputy.first_name = deputy.full_name.split(" ")[1].strip()
+        deputy.last_name = deputy.full_name.split(" ")[0].strip()
+        print [deputy.first_name], [deputy.last_name]
 
     # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
     # look at the bottom of each deputies' page

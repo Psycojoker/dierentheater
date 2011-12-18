@@ -24,6 +24,8 @@ class Jsonify(object):
 
 class Deputy(models.Model, Jsonify):
     full_name = models.CharField(max_length=1337, unique=True)
+    first_name = models.CharField(max_length=1337)
+    last_name = models.CharField(max_length=1337)
     sex = models.CharField(max_length=1337, null=True)
     emails = ListField()
     party = models.ForeignKey('Party')
