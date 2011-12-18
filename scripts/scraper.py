@@ -104,7 +104,7 @@ def each_deputies():
 @hammer_time
 def parse_deputy(deputy, reset=False):
     soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
-    deputy.language = soup.i.parent.text.split(":")[1]
+    deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
     deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
     if deputy.cv.encode("Utf-8").startswith("Députée"):
         deputy.sex = "F"
