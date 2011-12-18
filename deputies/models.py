@@ -82,8 +82,8 @@ class Commission(models.Model, Jsonify):
 class Document(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     url = models.CharField(max_length=1337)
-    status = models.CharField(max_length=1337)
-    eurovoc_main_descriptor = models.CharField(max_length=1337)
+    status = models.CharField(max_length=1337, null=True)
+    eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
     eurovoc_descriptors = ListField()
     type = models.CharField(max_length=1337, default=None, null=True)
     lachambre_id = models.IntegerField(unique=True)
