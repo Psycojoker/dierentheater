@@ -159,15 +159,17 @@ def get_deputy_questions(url, deputy, type, reset=False):
     setattr(deputy, "questions_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type, i.tr('td')[1].text.strip()
+        dico = table2dic(i.table('td'))
+        print dico
         if type == "written":
             deputy.questions_written_list.append(get_or_create(Question,
                                                                _id="lachambre_id",
-                                                               title=i.table('td')[5].text,
-                                                               departement=i.table('td')[3].text,
+                                                               title=dico["Titre"],
+                                                               departement=dico[u"Département"],
                                                                lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                                               deposition_date=re.sub("[^0-9/]", "", i.table('td')[7].contents[0]),
-                                                               eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[9].text.split('|')) if len(i.table('td')) >= 10 and i.table('td')[8].text == u'Descripteurs Eurovoc :' else [],
-                                                               keywords=map(lambda x: x.strip(), i.table('td')[-1].text.split('|')) if len(i.table('td')) >= 12 else [],
+                                                               deposition_date=dico[u"Date de dépôt"],
+                                                               eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
+                                                               keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
                                                                url=i.a['href'],
                                                                type=type))
         else:
