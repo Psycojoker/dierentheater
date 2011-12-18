@@ -76,9 +76,6 @@ class CommissionMembership(models.Model, Jsonify):
 class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
 
-    class Meta:
-        ordering = ['lachambre_id']
-
 class Document(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     url = models.CharField(max_length=1337)
@@ -89,9 +86,6 @@ class Document(models.Model, Jsonify):
     eurovoc_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
-
-    class Meta:
-        ordering = ['lachambre_id']
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
@@ -108,13 +102,7 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
-    class Meta:
-        ordering = ['lachambre_id']
-
 class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
-
-    class Meta:
-        ordering = ['lachambre_id']
