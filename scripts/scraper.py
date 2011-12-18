@@ -148,7 +148,8 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
                                                                                                          status_chambre=dico.get("Chambre FR :"),
                                                                                                          status_senat=dico.get("Sénat FR :"),
                                                                                                          eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
-                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|'))))
+                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
+                                                                                                         keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
 @hammer_time
 def get_deputy_questions(url, deputy, type, reset=False):
