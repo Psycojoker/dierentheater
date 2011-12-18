@@ -65,6 +65,12 @@ def read_or_dl(url, name, reset=False):
         raise IndexError
     return soup
 
+def table2dic(table):
+    dico = {}
+    for x, y in zip(table[::2], table[1::2]):
+        dico[x.text] = y.text if y.a is None else y.a
+    return dico
+
 def clean():
     print "cleaning db"
     map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission))
@@ -133,13 +139,15 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
     setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
     for i in soupsoup('table')[3]('tr', valign="top"):
         print "add", type if type else '', role, i.tr('td')[1].text
+        dico = table2dic(i.table('td'))
+        print dico
         getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(get_or_create(Document, _id="lachambre_id",
                                                                                                          lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
                                                                                                          url=i.a['href'],
-                                                                                                         title=i.table('td')[1].text,
-                                                                                                         status=i.table('td')[5].text,
-                                                                                                         eurovoc_main_descriptor=i.table('td')[7].text,
-                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), i.table('td')[9].text.split('|')),
+                                                                                                         title=dico["Titre :"],
+                                                                                                         status=dico.get("Chambre FR :"),
+                                                                                                         eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
+                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
                                                                                                          type=type))
 
 @hammer_time
