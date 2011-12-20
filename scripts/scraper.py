@@ -265,5 +265,11 @@ def deputies():
     deputies_list()
     each_deputies()
 
+def laws():
+    for law_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all laws")('div', **{'class': re.compile("linklist_[01]")}):
+        for soup in read_or_dl(LACHAMBRE_PREFIX + law_page.a["href"], "law %s" % law_page.a.text)('table')[4]('tr', valign="top"):
+            get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
+
 def run():
     deputies()
+    laws()
