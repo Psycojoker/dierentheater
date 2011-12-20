@@ -181,7 +181,7 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
                                                                                                          eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
                                                                                                          keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
-#@hammer_time
+@hammer_time
 def get_deputy_written_questions(url, deputy, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
     deputy.questions_written_url = url
@@ -202,7 +202,7 @@ def get_deputy_written_questions(url, deputy, reset=False):
                                      keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
                                      url=i.a['href']))
 
-#@hammer_time
+@hammer_time
 def get_deputy_questions(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "questions_%s_url" % type, url)
