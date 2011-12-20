@@ -89,6 +89,10 @@ class Document(models.Model, Jsonify):
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
 
+    def __unicode__(self):
+        return "%s - %s" % (self.lachambre_id, self.title)
+
+
 class WrittenQuestion(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     departement = models.CharField(max_length=1337, )
