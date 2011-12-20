@@ -17,7 +17,7 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic import ListView, DetailView
 
-from models import Deputy, Commission, Document, Question, Analysis
+from models import Deputy, Commission, Document, Question, Analysis, WrittenQuestion
 
 urlpatterns = patterns('',
     url(r'^deputy/$', ListView.as_view(model=Deputy), name='deputy-list'),
@@ -26,6 +26,8 @@ urlpatterns = patterns('',
     url(r'^commission/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Commission), name='commission'),
     url(r'^document/$', ListView.as_view(model=Document), name='document-list'),
     url(r'^document/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Document), name='document'),
+    url(r'^written-question/$', ListView.as_view(model=WrittenQuestion), name='written-question-list'),
+    url(r'^written-question/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=WrittenQuestion), name='written-question'),
     url(r'^question/$', ListView.as_view(model=Question), name='question-list'),
     url(r'^question/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Question), name='question'),
     url(r'^analysis/$', ListView.as_view(model=Analysis), name='analysis-list'),

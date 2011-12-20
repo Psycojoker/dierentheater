@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Written Questions</h2>
+<ul>
+{% for question in object_list %}
+    <li><a href="{% url deputies:written-question question.id %}">{{ question.lachambre_id }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
