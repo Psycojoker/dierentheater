@@ -261,7 +261,6 @@ def deputy_documents(soup, deputy):
     get_deputy_analysis(urls[12], deputy, "divers")
 
 def deputies():
-    clean()
     deputies_list()
     each_deputies()
 
@@ -271,5 +270,6 @@ def laws():
             get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
 
 def run():
+    clean()
     deputies()
     laws()
