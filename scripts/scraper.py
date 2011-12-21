@@ -170,16 +170,17 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
         print "add", type if type else '', role, i.tr('td')[1].text
         dico = table2dic(i.table('td'))
         print dico
-        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).append(get_or_create(Document, _id="lachambre_id",
-                                                                                                         lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
-                                                                                                         url=i.a['href'],
-                                                                                                         title=dico["Titre :"],
-                                                                                                         status_chambre=dico.get("Chambre FR :"),
-                                                                                                         status_senat=dico.get("Sénat FR :"),
-                                                                                                         date=dico.get("Date :"),
-                                                                                                         eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
-                                                                                                         eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
-                                                                                                         keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
+        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
+                append(get_or_create(Document, _id="lachambre_id",
+                                     lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
+                                     url=i.a['href'],
+                                     title=dico["Titre :"],
+                                     status_chambre=dico.get("Chambre FR :"),
+                                     status_senat=dico.get("Sénat FR :"),
+                                     date=dico.get("Date :"),
+                                     eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
+                                     eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
+                                     keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
 @hammer_time
 def get_deputy_written_questions(url, deputy, reset=False):
