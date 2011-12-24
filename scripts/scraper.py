@@ -330,7 +330,13 @@ def laws():
         soup = lxml_read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
         table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
         dico = document_to_dico(list(table.table('tr', recursive=False)))
+        handle_document(law, dico)
         law.save()
+
+def handle_document(law, dico):
+    if dico.get("Etat d'avancement"):
+        law.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
+        law.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
 def run():
     clean()
