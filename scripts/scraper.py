@@ -337,6 +337,8 @@ def handle_document(document, dico):
         document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
         document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
+    document.date = dico[u"Date de dépôt"].text
+
 def run():
     clean()
     deputies()
