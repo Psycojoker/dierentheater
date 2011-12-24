@@ -70,7 +70,6 @@ def read_or_dl(url, name, reset=False):
     return soup
 
 def lxml_read_or_dl(url, name, reset=False):
-    print "parsing", url
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name)
     else:
@@ -314,7 +313,6 @@ def document_to_dico(table):
             else:
                 if dico.get(key):
                     raise Exception("'%s' is already use as a key for '%s'" % (key, dico[key]))
-                print i('td')
                 dico[key] = i('td')[1]
     return dico
 
