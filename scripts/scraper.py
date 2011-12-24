@@ -318,28 +318,28 @@ def document_to_dico(table):
                 dico[key] = i('td')[1]
     return dico
 
-def laws():
-    for law_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all laws")('div', **{'class': re.compile("linklist_[01]")}):
-        for soup in read_or_dl(LACHAMBRE_PREFIX + law_page.a["href"], "law %s" % law_page.a.text)('table')[4]('tr', valign="top"):
+def documents():
+    for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
+        for soup in read_or_dl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)('table')[4]('tr', valign="top"):
             get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
 
-    for law in list(Document.objects.all()):
-        soup = read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
-        law.full_details_url = soup('table')[4].a["href"]
-        law.title = soup.h4.text
+    for document in list(Document.objects.all()):
+        soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+        document.full_details_url = soup('table')[4].a["href"]
+        document.title = soup.h4.text
         # fucking stupid hack because BeautifulSoup fails to parse correctly the html
-        soup = lxml_read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
+        soup = lxml_read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
         table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
         dico = document_to_dico(list(table.table('tr', recursive=False)))
-        handle_document(law, dico)
-        law.save()
+        handle_document(document, dico)
+        document.save()
 
-def handle_document(law, dico):
+def handle_document(document, dico):
     if dico.get("Etat d'avancement"):
-        law.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
-        law.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
+        document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
+        document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
 def run():
     clean()
     deputies()
-    laws()
+    documents()
