@@ -27,7 +27,7 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
 def clean_text(text):
-    return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "").strip()
+    return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "").replace("&#233;", u"é").replace("&#244;", u"ô").strip()
 
 def hammer_time(function):
     "decorator to retry to download a page because La Chambre website sucks"
@@ -295,7 +295,7 @@ def document_to_dico(table):
         elif i.td.img:
             key = clean_text(i.td.text)
             # we can have a list on joined documents
-            if str(key) == 'Document(s) joint(s)/li&#233;(s)':
+            if unicode(key) == u'Document(s) joint(s)/lié(s)':
                 if not dico[sub_section].get(key):
                     dico[sub_section][key] = []
                 dico[sub_section][key].append(i('td')[1])
@@ -306,7 +306,7 @@ def document_to_dico(table):
         else:
             key = clean_text(i.td.text)
             # we can get severals Moniter erratum
-            if str(key) == 'Moniteur erratum':
+            if unicode(key) == 'Moniteur erratum':
                 if not dico.get(key):
                     dico[key] = []
                 dico[key].append(i('td')[1])
