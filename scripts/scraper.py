@@ -338,6 +338,8 @@ def handle_document(document, dico):
         document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
     document.date = dico[u"Date de dépôt"].text
+    if dico.get("Descripteur Eurovoc principal"):
+        document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
 
 def run():
     clean()
