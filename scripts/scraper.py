@@ -26,6 +26,9 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
+def clean_text(text):
+    return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "").strip()
+
 def hammer_time(function):
     "decorator to retry to download a page because La Chambre website sucks"
     def wrap(*args, **kwargs):
@@ -277,8 +280,6 @@ def deputies():
     each_deputies()
 
 def document_to_dico(table):
-    def clean(text):
-        return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "")
     dico = {}
     sub_section = None
     for i in table:
@@ -287,13 +288,13 @@ def document_to_dico(table):
         if i.td.text in ("&#13;", "&nbsp;", "&#160;"):
             continue
         if i.td.b:
-            sub_section = clean(i.td.b.text)
+            sub_section = clean_text(i.td.b.text)
             if dico.get(sub_section):
                 raise Exception("'%s' is already use as a key for '%s'" % (sub_section, dico[sub_section]))
             dico[sub_section] = {}
             dico[sub_section]["head"] = i('td')[1]
         elif i.td.img:
-            key = clean(i.td.text)
+            key = clean_text(i.td.text)
             # we can have a list on joined documents
             if str(key) == 'Document(s) joint(s)/li&#233;(s)':
                 if not dico[sub_section].get(key):
@@ -304,7 +305,7 @@ def document_to_dico(table):
                     raise Exception("'%s' is already use as a key in the sub_section '%s' for '%s'" % (key, sub_section, dico[sub_section][key]))
                 dico[sub_section][key] = i('td')[1]
         else:
-            key = clean(i.td.text)
+            key = clean_text(i.td.text)
             # we can get severals Moniter erratum
             if str(key) == 'Moniteur erratum':
                 if not dico.get(key):
