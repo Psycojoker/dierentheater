@@ -270,6 +270,11 @@ def laws():
         for soup in read_or_dl(LACHAMBRE_PREFIX + law_page.a["href"], "law %s" % law_page.a.text)('table')[4]('tr', valign="top"):
             get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
 
+    for law in list(Document.objects.all()):
+        soup = read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
+        law.full_details_url = soup('table')[4].a["href"]
+        law.save()
+
 def run():
     clean()
     deputies()
