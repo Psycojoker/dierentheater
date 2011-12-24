@@ -4,3 +4,4 @@ git+https://github.com/django-nonrel/mongodb-engine
 django_extensions
 beautifulsoup
 json_diff
+lxml

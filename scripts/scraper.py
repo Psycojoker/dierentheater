@@ -20,6 +20,7 @@ import re
 from os.path import exists
 from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
+from lxml import etree
 
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion
 
@@ -63,6 +64,16 @@ def read_or_dl(url, name, reset=False):
     soup = BeautifulSoup(text)
     if soup.title.text == "404 Not Found":
         raise IndexError
+    return soup
+
+def lxml_read_or_dl(url, name, reset=False):
+    print "parsing", url
+    if not reset and exists('dump/%s' % name):
+        text = open('dump/%s' % name)
+    else:
+        text = urlopen(url)
+        open('dump/%s' % name, "w").write(text)
+    soup = etree.parse(text, etree.HTMLParser())
     return soup
 
 def table2dic(table):
@@ -265,6 +276,47 @@ def deputies():
     deputies_list()
     each_deputies()
 
+def document_to_dico(table):
+    def clean(text):
+        return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "")
+    dico = {}
+    sub_section = None
+    for i in table:
+        if i == u"\n":
+            continue
+        if i.td.text in ("&#13;", "&nbsp;", "&#160;"):
+            continue
+        if i.td.b:
+            sub_section = clean(i.td.b.text)
+            if dico.get(sub_section):
+                raise Exception("'%s' is already use as a key for '%s'" % (sub_section, dico[sub_section]))
+            dico[sub_section] = {}
+            dico[sub_section]["head"] = i('td')[1]
+        elif i.td.img:
+            key = clean(i.td.text)
+            # we can have a list on joined documents
+            if str(key) == 'Document(s) joint(s)/li&#233;(s)':
+                if not dico[sub_section].get(key):
+                    dico[sub_section][key] = []
+                dico[sub_section][key].append(i('td')[1])
+            else:
+                if dico[sub_section].get(key):
+                    raise Exception("'%s' is already use as a key in the sub_section '%s' for '%s'" % (key, sub_section, dico[sub_section][key]))
+                dico[sub_section][key] = i('td')[1]
+        else:
+            key = clean(i.td.text)
+            # we can get severals Moniter erratum
+            if str(key) == 'Moniteur erratum':
+                if not dico.get(key):
+                    dico[key] = []
+                dico[key].append(i('td')[1])
+            else:
+                if dico.get(key):
+                    raise Exception("'%s' is already use as a key for '%s'" % (key, dico[key]))
+                print i('td')
+                dico[key] = i('td')[1]
+    return dico
+
 def laws():
     for law_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all laws")('div', **{'class': re.compile("linklist_[01]")}):
         for soup in read_or_dl(LACHAMBRE_PREFIX + law_page.a["href"], "law %s" % law_page.a.text)('table')[4]('tr', valign="top"):
@@ -273,6 +325,10 @@ def laws():
     for law in list(Document.objects.all()):
         soup = read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
         law.full_details_url = soup('table')[4].a["href"]
+        # fucking stupid hack because BeautifulSoup fails to parse correctly the html
+        soup = lxml_read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
+        table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
+        dico = document_to_dico(list(table.table('tr', recursive=False)))
         law.save()
 
 def run():
