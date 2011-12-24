@@ -326,6 +326,7 @@ def laws():
     for law in list(Document.objects.all()):
         soup = read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
         law.full_details_url = soup('table')[4].a["href"]
+        law.title = soup.h4.text
         # fucking stupid hack because BeautifulSoup fails to parse correctly the html
         soup = lxml_read_or_dl(LACHAMBRE_PREFIX + law.url if not law.url.startswith("http") else law.url, "a law %s" % law.lachambre_id)
         table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
