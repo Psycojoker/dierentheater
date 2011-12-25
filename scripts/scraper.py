@@ -190,7 +190,7 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
                                      title=dico["Titre :"],
                                      status_chambre=dico.get("Chambre FR :"),
                                      status_senat=dico.get("Sénat FR :"),
-                                     date=dico.get("Date :"),
+                                     deposition_date=dico.get("Date :"),
                                      eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
                                      eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
                                      keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
@@ -337,7 +337,7 @@ def handle_document(document, dico):
         document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
         document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
-    document.date = dico[u"Date de dépôt"].text
+    document.deposition_date = dico[u"Date de dépôt"].text
     if dico.get("Descripteur Eurovoc principal"):
         document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
     if dico.get("Descripteurs Eurovoc"):

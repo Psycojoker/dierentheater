@@ -85,7 +85,7 @@ class Document(models.Model, Jsonify):
     status_chambre = models.CharField(max_length=1337, null=True)
     status_senat = models.CharField(max_length=1337, null=True)
     eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
-    date = models.CharField(max_length=1337, null=True)
+    deposition_date = models.CharField(max_length=1337, null=True)
     eurovoc_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
