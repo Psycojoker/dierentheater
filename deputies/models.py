@@ -87,6 +87,10 @@ class Document(models.Model, Jsonify):
     eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
     deposition_date = models.CharField(max_length=1337, null=True)
     constitution_article = models.CharField(max_length=1337)
+    visibility = models.CharField(max_length=1337)
+    # need to turn that into a EmbeddedModelField(commissions) in the futur
+    # when the commissions will be parsed
+    commissions = ListField()
     eurovoc_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)

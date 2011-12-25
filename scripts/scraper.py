@@ -352,6 +352,14 @@ def handle_document(document, dico):
         document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
         document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+    if dico.get("1. COMMISSION CHAMBRE") or dico.get("COMMISSION CHAMBRE"):
+        key = "1. COMMISSION CHAMBRE" if dico.get("1. COMMISSION CHAMBRE") else "COMMISSION CHAMBRE"
+        if len(clean_text(dico[key]["head"].text).split(u"\xa0")) == 3:
+            commissions, _, visibility = clean_text(dico[key]["head"].text).split(u"\xa0")
+            document.commissions = map(lambda x: x.strip(), commissions.split(", "))
+            document.visibility = visibility[1:-1]
+        else:
+            document.visibility = clean_text(dico[key]["head"].text).split(u"\xa0")[1:-1]
 
 def run():
     clean()
