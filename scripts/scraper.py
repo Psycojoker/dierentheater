@@ -27,7 +27,13 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
 def clean_text(text):
-    return re.sub("(\r|\t|\n| )+", " ", text).replace("&#13; ", "").replace("&#13;", "").replace("&#233;", u"é").replace("&#244;", u"ô").strip()
+    def rep(result):
+        string = result.group()                   # "&#xxx;"
+        n = int(string[2:-1])
+        uchar = unichr(n)                         # matching unicode char
+        return uchar
+
+    return re.sub("(\r|\t|\n| )+", " ", re.sub("&#\d+;", rep, text)).strip()
 
 def hammer_time(function):
     "decorator to retry to download a page because La Chambre website sucks"
