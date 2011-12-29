@@ -18,6 +18,10 @@ And pdftotext:
 
     sudo apt-get install xpdf-utils
 
+And libxml2 and libxslt for lxml:
+
+    sudo apt-get install libxml2-dev libxslt-dev
+
 Once this is done create a virtualenv, for example:
 
     virtualenv --distribute --no-site-packages ve
