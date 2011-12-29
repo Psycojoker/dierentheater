@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -360,6 +360,11 @@ def handle_document(document, dico):
             document.visibility = visibility[1:-1]
         else:
             document.visibility = clean_text(dico[key]["head"].text).split(u"\xa0")[1:-1]
+    if dico.get(u"Compétence"):
+        document.timeline = []
+        for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
+            print "append time line", a, b
+            document.timeline.append(DocumentTimeLine.objects.create(title=b, date=a))
 
 def run():
     clean()

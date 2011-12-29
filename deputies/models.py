@@ -91,12 +91,18 @@ class Document(models.Model, Jsonify):
     # need to turn that into a EmbeddedModelField(commissions) in the futur
     # when the commissions will be parsed
     commissions = ListField()
+    timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
     eurovoc_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
+
+
+class DocumentTimeLine(models.Model):
+    title = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
 
 
 class WrittenQuestion(models.Model, Jsonify):
