@@ -95,6 +95,7 @@ class Document(models.Model, Jsonify):
     eurovoc_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
+    analysis = EmbeddedModelField('Analysis', null=True)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
