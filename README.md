@@ -35,7 +35,7 @@ Now, install the dependencies (this can take a little bit of time):
 To launch the scraping (this is *long*, do this in a screen):
 
     mkdir dump # only once
-    python manange.py runscript scrapers
+    python manage.py runscript scrapers
 
 But aware that by default the parser store every page he has encountered in the
 folder dump but re-download it (for a maximum number of 2 more times) if it has
