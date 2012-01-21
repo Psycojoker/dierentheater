@@ -49,7 +49,7 @@ problems with it. If you want to reset the cache simply run:
 
 To launch the dev server:
 
-    python manange.py runserver
+    python manage.py runserver
 
 # Parsing progress
 
