@@ -18,6 +18,8 @@ from json import dumps
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField
 
+LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+
 class Jsonify(object):
     def json(self):
         return dumps(self.__class__.objects.filter(pk=self.pk).values()[0], indent=4)
@@ -99,6 +101,9 @@ class Document(models.Model, Jsonify):
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 class DocumentTimeLine(models.Model):
