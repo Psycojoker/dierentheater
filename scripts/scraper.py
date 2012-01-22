@@ -383,6 +383,10 @@ def handle_document(document, dico):
             document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
         if dico['Document Chambre'].get(u'Statut'):
             document_chambre.status = dico['Document Chambre'][u'Statut'].text
+
+        if dico['Document Chambre'].get('Auteur(s)'):
+            document_chambre.authors = [{"lachambre_id": Deputy.objects.get(lachambre_id=i).lachambre_id, "id": Deputy.objects.get(lachambre_id=i).id} for i in map(lambda x: re.search('key=(\d+)', x).groups()[0], map(lambda x: x['href'], dico['Document Chambre'][u'Auteur(s)']('a')))]
+
         document_chambre.save()
         document.document_chambre = document_chambre
 
