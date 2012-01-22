@@ -328,17 +328,17 @@ def documents():
             get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
 
     for document in list(Document.objects.all()):
-        soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
-        document.full_details_url = soup('table')[4].a["href"]
-        document.title = soup.h4.text
-        # fucking stupid hack because BeautifulSoup fails to parse correctly the html
-        soup = lxml_read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
-        table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
-        dico = document_to_dico(list(table.table('tr', recursive=False)))
-        handle_document(document, dico)
-        document.save()
+        handle_document(document)
 
-def handle_document(document, dico):
+def handle_document(document):
+    soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+    document.full_details_url = soup('table')[4].a["href"]
+    document.title = soup.h4.text
+    # fucking stupid hack because BeautifulSoup fails to parse correctly the html
+    soup = lxml_read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+    table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
+    dico = document_to_dico(list(table.table('tr', recursive=False)))
+
     if dico.get("Etat d'avancement"):
         document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
         document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
@@ -395,6 +395,8 @@ def handle_document(document, dico):
         document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
         document_chambre.save()
         document.document_chambre = document_chambre
+
+    document.save()
 
 def run():
     clean()
