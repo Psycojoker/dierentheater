@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -390,6 +390,9 @@ def handle_document(document, dico):
         if dico['Document Chambre'].get(u'Commentaire'):
             document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
 
+        url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
+        url = re.search('href="([^"]+)', url).groups()[0]
+        document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
         document_chambre.save()
         document.document_chambre = document_chambre
 

@@ -117,7 +117,13 @@ class DocumentChambre(models.Model):
     status = models.CharField(max_length=1337)
     authors = ListField()
     comments = ListField()
+    pdf = EmbeddedModelField('DocumentChambrePdf')
 
+
+class DocumentChambrePdf(models.Model):
+    url = models.CharField(max_length=1337)
+    session = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
 
 class DocumentTimeLine(models.Model):
     title = models.CharField(max_length=1337)
