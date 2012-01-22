@@ -387,6 +387,9 @@ def handle_document(document, dico):
         if dico['Document Chambre'].get('Auteur(s)'):
             document_chambre.authors = [{"lachambre_id": Deputy.objects.get(lachambre_id=i).lachambre_id, "id": Deputy.objects.get(lachambre_id=i).id} for i in map(lambda x: re.search('key=(\d+)', x).groups()[0], map(lambda x: x['href'], dico['Document Chambre'][u'Auteur(s)']('a')))]
 
+        if dico['Document Chambre'].get(u'Commentaire'):
+            document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
+
         document_chambre.save()
         document.document_chambre = document_chambre
 

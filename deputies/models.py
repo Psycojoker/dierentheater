@@ -116,6 +116,7 @@ class DocumentChambre(models.Model):
     ending_date = models.CharField(max_length=1337)
     status = models.CharField(max_length=1337)
     authors = ListField()
+    comments = ListField()
 
 
 class DocumentTimeLine(models.Model):
