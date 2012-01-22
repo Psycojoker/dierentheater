@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -367,6 +367,24 @@ def handle_document(document, dico):
             document.timeline.append(DocumentTimeLine.objects.create(title=b, date=a))
     if dico.get("Analyse des interventions"):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
+
+    # document chambre
+    if dico.get("Document Chambre"):
+        document_chambre = DocumentChambre()
+        document_chambre.deposition_date = dico['Document Chambre'][u'Date de dépôt'].text
+        document_chambre.type = dico['Document Chambre'][u'Type de document'].text
+        if dico['Document Chambre'].get(u'Prise en considération'):
+            document_chambre.taken_in_account_date = dico['Document Chambre'][u'Prise en considération'].text
+        if dico['Document Chambre'].get(u'Date de distribution'):
+            document_chambre.distribution_date = dico['Document Chambre'][u'Date de distribution'].text
+        if dico['Document Chambre'].get(u'Date d\'envoi'):
+            document_chambre.sending_date = dico['Document Chambre'][u'Date d\'envoi'].text
+        if dico['Document Chambre'].get(u'Date de fin'):
+            document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
+        if dico['Document Chambre'].get(u'Statut'):
+            document_chambre.status = dico['Document Chambre'][u'Statut'].text
+        document_chambre.save()
+        document.document_chambre = document_chambre
 
 def run():
     clean()

@@ -98,12 +98,23 @@ class Document(models.Model, Jsonify):
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
     analysis = EmbeddedModelField('Analysis', null=True)
+    document_chambre = EmbeddedModelField('DocumentChambre', null=True)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
+
+class DocumentChambre(models.Model):
+    deposition_date = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
+    taken_in_account_date = models.CharField(max_length=1337)
+    distribution_date = models.CharField(max_length=1337)
+    sending_date = models.CharField(max_length=1337)
+    ending_date = models.CharField(max_length=1337)
+    status = models.CharField(max_length=1337)
 
 
 class DocumentTimeLine(models.Model):
