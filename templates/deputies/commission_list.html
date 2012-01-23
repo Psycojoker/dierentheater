@@ -11,7 +11,7 @@
 
 <ul>
 {% for commission in object_list %}
-    <li><a href="{% url deputies:commission commission.id %}">{{ commission.lachambre_id }}</a></li>
+    <li><a href="{% url deputies:commission commission.lachambre_id %}">{{ commission.lachambre_id }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

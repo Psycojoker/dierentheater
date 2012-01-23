@@ -21,15 +21,16 @@ from models import Deputy, Commission, Document, Question, Analysis, WrittenQues
 
 urlpatterns = patterns('',
     url(r'^deputy/$', ListView.as_view(model=Deputy), name='deputy-list'),
-    url(r'^deputy/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Deputy), name='deputy'),
+    # yes, O in the regex, one deputy has an O instead of a 0 in it's lachambre_id, yes this is awfull
+    url(r'^deputy/(?P<slug>[O0-9]+)/$', DetailView.as_view(model=Deputy, slug_field="lachambre_id"), name='deputy'),
     url(r'^commission/$', ListView.as_view(model=Commission), name='commission-list'),
-    url(r'^commission/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Commission), name='commission'),
+    url(r'^commission/(?P<slug>[0-9]+)/$', DetailView.as_view(model=Commission, slug_field="lachambre_id"), name='commission'),
     url(r'^document/$', ListView.as_view(model=Document), name='document-list'),
-    url(r'^document/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Document), name='document'),
+    url(r'^document/(?P<slug>[0-9]+)/$', DetailView.as_view(model=Document, slug_field="lachambre_id"), name='document'),
     url(r'^written-question/$', ListView.as_view(model=WrittenQuestion), name='written-question-list'),
-    url(r'^written-question/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=WrittenQuestion), name='written-question'),
+    url(r'^written-question/(?P<slug>[-a-zA-Z0-9]+)/$', DetailView.as_view(model=WrittenQuestion, slug_field="lachambre_id"), name='written-question'),
     url(r'^question/$', ListView.as_view(model=Question), name='question-list'),
-    url(r'^question/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Question), name='question'),
+    url(r'^question/(?P<slug>[A-Z0-9]+)/$', DetailView.as_view(model=Question, slug_field="lachambre_id"), name='question'),
     url(r'^analysis/$', ListView.as_view(model=Analysis), name='analysis-list'),
-    url(r'^analysis/(?P<pk>[a-z0-9]+)/$', DetailView.as_view(model=Analysis), name='analysis'),
+    url(r'^analysis/(?P<slug>[A-Z0-9]+)/$', DetailView.as_view(model=Analysis, slug_field="lachambre_id"), name='analysis'),
 )

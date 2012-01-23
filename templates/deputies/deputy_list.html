@@ -9,11 +9,9 @@
     <h1>List of available documents <small>yes, there will be a real api later</small></h1>
 </div>
 
-
 <ul>
 {% for deputy in object_list %}
-    <li><a href="{% url deputies:deputy deputy.pk %}">{{ deputy.full_name }}</a></li>
+    <li><a href="{% url deputies:deputy deputy.lachambre_id %}">{{ deputy.full_name }}</a></li>
 {% endfor %}
 </ul>
-
 {% endblock %}
