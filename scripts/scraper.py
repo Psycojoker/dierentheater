@@ -385,7 +385,15 @@ def handle_document(document):
             document_chambre.status = dico['Document Chambre'][u'Statut'].text
 
         if dico['Document Chambre'].get('Auteur(s)'):
-            document_chambre.authors = [{"lachambre_id": Deputy.objects.get(lachambre_id=i).lachambre_id, "id": Deputy.objects.get(lachambre_id=i).id} for i in map(lambda x: re.search('key=(\d+)', x).groups()[0], map(lambda x: x['href'], dico['Document Chambre'][u'Auteur(s)']('a')))]
+            for dep, role in zip(dico['Document Chambre'][u'Auteur(s)']('a'), dico['Document Chambre'][u'Auteur(s)']('i')):
+                lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
+                deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                document_chambre.authors.append({
+                    "lachambre_id": deputy.lachambre_id,
+                    "id": deputy.id,
+                    "full_name": deputy.full_name,
+                    "role": role.text[1:-1]
+                })
 
         if dico['Document Chambre'].get(u'Commentaire'):
             document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
