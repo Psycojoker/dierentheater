@@ -1,10 +1,5 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ object }}</h2>
-
-<p><a href="{{ object.url }}">Page on lachambre.be</a></p>
-
-<textarea cols=150 rows=50>{{ object.json }}</textarea>
-
+{% include "object_display.html" %}
 {% endblock %}
