@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 
+{% block title %}
+<h1>Analysiss</h1>
+{% endblock %}
+
 {% block content %}
-<h2>Analysiss</h2>
+<div style="padding-top: 10px;" class="page-header">
+    <h1>List <small>yes, there will be a real api later</small></h1>
+</div>
+
 <ul>
 {% for analysis in object_list %}
     <li><a href="{% url deputies:analysis analysis.id %}">{{ analysis.lachambre_id }}</a></li>

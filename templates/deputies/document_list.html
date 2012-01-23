@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 
+{% block title %}
+<h1>Documents</h1>
+{% endblock %}
+
 {% block content %}
-<h2>Documents</h2>
+<div style="padding-top: 10px;" class="page-header">
+    <h1>List of available documents <small>yes, there will be a real api later</small></h1>
+</div>
+
 <ul>
 {% for document in object_list %}
     <li><a href="{% url deputies:document document.id %}">{{ document.lachambre_id }}</a></li>

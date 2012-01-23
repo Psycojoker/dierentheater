@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 
+{% block title %}
+<h1>Deputies</h1>
+{% endblock %}
+
 {% block content %}
-<h2>Deputies</h2>
+<div style="padding-top: 10px;" class="page-header">
+    <h1>List of available documents <small>yes, there will be a real api later</small></h1>
+</div>
+
 
 <ul>
 {% for deputy in object_list %}
