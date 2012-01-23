@@ -434,6 +434,9 @@ def handle_document(document):
                 doc.save()
                 document_chambre.other_pdfs.append(doc)
 
+        if dico["Document Chambre"].get(u'Document(s) joint(s)/lié(s)'):
+            document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in dico['Document Chambre'][u'Document(s) joint(s)/lié(s)']]
+
         document_chambre.save()
         document.document_chambre = document_chambre
 

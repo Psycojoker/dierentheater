@@ -119,6 +119,7 @@ class DocumentChambre(models.Model):
     comments = ListField()
     pdf = EmbeddedModelField('DocumentChambrePdf')
     other_pdfs = ListField(EmbeddedModelField('OtherDocumentChambrePdf'))
+    joint_pdfs = ListField()
 
 
 class DocumentChambrePdf(models.Model):
