@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, ))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -330,6 +330,21 @@ def documents():
     for document in list(Document.objects.all()):
         handle_document(document)
 
+def document_pdf_part_cutter(soup):
+    result = []
+    blob = [soup('tr')[0]]
+    for i in soup('tr')[1:]:
+        if not clean_text(i.text):
+            continue
+        if not i.img or not i.img.get("class") or i.img["class"] != "picto":
+            blob.append(i)
+        else:
+            result.append(blob)
+            blob = [i]
+
+    result.append(blob)
+    return result
+
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
@@ -401,6 +416,24 @@ def handle_document(document):
         url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+
+        if dico['Document Chambre'].get('Document(s) suivant(s)'):
+            for d in document_pdf_part_cutter(dico['Document Chambre'][u'Document(s) suivant(s)']):
+                print "add pdf %s" % clean_text(d[0].font.text)
+                doc = OtherDocumentChambrePdf()
+                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                doc.type = clean_text(d[0].font.text)
+                doc.distribution_date = d[1]('td')[-1].text
+                for dep in d[2:]:
+                    if dep.a:
+                        lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
+                        deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                        doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
+                    else:
+                        doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
+                doc.save()
+                document_chambre.other_pdfs.append(doc)
+
         document_chambre.save()
         document.document_chambre = document_chambre
 

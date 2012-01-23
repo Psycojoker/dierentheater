@@ -118,12 +118,21 @@ class DocumentChambre(models.Model):
     authors = ListField()
     comments = ListField()
     pdf = EmbeddedModelField('DocumentChambrePdf')
+    other_pdfs = ListField(EmbeddedModelField('OtherDocumentChambrePdf'))
 
 
 class DocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337)
+
+
+class OtherDocumentChambrePdf(models.Model):
+    url = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
+    distribution_date = models.CharField(max_length=1337)
+    authors = ListField()
+
 
 class DocumentTimeLine(models.Model):
     title = models.CharField(max_length=1337)
