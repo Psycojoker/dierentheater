@@ -399,7 +399,7 @@ def handle_document(document):
             document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
 
         url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
-        url = re.search('href="([^"]+)', url).groups()[0]
+        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
         document_chambre.save()
         document.document_chambre = document_chambre
