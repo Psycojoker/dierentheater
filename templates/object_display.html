@@ -1,7 +1,16 @@
-<h2>{{ object }}</h2>
+{% extends "base.html" %}
 
-<div style="margin-left: 30px; padding-top: 20px; padding-bottom: 20px;">
+{% block title %}
+    <h2 style="color: #FFFFFF; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">{{ object }}</h2>
+{% endblock %}
+
+{% block content %}
+<div style="padding-top: 10px;" class="page-header">
+    <h1>Json document <small>yes, there will be a real api later</small></h1>
+</div>
+<pre>{{ object.json }}</pre>
+
+<div style="text-align: center; padding-top: 20px; padding-bottom: 20px;">
     <p><a class="btn info" href="{{ object.get_url }}">Page on lachambre.be</a></p>
 </div>
-
-<pre>{{ object.json }}</pre>
+{% endblock %}
