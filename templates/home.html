@@ -1,31 +1,50 @@
 {% extends 'base.html' %}
 
+{% block title %}
+<h1>Dieren Theater</h1>
+<p class="lead">
+Derien Theater is a project to create a lachambre.be_to_json sausage machine<br>
+The objective is to brings to us citizen opendata.
+</p>
+
+<p>
+It's a freesoftware licenced under aGPLv3+, you can find the code <a href="https://github.com/Psycojoker/dierentheater">here</a>. You can report bugs <a href="https://github.com/Psycojoker/dierentheater/issues">here</a>.<br>
+
+This is, for the moment, only my personal initiative.
+</p>
+{% endblock %}
+
 {% block content %}
 
-<p>Derien Theater is a project to create a lachambre.be_to_json sausage machine to brings to us citizen opendata.</p>
-
-<p>It's a freesoftware licenced under aGPLv3+, you can find the code <a href="https://github.com/Psycojoker/dierentheater">here</a>. You can report bugs <a href="https://github.com/Psycojoker/dierentheater/issues">here</a>.</p>
-
-<p>This is, for the moment, only my personal initiative.</p>
-
-<p>The textarea are here to display the current data, a real RETful API will come later when I'll feel in the mood to code it (you can also send a patch).</p>
-
-<h2>Deputies</h2>
-<ul>
-    <li><a href="{% url deputies:deputy-list %}">All</a></li>
-    <li><a href="{% url deputies:commission-list %}">Commissions</a></li>
-</ul>
-<h2>Documents</h2>
-<ul>
-    <li><a href="{% url deputies:document-list %}">All</a></li>
-</ul>
-<h2>Questions</h2>
-<ul>
-    <li><a href="{% url deputies:written-question-list %}">Written</a></li>
-    <li><a href="{% url deputies:question-list %}">Others</a></li>
-</ul>
-<h2>Analysis</h2>
-<ul>
-    <li><a href="{% url deputies:analysis-list %}">All</a></li>
-</ul>
+<div style="padding-top: 15px;" class="page-header">
+    <h1>List of available json documents <small>yes, a real api will come later</small></h1>
+</div>
+<div class="row">
+    <div class="span4">
+        <h2>Deputies</h2>
+        <ul>
+            <li><a href="{% url deputies:deputy-list %}">All</a></li>
+            <li><a href="{% url deputies:commission-list %}">Commissions</a></li>
+        </ul>
+    </div>
+    <div class="span4">
+        <h2>Documents</h2>
+        <ul>
+            <li><a href="{% url deputies:document-list %}">All</a></li>
+        </ul>
+    </div>
+    <div class="span4">
+        <h2>Questions</h2>
+        <ul>
+            <li><a href="{% url deputies:written-question-list %}">Written</a></li>
+            <li><a href="{% url deputies:question-list %}">Others</a></li>
+        </ul>
+    </div>
+    <div class="span4">
+        <h2>Analysis</h2>
+        <ul>
+            <li><a href="{% url deputies:analysis-list %}">All</a></li>
+        </ul>
+    </div>
+</div>
 {% endblock %}
