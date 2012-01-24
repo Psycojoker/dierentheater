@@ -449,7 +449,8 @@ def handle_document(document):
         document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
         if dico['Document Chambre'].get(u'Commentaire'):
             document_senat.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
-        document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
+        if dico[u"Document Sénat"].get(u"Auteur(s)"):
+            document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
 
         url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
