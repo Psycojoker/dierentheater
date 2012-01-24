@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -450,6 +450,11 @@ def handle_document(document):
         if dico['Document Chambre'].get(u'Commentaire'):
             document_senat.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
         document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
+
+        url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
+        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
+        document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+
         document_senat.save()
         document.document_senat = document_senat
 

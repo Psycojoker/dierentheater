@@ -135,6 +135,13 @@ class DocumentSenat(models.Model):
     comments = ListField()
     ending_date = models.CharField(max_length=1337)
     author = models.CharField(max_length=1337)
+    pdf = EmbeddedModelField('DocumentSenatPdf')
+
+
+class DocumentSenatPdf(models.Model):
+    url = models.CharField(max_length=1337)
+    session = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
 
 
 class OtherDocumentChambrePdf(models.Model):
