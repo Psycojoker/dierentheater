@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, ))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -439,6 +439,19 @@ def handle_document(document):
 
         document_chambre.save()
         document.document_chambre = document_chambre
+
+    # document senat
+    if dico.get(u"Document Sénat"):
+        document_senat = DocumentSenat()
+        document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
+        if dico[u"Document Sénat"].get(u"Date de fin"):
+            document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
+        document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
+        if dico['Document Chambre'].get(u'Commentaire'):
+            document_senat.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
+        document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
+        document_senat.save()
+        document.document_senat = document_senat
 
     document.save()
 

@@ -99,6 +99,7 @@ class Document(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
     analysis = EmbeddedModelField('Analysis', null=True)
     document_chambre = EmbeddedModelField('DocumentChambre', null=True)
+    document_senat = EmbeddedModelField('DocumentSenat', null=True)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
@@ -126,6 +127,14 @@ class DocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337)
+
+
+class DocumentSenat(models.Model):
+    deposition_date = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
+    comments = ListField()
+    ending_date = models.CharField(max_length=1337)
+    author = models.CharField(max_length=1337)
 
 
 class OtherDocumentChambrePdf(models.Model):
