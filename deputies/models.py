@@ -91,6 +91,7 @@ class Document(models.Model, Jsonify):
     constitution_article = models.CharField(max_length=1337)
     in_charge_commissions = ListField(EmbeddedModelField('InChargeCommissions'))
     plenaries = ListField(EmbeddedModelField('DocumentPlenary'))
+    senat_plenaries = ListField(EmbeddedModelField('DocumentSenatPlenary'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
     eurovoc_descriptors = ListField()
     eurovoc_candidats_descriptors = ListField()
@@ -128,6 +129,11 @@ class DocumentPlenary(models.Model):
     type = models.CharField(max_length=1337)
     agenda = ListField()
     incident = ListField()
+
+
+class DocumentSenatPlenary(models.Model):
+    visibility = models.CharField(max_length=1337)
+    agenda = ListField()
 
 
 class DocumentChambre(models.Model):
