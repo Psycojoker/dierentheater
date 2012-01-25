@@ -379,7 +379,7 @@ def handle_document(document):
 
         icc.agenda = []
         if dico[key].get("Calendrier"):
-            for _date, _type in map(lambda x: x.split(u" \xa0 "), map(clean_text, dico[key]["Calendrier"].contents[::2])):
+            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
                 icc.agenda.append({"date": _date, "type": _type})
 
         if dico[key].get("Rapport"):
