@@ -514,8 +514,8 @@ def handle_document(document):
         if dico[u"Document Sénat"].get(u"Date de fin"):
             document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
         document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
-        if dico['Document Chambre'].get(u'Commentaire'):
-            document_senat.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
+        if dico[u'Document Sénat'].get(u'Commentaire'):
+            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
         if dico[u"Document Sénat"].get(u"Auteur(s)"):
             document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
         if dico[u'Document Sénat'].get(u'Commentaire'):
