@@ -106,6 +106,7 @@ class Document(models.Model, Jsonify):
     moniteur_number = models.CharField(max_length=1337)
     moniteur_date = models.CharField(max_length=1337)
     main_docs = ListField()
+    candidature_vote_date = models.CharField(max_length=1337)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
