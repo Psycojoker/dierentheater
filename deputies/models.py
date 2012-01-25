@@ -159,6 +159,7 @@ class DocumentSenat(models.Model):
     author = models.CharField(max_length=1337)
     pdf = EmbeddedModelField('DocumentSenatPdf')
     comments = ListField()
+    status = models.CharField(max_length=1337)
 
 
 class DocumentSenatPdf(models.Model):
