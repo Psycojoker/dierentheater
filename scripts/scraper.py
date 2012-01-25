@@ -419,6 +419,11 @@ def handle_document(document):
         pl.visibility = clean_text(dico[key]["head"].text).split()[-1]
         pl.type = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
 
+        pl.agenda = []
+        if dico[key].get("Calendrier"):
+            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
+                pl.agenda.append({"date": _date, "type": _type})
+
         pl.save()
         document.plenaries.append(pl)
 
