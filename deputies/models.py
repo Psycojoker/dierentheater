@@ -143,6 +143,7 @@ class DocumentSenat(models.Model):
     ending_date = models.CharField(max_length=1337)
     author = models.CharField(max_length=1337)
     pdf = EmbeddedModelField('DocumentSenatPdf')
+    comments = ListField()
 
 
 class DocumentSenatPdf(models.Model):
