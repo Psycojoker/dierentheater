@@ -110,6 +110,7 @@ class Document(models.Model, Jsonify):
 class InChargeCommissions(models.Model):
     visibility = models.CharField(max_length=1337)
     commission = models.CharField(max_length=1337)
+    rapporters = ListField()
 
 
 class DocumentChambre(models.Model):

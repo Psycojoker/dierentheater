@@ -373,6 +373,9 @@ def handle_document(document):
         icc = InChargeCommissions()
         icc.visibility = clean_text(dico[key]["head"].text).split()[-1]
         icc.commission = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+        if dico[key].get("Rapporteur"):
+            # FIXME link to actual deputies
+            icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
 
         icc.save()
         document.in_charge_commissions.append(icc)
