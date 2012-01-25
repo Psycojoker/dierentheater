@@ -89,8 +89,6 @@ class Document(models.Model, Jsonify):
     eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
     deposition_date = models.CharField(max_length=1337, null=True)
     constitution_article = models.CharField(max_length=1337)
-    # need to turn that into a EmbeddedModelField(commissions) in the futur
-    # when the commissions will be parsed
     in_charge_commissions = ListField(EmbeddedModelField('InChargeCommissions'))
     plenaries = ListField(EmbeddedModelField('DocumentPlenary'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
@@ -113,6 +111,8 @@ class Document(models.Model, Jsonify):
 
 class InChargeCommissions(models.Model):
     visibility = models.CharField(max_length=1337)
+    # need to turn that into a EmbeddedModelField(commissions) in the futur
+    # when the commissions will be parsed
     commission = models.CharField(max_length=1337)
     rapporters = ListField()
     agenda = ListField()
