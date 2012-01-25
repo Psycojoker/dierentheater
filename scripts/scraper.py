@@ -390,6 +390,8 @@ def handle_document(document):
         document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
     if dico.get(u'Vote Chambre'):
         document.vote_date = dico["Vote Chambre"].text
+    if dico.get("Documents principaux"):
+        document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
 
     document.in_charge_commissions = []
     for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
