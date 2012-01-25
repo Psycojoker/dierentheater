@@ -386,6 +386,8 @@ def handle_document(document):
         document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
     if dico.get("Descripteurs Eurovoc"):
         document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
+    if dico.get("Candidats-descripteurs Eurovoc"):
+        document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
         document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
     if dico.get(u'Vote Chambre'):

@@ -95,6 +95,7 @@ class Document(models.Model, Jsonify):
     plenaries = ListField(EmbeddedModelField('DocumentPlenary'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
     eurovoc_descriptors = ListField()
+    eurovoc_candidats_descriptors = ListField()
     keywords = ListField()
     lachambre_id = models.IntegerField(unique=True)
     analysis = EmbeddedModelField('Analysis', null=True)
