@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -113,7 +113,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -546,6 +546,19 @@ def handle_document(document):
         url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+
+        if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
+            for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
+                print "add pdf %s" % clean_text(d[0].font.text)
+                doc = OtherDocumentSenatPdf()
+                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                doc.type = clean_text(d[0].font.text)
+                doc.date = d[0]('td')[-1].contents[0]
+                doc.authors = []
+                for dep in d[1:]:
+                    doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
+                doc.save()
+                document_senat.other_pdfs.append(doc)
 
         document_senat.save()
         document.document_senat = document_senat

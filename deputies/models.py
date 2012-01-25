@@ -168,12 +168,20 @@ class DocumentSenat(models.Model):
     pdf = EmbeddedModelField('DocumentSenatPdf')
     comments = ListField()
     status = models.CharField(max_length=1337)
+    other_pdfs = ListField(EmbeddedModelField('OtherDocumentSenatPdf'))
 
 
 class DocumentSenatPdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337)
+
+
+class OtherDocumentSenatPdf(models.Model):
+    url = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
+    authors = ListField()
 
 
 class OtherDocumentChambrePdf(models.Model):
