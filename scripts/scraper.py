@@ -26,6 +26,27 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
+class AccessControlDict(dict):
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        self.accessed = set()
+
+    def __getitem__(self, key):
+        self.accessed.add(key)
+        return dict.__getitem__(self, key)
+
+    def get_not_accessed_keys(self):
+        a = []
+        for i in self.keys():
+            if i not in self.accessed:
+                a.append(i)
+            elif isinstance(self[i], AccessControlDict) and self[i].get_not_accessed_keys():
+                a.append(i)
+                a.append(self[i].get_not_accessed_keys())
+
+        return a
+
+
 def clean_text(text):
     def rep(result):
         string = result.group()                   # "&#xxx;"
@@ -285,7 +306,7 @@ def deputies():
     each_deputies()
 
 def document_to_dico(table):
-    dico = {}
+    dico = AccessControlDict()
     sub_section = None
     for i in table:
         if i == u"\n":
@@ -296,7 +317,7 @@ def document_to_dico(table):
             sub_section = clean_text(i.td.b.text)
             if dico.get(sub_section):
                 raise Exception("'%s' is already use as a key for '%s'" % (sub_section, dico[sub_section]))
-            dico[sub_section] = {}
+            dico[sub_section] = AccessControlDict()
             dico[sub_section]["head"] = i('td')[1]
         elif i.td.img:
             key = clean_text(i.td.text)
