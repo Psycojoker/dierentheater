@@ -16,7 +16,7 @@
 
 from json import dumps
 from django.db import models
-from djangotoolbox.fields import ListField, EmbeddedModelField
+from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -112,6 +112,7 @@ class InChargeCommissions(models.Model):
     commission = models.CharField(max_length=1337)
     rapporters = ListField()
     agenda = ListField()
+    rapport = DictField()
 
 
 class DocumentChambre(models.Model):

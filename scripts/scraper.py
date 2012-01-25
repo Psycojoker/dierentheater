@@ -382,6 +382,9 @@ def handle_document(document):
             for _date, _type in map(lambda x: x.split(u" \xa0 "), map(clean_text, dico[key]["Calendrier"].contents[::2])):
                 icc.agenda.append({"date": _date, "type": _type})
 
+        if dico[key].get("Rapport"):
+            icc.rapport = {"url": dico[key]["Rapport"].a["href"], "date": clean_text(dico[key]["Rapport"].contents[-2])}
+
         icc.save()
         document.in_charge_commissions.append(icc)
 
