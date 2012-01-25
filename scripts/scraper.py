@@ -394,6 +394,10 @@ def handle_document(document):
         document.vote_date = dico["Vote Chambre"].text
     if dico.get(u"Date de la loi"):
         document.law_date = dico["Date de la loi"].text
+    if dico.get(u"Moniteur n°"):
+        document.moniteur_number = dico[u"Moniteur n°"].text
+    if dico.get(u"Date moniteur"):
+        document.moniteur_date = dico[u"Date moniteur"].text
     if dico.get("Documents principaux"):
         document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
 

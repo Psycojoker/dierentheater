@@ -101,6 +101,8 @@ class Document(models.Model, Jsonify):
     document_senat = EmbeddedModelField('DocumentSenat', null=True)
     vote_date = models.CharField(max_length=1337)
     law_date = models.CharField(max_length=1337)
+    moniteur_number = models.CharField(max_length=1337)
+    moniteur_date = models.CharField(max_length=1337)
     main_docs = ListField()
 
     def __unicode__(self):
