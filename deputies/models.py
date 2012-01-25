@@ -100,6 +100,7 @@ class Document(models.Model, Jsonify):
     document_chambre = EmbeddedModelField('DocumentChambre', null=True)
     document_senat = EmbeddedModelField('DocumentSenat', null=True)
     vote_date = models.CharField(max_length=1337)
+    vote_senat_date = models.CharField(max_length=1337)
     law_date = models.CharField(max_length=1337)
     moniteur_number = models.CharField(max_length=1337)
     moniteur_date = models.CharField(max_length=1337)
