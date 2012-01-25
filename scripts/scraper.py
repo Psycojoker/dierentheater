@@ -388,6 +388,8 @@ def handle_document(document):
         document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
         document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+    if dico.get(u'Vote Chambre'):
+        document.vote_date = dico["Vote Chambre"].text
 
     document.in_charge_commissions = []
     for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):

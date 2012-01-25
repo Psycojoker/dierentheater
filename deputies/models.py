@@ -99,6 +99,7 @@ class Document(models.Model, Jsonify):
     analysis = EmbeddedModelField('Analysis', null=True)
     document_chambre = EmbeddedModelField('DocumentChambre', null=True)
     document_senat = EmbeddedModelField('DocumentSenat', null=True)
+    vote_date = models.CharField(max_length=1337)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
