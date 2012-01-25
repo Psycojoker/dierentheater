@@ -377,6 +377,11 @@ def handle_document(document):
             # FIXME link to actual deputies
             icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
 
+        icc.agenda = []
+        if dico[key].get("Calendrier"):
+            for _date, _type in map(lambda x: x.split(u" \xa0 "), map(clean_text, dico[key]["Calendrier"].contents[::2])):
+                icc.agenda.append({"date": _date, "type": _type})
+
         icc.save()
         document.in_charge_commissions.append(icc)
 

@@ -111,6 +111,7 @@ class InChargeCommissions(models.Model):
     visibility = models.CharField(max_length=1337)
     commission = models.CharField(max_length=1337)
     rapporters = ListField()
+    agenda = ListField()
 
 
 class DocumentChambre(models.Model):
