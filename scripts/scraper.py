@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -113,7 +113,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -412,6 +412,15 @@ def handle_document(document):
 
         icc.save()
         document.in_charge_commissions.append(icc)
+
+    document.plenaries = []
+    for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys()):
+        pl = DocumentPlenary()
+        pl.visibility = clean_text(dico[key]["head"].text).split()[-1]
+        pl.type = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+
+        pl.save()
+        document.plenaries.append(pl)
 
     if dico.get(u"Compétence"):
         document.timeline = []

@@ -92,6 +92,7 @@ class Document(models.Model, Jsonify):
     # need to turn that into a EmbeddedModelField(commissions) in the futur
     # when the commissions will be parsed
     in_charge_commissions = ListField(EmbeddedModelField('InChargeCommissions'))
+    plenaries = ListField(EmbeddedModelField('DocumentPlenary'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
     eurovoc_descriptors = ListField()
     keywords = ListField()
@@ -115,6 +116,11 @@ class InChargeCommissions(models.Model):
     rapporters = ListField()
     agenda = ListField()
     rapport = DictField()
+
+
+class DocumentPlenary(models.Model):
+    visibility = models.CharField(max_length=1337)
+    type = models.CharField(max_length=1337)
 
 
 class DocumentChambre(models.Model):
