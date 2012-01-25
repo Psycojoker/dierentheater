@@ -122,6 +122,7 @@ class InChargeCommissions(models.Model):
     commission = models.CharField(max_length=1337)
     rapporters = ListField()
     agenda = ListField()
+    incident = ListField()
     rapport = DictField()
 
 

@@ -414,6 +414,11 @@ def handle_document(document):
             # FIXME link to actual deputies
             icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
 
+        icc.incident = []
+        if dico[key].get("Incident"):
+            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
+                icc.incident.append({"date": _date, "type": _type})
+
         icc.agenda = []
         if dico[key].get("Calendrier"):
             for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
