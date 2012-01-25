@@ -494,6 +494,17 @@ def handle_document(document):
         document.document_senat = document_senat
 
     document.save()
+    if dico.get_not_accessed_keys():
+        print "\nError: untreated sections:"
+        for i in dico.get_not_accessed_keys():
+            if isinstance(i, (str, unicode)):
+                print "*", i
+            else:
+                for j in i:
+                    print "    *", j
+        print "------------ stop ------------"
+        import sys
+        sys.exit(1)
 
 def run():
     clean()
