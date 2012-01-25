@@ -89,10 +89,9 @@ class Document(models.Model, Jsonify):
     eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
     deposition_date = models.CharField(max_length=1337, null=True)
     constitution_article = models.CharField(max_length=1337)
-    visibility = models.CharField(max_length=1337)
     # need to turn that into a EmbeddedModelField(commissions) in the futur
     # when the commissions will be parsed
-    commissions = ListField()
+    in_charge_commissions = ListField(EmbeddedModelField('InChargeCommissions'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
     eurovoc_descriptors = ListField()
     keywords = ListField()
@@ -106,6 +105,11 @@ class Document(models.Model, Jsonify):
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
+
+class InChargeCommissions(models.Model):
+    visibility = models.CharField(max_length=1337)
+    commission = models.CharField(max_length=1337)
 
 
 class DocumentChambre(models.Model):

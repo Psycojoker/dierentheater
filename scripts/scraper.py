@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -92,7 +92,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -367,14 +367,16 @@ def handle_document(document):
         document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
         document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
-    if dico.get("1. COMMISSION CHAMBRE") or dico.get("COMMISSION CHAMBRE"):
-        key = "1. COMMISSION CHAMBRE" if dico.get("1. COMMISSION CHAMBRE") else "COMMISSION CHAMBRE"
-        if len(clean_text(dico[key]["head"].text).split(u"\xa0")) == 3:
-            commissions, _, visibility = clean_text(dico[key]["head"].text).split(u"\xa0")
-            document.commissions = map(lambda x: x.strip(), commissions.split(", "))
-            document.visibility = visibility[1:-1]
-        else:
-            document.visibility = clean_text(dico[key]["head"].text).split(u"\xa0")[1:-1]
+
+    document.in_charge_commissions = []
+    for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
+        icc = InChargeCommissions()
+        icc.visibility = clean_text(dico[key]["head"].text).split()[-1]
+        icc.commission = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+
+        icc.save()
+        document.in_charge_commissions.append(icc)
+
     if dico.get(u"Compétence"):
         document.timeline = []
         for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
