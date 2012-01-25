@@ -424,6 +424,11 @@ def handle_document(document):
             for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
                 pl.agenda.append({"date": _date, "type": _type})
 
+        pl.incident = []
+        if dico[key].get("Incident"):
+            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
+                pl.incident.append({"date": _date, "type": _type})
+
         pl.save()
         document.plenaries.append(pl)
 

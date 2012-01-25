@@ -122,6 +122,7 @@ class DocumentPlenary(models.Model):
     visibility = models.CharField(max_length=1337)
     type = models.CharField(max_length=1337)
     agenda = ListField()
+    incident = ListField()
 
 
 class DocumentChambre(models.Model):
