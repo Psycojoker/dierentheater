@@ -194,7 +194,7 @@ def parse_deputy(deputy, reset=False):
                 role = item.text[6:-1]
             elif item.name == 'div':
                 print "linking deputy to commission", item.a.text
-                commission = get_or_create(Commission, name=item.a.text, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
                 deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
         item = item.nextSibling
 
@@ -587,6 +587,7 @@ def commissions():
             elif i.a:
                 commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", i.a["href"]).groups()[0]))
                 commission.type = _type
+                commission.name = i.a.text
 
                 commission.save()
 
