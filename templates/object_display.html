@@ -10,7 +10,9 @@
 </div>
 <pre>{{ object.json }}</pre>
 
+{% if object.get_url %}
 <div style="text-align: center; padding-top: 20px; padding-bottom: 20px;">
     <p><a class="btn info" href="{{ object.get_url }}">Page on lachambre.be</a></p>
 </div>
+{% endif %}
 {% endblock %}
