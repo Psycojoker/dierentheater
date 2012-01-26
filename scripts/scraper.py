@@ -139,10 +139,10 @@ def deputies_list(reset=False):
 def each_deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
-        parse_deputy(deputy)
+        handle_deputy(deputy)
 
 @hammer_time
-def parse_deputy(deputy, reset=False):
+def handle_deputy(deputy, reset=False):
     soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
     deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
