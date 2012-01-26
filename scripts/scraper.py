@@ -19,7 +19,7 @@
 import re
 from os.path import exists
 from urllib import urlopen, quote
-from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulSoup, NavigableString
 from lxml import etree
 
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf
@@ -577,7 +577,18 @@ def handle_document(document):
         import sys
         sys.exit(1)
 
+def commissions():
+    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
+    _type = ""
+    for i in soup("div", id="story")[1]:
+        if not isinstance(i, NavigableString) and (i.h4 or i.a):
+            if i.h4:
+                _type = i.h4.text
+            elif i.a:
+                commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", i.a["href"]).groups()[0]))
+
 def run():
     clean()
+    commissions()
     deputies()
     documents()
