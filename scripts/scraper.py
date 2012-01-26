@@ -588,6 +588,7 @@ def commissions():
                 commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", i.a["href"]).groups()[0]))
                 commission.type = _type
                 commission.name = i.a.text
+                commission.url = i.a["href"]
 
                 commission.save()
 
