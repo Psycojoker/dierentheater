@@ -592,6 +592,13 @@ def commissions():
 
                 commission.save()
 
+    for com in list(Commission.objects.all()):
+        handle_commission(com)
+
+def handle_commission(commission):
+    soup = read_or_dl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
+    commission.full_name = soup.h1.text
+
 def run():
     clean()
     commissions()
