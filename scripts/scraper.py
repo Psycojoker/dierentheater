@@ -187,14 +187,15 @@ def parse_deputy(deputy, reset=False):
     membership = soup.find('td', rowspan="1")
     item = membership.h4
     role = None
+    deputy.commissions = []
     while item.nextSibling:
         if hasattr(item, 'tag'):
             if item.name == 'h5':
                 role = item.text[6:-1]
             elif item.name == 'div':
                 print "linking deputy to commission", item.a.text
-                commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
-                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, name=item.a.text, role=role, url=item.a['href']))
+                commission = get_or_create(Commission, name=item.a.text, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
         item = item.nextSibling
 
     deputy_documents(soup, deputy)

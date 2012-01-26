@@ -72,13 +72,15 @@ class Party(models.Model, Jsonify):
 
 
 class CommissionMembership(models.Model, Jsonify):
-    name = models.CharField(max_length=1337)
     role = models.CharField(max_length=1337)
-    url = models.URLField()
-    commission = models.ForeignKey('Commission')
+    commission = models.ForeignKey("Commission")
+
 
 class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=1337)
+    url = models.URLField()
+
 
 class Document(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
