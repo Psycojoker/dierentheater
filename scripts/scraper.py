@@ -586,6 +586,9 @@ def commissions():
                 _type = i.h4.text
             elif i.a:
                 commission = get_or_create(Commission, lachambre_id=int(re.search("com=(\d+)", i.a["href"]).groups()[0]))
+                commission.type = _type
+
+                commission.save()
 
 def run():
     clean()

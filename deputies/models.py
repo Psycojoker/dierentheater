@@ -80,6 +80,7 @@ class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=1337)
     url = models.URLField()
+    type = models.CharField(max_length=1337)
 
 
 class Document(models.Model, Jsonify):
