@@ -598,6 +598,15 @@ def commissions():
 def handle_commission(commission):
     soup = read_or_dl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
     commission.full_name = soup.h1.text
+    commission.deputies = []
+    for i in soup('p'):
+        role = i.b.text[:-1]
+        for dep in i('a'):
+            deputy = Deputy.objects.get(lachambre_id=re.search("key=([O0-9]+)", dep["href"]).groups()[0])
+            membership = get_or_create(CommissionMembership, deputy=deputy, commission=commission)
+            membership.role = role
+            membership.save()
+            commission.deputies.append(membership)
 
 def run():
     clean()

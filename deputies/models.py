@@ -74,6 +74,7 @@ class Party(models.Model, Jsonify):
 class CommissionMembership(models.Model, Jsonify):
     role = models.CharField(max_length=1337)
     commission = models.ForeignKey("Commission")
+    deputy = models.ForeignKey("Deputy")
 
 
 class Commission(models.Model, Jsonify):
@@ -82,6 +83,7 @@ class Commission(models.Model, Jsonify):
     full_name = models.CharField(max_length=1337)
     url = models.URLField()
     type = models.CharField(max_length=1337)
+    deputies = ListField(models.ForeignKey(CommissionMembership))
 
 
 class Document(models.Model, Jsonify):
