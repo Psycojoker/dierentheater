@@ -599,6 +599,13 @@ def handle_commission(commission):
     soup = read_or_dl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
     commission.full_name = soup.h1.text
     commission.deputies = []
+    convert_roles_to_english = {
+        u"Pr&eacute;sident(s)": "president",
+        u"Vice-Pr&eacute;sident(s)": "vice-president",
+        u"Membres Effectifs": "effective-members",
+        u"Membres Suppl&eacute;ants": "suppleant-members",
+        u"Membres sans voix d&eacute;lib&eacute;rative": "member-without-deliberatives-voices",
+    }
     seats = {}
     for i in soup('p'):
         role = i.b.text[:-1]
@@ -606,9 +613,10 @@ def handle_commission(commission):
             deputy = Deputy.objects.get(lachambre_id=re.search("key=([O0-9]+)", dep["href"]).groups()[0])
             membership = get_or_create(CommissionMembership, deputy=deputy, commission=commission)
             membership.role = role
+            membership.role_en = convert_roles_to_english[role]
             membership.save()
             commission.deputies.append(membership.id)
-        seats[role] = map(lambda x: (x[0], len(x[1].split(','))), zip(map(lambda x: x.text[:-1], i('b')[1:]), str(i).split("<br />")[1:]))
+        seats[convert_roles_to_english[role]] = map(lambda x: (x[0], len(x[1].split(','))), zip(map(lambda x: x.text[:-1], i('b')[1:]), str(i).split("<br />")[1:]))
 
     commission.seats = seats
     commission.save()
