@@ -84,6 +84,7 @@ class Commission(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     deputies = ListField(models.ForeignKey(CommissionMembership))
+    seats = DictField()
 
 
 class Document(models.Model, Jsonify):

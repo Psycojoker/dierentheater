@@ -599,6 +599,7 @@ def handle_commission(commission):
     soup = read_or_dl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
     commission.full_name = soup.h1.text
     commission.deputies = []
+    seats = {}
     for i in soup('p'):
         role = i.b.text[:-1]
         for dep in i('a'):
@@ -606,7 +607,11 @@ def handle_commission(commission):
             membership = get_or_create(CommissionMembership, deputy=deputy, commission=commission)
             membership.role = role
             membership.save()
-            commission.deputies.append(membership)
+            commission.deputies.append(membership.id)
+        seats[role] = map(lambda x: (x[0], len(x[1].split(','))), zip(map(lambda x: x.text[:-1], i('b')[1:]), str(i).split("<br />")[1:]))
+
+    commission.seats = seats
+    commission.save()
 
 def run():
     clean()
