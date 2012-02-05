@@ -303,7 +303,6 @@ def deputy_documents(soup, deputy):
     get_deputy_analysis(urls[12], deputy, "divers")
 
 def deputies():
-    deputies_list()
     each_deputies()
 
 def document_to_dico(table):
@@ -615,6 +614,7 @@ def handle_commission(commission):
 
 def run():
     clean()
+    deputies_list()
     commissions()
     deputies()
     documents()
