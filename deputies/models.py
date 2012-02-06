@@ -231,3 +231,11 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
+class WrittenQuestionBulletin(models.Model, Jsonify):
+    lachambre_id = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
+    publication_date = models.CharField(max_length=1337)
+    url = models.URLField()
+    pdf_url = models.URLField()
+    legislature = models.CharField(max_length=1337)

@@ -22,7 +22,7 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup, NavigableString
 from lxml import etree
 
-from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf
+from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin
 
 LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
 
@@ -113,7 +113,7 @@ def table2dic(table):
 
 def clean():
     print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf))
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin))
 
 @hammer_time
 def deputies_list(reset=False):
@@ -611,6 +611,19 @@ def handle_commission(commission):
 
     commission.seats = seats
     commission.save()
+
+def written_questions():
+    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&cfm=qrvaList.cfm&rightmenu=right", "bulletin list 53")
+    for b in soup('table')[4]('tr')[1:]:
+        WrittenQuestionBulletin.objects.create(
+            legislature="53",
+            lachambre_id=b('td')[1]('a')[-1].text,
+            date=b('td')[2].text,
+            publication_date=b('td')[3].text,
+            url=b('td')[1].a["href"],
+            pdf_url=b('td')[0].a["href"],
+        )
+        print b('td')[1]('a')[-1].text
 
 def run():
     clean()
