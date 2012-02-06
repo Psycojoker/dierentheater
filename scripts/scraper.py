@@ -625,9 +625,13 @@ def written_questions():
         )
         print b('td')[1]('a')[-1].text
 
+    for bulletin in list(WrittenQuestionBulletin.objects.all()):
+        read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
+
 def run():
     clean()
     deputies_list()
     commissions()
     deputies()
     documents()
+    written_questions()
