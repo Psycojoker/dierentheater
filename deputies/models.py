@@ -206,9 +206,10 @@ class DocumentTimeLine(models.Model):
 class WrittenQuestion(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     departement = models.CharField(max_length=1337)
-    eurovoc_descriptors = ListField()
     deposition_date = models.CharField(max_length=1337)
     delay_date = models.CharField(max_length=1337, null=True)
+    eurovoc_descriptors = ListField()
+    eurovoc_candidats_descriptors = ListField()
     keywords = ListField()
     url = models.URLField()
     lachambre_id = models.CharField(max_length=1337)
