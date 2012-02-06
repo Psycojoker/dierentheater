@@ -642,6 +642,8 @@ def written_questions():
                           departement=data[u"Département"].text,
                           deposition_date=data[u"Date de dépôt"].text,
                           delay_date=dico_get_text(data, u"Date de délai"),
+                          eurovoc_descriptors=data["Descripteurs Eurovoc"].text.split(" | ") if data.get("Descripteurs Eurovoc") else [],
+                          keywords=data[u"Mots-clés libres"].text.split(" | ") if data.get(u"Mots-clés libres") else [],
                          )
 
 def run():
