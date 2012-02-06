@@ -613,6 +613,11 @@ def handle_commission(commission):
     commission.save()
 
 def written_questions():
+    def dico_get_text(dico, key):
+        if dico.get(key):
+            return dico[key].text
+        return ""
+
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&cfm=qrvaList.cfm&rightmenu=right", "bulletin list 53")
     for b in soup('table')[4]('tr')[1:]:
         WrittenQuestionBulletin.objects.create(
@@ -636,6 +641,7 @@ def written_questions():
                           title=data["Titre"].text,
                           departement=data[u"Département"].text,
                           deposition_date=data[u"Date de dépôt"].text,
+                          delay_date=dico_get_text(data, u"Date de délai"),
                          )
 
 def run():
