@@ -646,6 +646,8 @@ def written_questions():
                           # TODO: link to the actual deputy
                           author=data[u"Auteur"].text,
                           language=data[u"Langue"].text,
+                          question_status=dico_get_text(data, "Statut question"),
+                          status=dico_get_text(data, "Statut"),
                           eurovoc_descriptors=data["Descripteurs Eurovoc"].text.split(" | ") if data.get("Descripteurs Eurovoc") else [],
                           eurovoc_candidats_descriptors=data["Candidats-descripteurs Eurovoc"].text.split(" | ") if data.get("Candidats-descripteurs Eurovoc") else [],
                           keywords=data[u"Mots-clés libres"].text.split(" | ") if data.get(u"Mots-clés libres") else [],
