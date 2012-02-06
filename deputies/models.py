@@ -222,6 +222,7 @@ class WrittenQuestion(models.Model, Jsonify):
     question = models.CharField(max_length=1337)
     answer = models.CharField(max_length=1337)
     publication_reponse_pdf_url = models.CharField(max_length=1337)
+    publication_question_pdf_url = models.CharField(max_length=1337)
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
