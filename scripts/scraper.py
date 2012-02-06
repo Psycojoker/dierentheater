@@ -635,6 +635,7 @@ def written_questions():
                           lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
                           title=data["Titre"].text,
                           departement=data[u"Département"].text,
+                          deposition_date=data[u"Date de dépôt"].text,
                          )
 
 def run():
