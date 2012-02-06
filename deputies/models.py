@@ -217,7 +217,7 @@ class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     reunion_type = models.CharField(max_length=1337, null=True)
     reunion_date = models.CharField(max_length=1337, null=True)
-    session_id = models.CharField(max_length=1337, )
+    session_id = models.CharField(max_length=1337)
     eurovoc_descriptors = ListField()
     keywords = ListField()
     pdf_url = models.URLField(null=True)
