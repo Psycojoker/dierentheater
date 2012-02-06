@@ -215,6 +215,7 @@ class WrittenQuestion(models.Model, Jsonify):
     keywords = ListField()
     url = models.URLField()
     lachambre_id = models.CharField(max_length=1337)
+    language = models.CharField(max_length=1337)
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
