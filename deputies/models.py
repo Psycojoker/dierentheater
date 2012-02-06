@@ -207,6 +207,7 @@ class WrittenQuestion(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     departement = models.CharField(max_length=1337)
     sub_departement = models.CharField(max_length=1337)
+    author = models.CharField(max_length=1337)
     deposition_date = models.CharField(max_length=1337)
     delay_date = models.CharField(max_length=1337, null=True)
     eurovoc_descriptors = ListField()
