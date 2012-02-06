@@ -643,6 +643,7 @@ def written_questions():
                           sub_departement=data[u"Sous-département"].text,
                           deposition_date=data[u"Date de dépôt"].text,
                           delay_date=dico_get_text(data, u"Date de délai"),
+                          publication_date=dico_get_text(data, "Date publication"),
                           # TODO: link to the actual deputy
                           author=data[u"Auteur"].text,
                           language=data[u"Langue"].text,

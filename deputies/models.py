@@ -218,6 +218,7 @@ class WrittenQuestion(models.Model, Jsonify):
     language = models.CharField(max_length=1337)
     status = models.CharField(max_length=1337)
     question_status = models.CharField(max_length=1337)
+    publication_date = models.CharField(max_length=1337)
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
