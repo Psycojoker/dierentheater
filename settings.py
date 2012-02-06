@@ -100,7 +100,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'dierentuin.urls'
+ROOT_URLCONF = PROJECT + '.urls'
 
 TEMPLATE_DIRS = (
     PROJECT_PATH + '/templates',
