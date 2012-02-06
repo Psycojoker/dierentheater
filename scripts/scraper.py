@@ -629,10 +629,13 @@ def written_questions():
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
         for link in soup('table')[4]('tr', recursive=False):
             soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
-            question = get_or_create(WrittenQuestion,
-                                     _id="lachambre_id",
-                                     lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
-                                    )
+            data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
+            get_or_create(WrittenQuestion,
+                          _id="lachambre_id",
+                          lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
+                          title=data["Titre"].text,
+                          departement=data[u"Département"].text,
+                         )
 
 def run():
     clean()
