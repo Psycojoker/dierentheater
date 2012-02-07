@@ -253,6 +253,6 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     lachambre_id = models.CharField(max_length=1337)
     date = models.CharField(max_length=1337)
     publication_date = models.CharField(max_length=1337)
-    url = models.URLField()
+    url = models.URLField(null=True)
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
