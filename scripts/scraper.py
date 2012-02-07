@@ -666,7 +666,9 @@ def written_questions():
 
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
-        for link in soup('table')[4]('tr', recursive=False):
+        if not soup.find('table', 'txt'):
+            continue
+        for link in soup.find('table', 'txt')('tr', recursive=False):
             if link.a is None:
                 continue
             soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
