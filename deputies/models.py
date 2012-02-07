@@ -18,7 +18,7 @@ from json import dumps
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
-LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 class Jsonify(object):
     def json(self):

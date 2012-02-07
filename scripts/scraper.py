@@ -24,7 +24,7 @@ from lxml import etree
 
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin
 
-LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 class AccessControlDict(dict):
     def __init__(self, *args, **kwargs):
@@ -77,7 +77,7 @@ def get_or_create(klass, _id=None, **kwargs):
     if _id is None:
         object = klass.objects.filter(**kwargs)
     else:
-        object = klass.objects.filter(**{_id : kwargs[_id]})
+        object = klass.objects.filter(**{_id: kwargs[_id]})
     if object:
         return object[0]
     else:
@@ -203,7 +203,7 @@ def handle_deputy(deputy, reset=False):
 
 @hammer_time
 def get_deputy_documents(url, deputy, role, type=None, reset=False):
-    print "working on %s %sdocuments" % (role, type + " " if type else '') #, LACHAMBRE_PREFIX + lame_url(urls[index])
+    print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
     setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
     setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
