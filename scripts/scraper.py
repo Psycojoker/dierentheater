@@ -346,9 +346,9 @@ def document_to_dico(table):
                 if not dico[sub_section].get(key):
                     dico[sub_section][key] = []
                 dico[sub_section][key].append(i('td')[1])
+            elif dico[sub_section].get(key):
+                raise Exception("'%s' is already use as a key in the sub_section '%s' for '%s'" % (key, sub_section, dico[sub_section][key]))
             else:
-                if dico[sub_section].get(key):
-                    raise Exception("'%s' is already use as a key in the sub_section '%s' for '%s'" % (key, sub_section, dico[sub_section][key]))
                 dico[sub_section][key] = i('td')[1]
         else:
             key = clean_text(i.td.text)
