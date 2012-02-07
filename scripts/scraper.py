@@ -331,9 +331,7 @@ def document_to_dico(table):
     dico = AccessControlDict()
     sub_section = None
     for i in table:
-        if i == u"\n":
-            continue
-        if i.td.text in ("&#13;", "&nbsp;", "&#160;"):
+        if i == u"\n" or i.td.text in ("&#13;", "&nbsp;", "&#160;"):
             continue
         if i.td.b:
             sub_section = clean_text(i.td.b.text)
