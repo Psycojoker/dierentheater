@@ -164,6 +164,29 @@ def handle_deputy(deputy, reset=False):
     else:
         deputy.sex = None
 
+    split_deputy_full_name(deputy, soup)
+
+    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
+    # look at the bottom of each deputies' page
+    #membership = soup.find('td', rowspan="1")
+    #item = membership.h4
+    #role = None
+    #deputy.commissions = []
+    #while item.nextSibling:
+        #if hasattr(item, 'tag'):
+            #if item.name == 'h5':
+                #role = item.text[6:-1]
+            #elif item.name == 'div':
+                #print "linking deputy to commission", item.a.text
+                #commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                #deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
+        #item = item.nextSibling
+
+    #deputy_documents(soup, deputy)
+    deputy.save()
+
+
+def split_deputy_full_name(deputy, soup):
     # stupid special case
     if deputy.full_name == "Fernandez Fernandez Julie":
         deputy.first_name = "Julie"
@@ -192,25 +215,6 @@ def handle_deputy(deputy, reset=False):
         deputy.first_name = deputy.full_name.split(" ")[1].strip()
         deputy.last_name = deputy.full_name.split(" ")[0].strip()
         print [deputy.first_name], [deputy.last_name]
-
-    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
-    # look at the bottom of each deputies' page
-    #membership = soup.find('td', rowspan="1")
-    #item = membership.h4
-    #role = None
-    #deputy.commissions = []
-    #while item.nextSibling:
-        #if hasattr(item, 'tag'):
-            #if item.name == 'h5':
-                #role = item.text[6:-1]
-            #elif item.name == 'div':
-                #print "linking deputy to commission", item.a.text
-                #commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
-                #deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
-        #item = item.nextSibling
-
-    #deputy_documents(soup, deputy)
-    deputy.save()
 
 
 @hammer_time
