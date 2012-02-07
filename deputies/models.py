@@ -258,3 +258,11 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     url = models.URLField(null=True)
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
+
+
+class AnnualReport(models.Model, Jsonify):
+    title = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
+    law_and_article = models.CharField(max_length=1337)
+    periodicity = models.CharField(max_length=1337)
+    pdf_url = models.URLField()
