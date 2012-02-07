@@ -26,6 +26,7 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
+
 class AccessControlDict(dict):
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
@@ -56,6 +57,7 @@ def clean_text(text):
 
     return re.sub("(\r|\t|\n| )+", " ", re.sub("&#\d+;", rep, text)).strip()
 
+
 def hammer_time(function):
     "decorator to retry to download a page because La Chambre website sucks"
     def wrap(*args, **kwargs):
@@ -69,9 +71,11 @@ def hammer_time(function):
         print "WARNING, function keeps failling", function, args, kwargs
     return wrap
 
+
 def lame_url(url):
     # convert super lame urls of lachambre.be into something uzable
     return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
+
 
 def get_or_create(klass, _id=None, **kwargs):
     if _id is None:
@@ -83,6 +87,7 @@ def get_or_create(klass, _id=None, **kwargs):
     else:
         print "add new", klass.__name__, kwargs
         return klass.objects.create(**kwargs)
+
 
 def read_or_dl(url, name, reset=False):
     print "parsing", url
@@ -96,6 +101,7 @@ def read_or_dl(url, name, reset=False):
         raise IndexError
     return soup
 
+
 def lxml_read_or_dl(url, name, reset=False):
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name)
@@ -105,15 +111,18 @@ def lxml_read_or_dl(url, name, reset=False):
     soup = etree.parse(text, etree.HTMLParser())
     return soup
 
+
 def table2dic(table):
     dico = {}
     for x, y in zip(table[::2], table[1::2]):
         dico[x.text] = y.text if y.a is None else y.a
     return dico
 
+
 def clean():
     print "cleaning db"
     map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin))
+
 
 @hammer_time
 def deputies_list(reset=False):
@@ -136,10 +145,12 @@ def deputies_list(reset=False):
                               emails=[email])
         print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
+
 def each_deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
         handle_deputy(deputy)
+
 
 @hammer_time
 def handle_deputy(deputy, reset=False):
@@ -201,6 +212,7 @@ def handle_deputy(deputy, reset=False):
     #deputy_documents(soup, deputy)
     deputy.save()
 
+
 @hammer_time
 def get_deputy_documents(url, deputy, role, type=None, reset=False):
     print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
@@ -223,6 +235,7 @@ def get_deputy_documents(url, deputy, role, type=None, reset=False):
                                      eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
                                      keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
+
 @hammer_time
 def get_deputy_written_questions(url, deputy, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
@@ -243,6 +256,7 @@ def get_deputy_written_questions(url, deputy, reset=False):
                                      eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
                                      keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
                                      url=i.a['href']))
+
 
 @hammer_time
 def get_deputy_questions(url, deputy, type, reset=False):
@@ -267,6 +281,7 @@ def get_deputy_questions(url, deputy, type, reset=False):
                                      url=i.a['href'],
                                      type=type))
 
+
 @hammer_time
 def get_deputy_analysis(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
@@ -285,6 +300,7 @@ def get_deputy_analysis(url, deputy, type, reset=False):
                                      url=i.a['href'],
                                      type=type))
 
+
 def deputy_documents(soup, deputy):
     # here we are in the grey black box
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
@@ -302,8 +318,10 @@ def deputy_documents(soup, deputy):
     get_deputy_analysis(urls[11], deputy, "parlimentary_control")
     get_deputy_analysis(urls[12], deputy, "divers")
 
+
 def deputies():
     each_deputies()
+
 
 def document_to_dico(table):
     dico = AccessControlDict()
@@ -343,6 +361,7 @@ def document_to_dico(table):
                 dico[key] = i('td')[1]
     return dico
 
+
 def documents():
     for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
         for soup in read_or_dl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)('table')[4]('tr', valign="top"):
@@ -350,6 +369,7 @@ def documents():
 
     for document in list(Document.objects.all()):
         handle_document(document)
+
 
 def document_pdf_part_cutter(soup):
     result = []
@@ -365,6 +385,7 @@ def document_pdf_part_cutter(soup):
 
     result.append(blob)
     return result
+
 
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
@@ -576,6 +597,7 @@ def handle_document(document):
         import sys
         sys.exit(1)
 
+
 def commissions():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
     _type = ""
@@ -594,6 +616,7 @@ def commissions():
     for com in list(Commission.objects.all()):
         handle_commission(com)
 
+
 def handle_commission(commission):
     soup = read_or_dl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
     commission.full_name = soup.h1.text
@@ -611,6 +634,7 @@ def handle_commission(commission):
 
     commission.seats = seats
     commission.save()
+
 
 def written_questions():
     def dico_get_text(dico, key):
@@ -670,6 +694,7 @@ def written_questions():
                 print "------------ stop ------------"
                 import sys
                 sys.exit(1)
+
 
 def run():
     clean()

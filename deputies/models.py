@@ -20,9 +20,11 @@ from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
+
 class Jsonify(object):
     def json(self):
         return dumps(self.__class__.objects.filter(pk=self.pk).values()[0], indent=4)
+
 
 class Deputy(models.Model, Jsonify):
     full_name = models.CharField(max_length=1337, unique=True)
@@ -62,6 +64,7 @@ class Deputy(models.Model, Jsonify):
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
+
 
 class Party(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
@@ -224,6 +227,7 @@ class WrittenQuestion(models.Model, Jsonify):
     publication_reponse_pdf_url = models.CharField(max_length=1337)
     publication_question_pdf_url = models.CharField(max_length=1337)
 
+
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     reunion_type = models.CharField(max_length=1337, null=True)
@@ -236,12 +240,14 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
+
 class Analysis(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     descriptor = models.CharField(max_length=1337)
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
 
 class WrittenQuestionBulletin(models.Model, Jsonify):
     lachambre_id = models.CharField(max_length=1337)
