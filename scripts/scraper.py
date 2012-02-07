@@ -652,32 +652,35 @@ def handle_commission(commission):
 
 
 def written_questions():
+    def get_written_question_bulletin():
+        for i in range(48, 54):
+            soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
+            for b in soup('table')[4]('tr')[1:]:
+                if i == 53:
+                    WrittenQuestionBulletin.objects.create(
+                        legislature="53",
+                        lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                        date=b('td')[2].text,
+                        publication_date=b('td')[3].text,
+                        url=b('td')[1].a["href"],
+                        pdf_url=b('td')[0].a["href"],
+                    )
+                else:
+                    WrittenQuestionBulletin.objects.create(
+                        legislature=str(i),
+                        lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                        publication_date=b('td')[2].text,
+                        url=b('td')[1].a["href"] if b('td')[1].a else None,
+                        pdf_url=b('td')[0].a["href"],
+                    )
+                print b('td')[0]('a')[-1].text.split()[-1]
+
     def dico_get_text(dico, key):
         if dico.get(key):
             return dico[key].text
         return ""
 
-    for i in range(48, 54):
-        soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
-        for b in soup('table')[4]('tr')[1:]:
-            if i == 53:
-                WrittenQuestionBulletin.objects.create(
-                    legislature="53",
-                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                    date=b('td')[2].text,
-                    publication_date=b('td')[3].text,
-                    url=b('td')[1].a["href"],
-                    pdf_url=b('td')[0].a["href"],
-                )
-            else:
-                WrittenQuestionBulletin.objects.create(
-                    legislature=str(i),
-                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                    publication_date=b('td')[2].text,
-                    url=b('td')[1].a["href"] if b('td')[1].a else None,
-                    pdf_url=b('td')[0].a["href"],
-                )
-            print b('td')[0]('a')[-1].text.split()[-1]
+    get_written_question_bulletin()
 
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
