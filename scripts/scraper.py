@@ -642,17 +642,27 @@ def written_questions():
             return dico[key].text
         return ""
 
-    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&cfm=qrvaList.cfm&rightmenu=right", "bulletin list 53")
-    for b in soup('table')[4]('tr')[1:]:
-        WrittenQuestionBulletin.objects.create(
-            legislature="53",
-            lachambre_id=b('td')[1]('a')[-1].text,
-            date=b('td')[2].text,
-            publication_date=b('td')[3].text,
-            url=b('td')[1].a["href"],
-            pdf_url=b('td')[0].a["href"],
-        )
-        print b('td')[1]('a')[-1].text
+    for i in range(48, 54):
+        soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
+        for b in soup('table')[4]('tr')[1:]:
+            if i == 53:
+                WrittenQuestionBulletin.objects.create(
+                    legislature="53",
+                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                    date=b('td')[2].text,
+                    publication_date=b('td')[3].text,
+                    url=b('td')[1].a["href"],
+                    pdf_url=b('td')[0].a["href"],
+                )
+            else:
+                WrittenQuestionBulletin.objects.create(
+                    legislature=str(i),
+                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                    publication_date=b('td')[2].text,
+                    url=b('td')[1].a["href"] if b('td')[1].a else None,
+                    pdf_url=b('td')[0].a["href"],
+                )
+            print b('td')[0]('a')[-1].text.split()[-1]
 
     for bulletin in list(WrittenQuestionBulletin.objects.all()):
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
