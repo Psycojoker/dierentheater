@@ -217,49 +217,49 @@ def split_deputy_full_name(deputy, soup):
         print [deputy.first_name], [deputy.last_name]
 
 
-@hammer_time
-def get_deputy_documents(url, deputy, role, type=None, reset=False):
-    print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
-    setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
-    setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", type if type else '', role, i.tr('td')[1].text
-        dico = table2dic(i.table('td'))
-        print dico
-        getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
-                append(get_or_create(Document, _id="lachambre_id",
-                                     lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
-                                     url=i.a['href'],
-                                     title=dico["Titre :"],
-                                     status_chambre=dico.get("Chambre FR :"),
-                                     status_senat=dico.get("Sénat FR :"),
-                                     deposition_date=dico.get("Date :"),
-                                     eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
-                                     eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
-                                     keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
+#@hammer_time
+#def get_deputy_documents(url, deputy, role, type=None, reset=False):
+    #print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
+    #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
+    #setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
+    #setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
+    #for i in soupsoup('table')[3]('tr', valign="top"):
+        #print "add", type if type else '', role, i.tr('td')[1].text
+        #dico = table2dic(i.table('td'))
+        #print dico
+        #getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
+                #append(get_or_create(Document, _id="lachambre_id",
+                                     #lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
+                                     #url=i.a['href'],
+                                     #title=dico["Titre :"],
+                                     #status_chambre=dico.get("Chambre FR :"),
+                                     #status_senat=dico.get("Sénat FR :"),
+                                     #deposition_date=dico.get("Date :"),
+                                     #eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
+                                     #eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
+                                     #keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
 
-@hammer_time
-def get_deputy_written_questions(url, deputy, reset=False):
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
-    deputy.questions_written_url = url
-    deputy.questions_written_list = []
-    for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", type, i.tr('td')[1].text.strip()
-        dico = table2dic(i.table('td'))
-        print dico
-        deputy.questions_written_list.\
-                append(get_or_create(WrittenQuestion,
-                                     _id="lachambre_id",
-                                     title=dico["Titre"],
-                                     departement=dico.get(u"Département"),
-                                     lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                     deposition_date=dico.get(u"Date de dépôt"),
-                                     delay_date=dico.get(u"Date de délai"),
-                                     eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
-                                     keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
-                                     url=i.a['href']))
+#@hammer_time
+#def get_deputy_written_questions(url, deputy, reset=False):
+    #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
+    #deputy.questions_written_url = url
+    #deputy.questions_written_list = []
+    #for i in soupsoup('table')[3]('tr', valign="top"):
+        #print "add", type, i.tr('td')[1].text.strip()
+        #dico = table2dic(i.table('td'))
+        #print dico
+        #deputy.questions_written_list.\
+                #append(get_or_create(WrittenQuestion,
+                                     #_id="lachambre_id",
+                                     #title=dico["Titre"],
+                                     #departement=dico.get(u"Département"),
+                                     #lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                     #deposition_date=dico.get(u"Date de dépôt"),
+                                     #delay_date=dico.get(u"Date de délai"),
+                                     #eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
+                                     #keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
+                                     #url=i.a['href']))
 
 
 @hammer_time
@@ -309,12 +309,12 @@ def deputy_documents(soup, deputy):
     # here we are in the grey black box
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
-    get_deputy_documents(urls[0], deputy, "author", "principal")
-    get_deputy_documents(urls[1], deputy, "signator", "principal")
-    get_deputy_documents(urls[2], deputy, "author", "next")
-    get_deputy_documents(urls[3], deputy, "signator", "next")
-    get_deputy_documents(urls[4], deputy, "rapporter")
-    get_deputy_written_questions(urls[5], deputy)
+    #get_deputy_documents(urls[0], deputy, "author", "principal")
+    #get_deputy_documents(urls[1], deputy, "signator", "principal")
+    #get_deputy_documents(urls[2], deputy, "author", "next")
+    #get_deputy_documents(urls[3], deputy, "signator", "next")
+    #get_deputy_documents(urls[4], deputy, "rapporter")
+    #get_deputy_written_questions(urls[5], deputy)
     # no one seems to do any interpellations nor motions or maybe the website is just broken
     get_deputy_questions(urls[8], deputy, "oral_plenary")
     get_deputy_questions(urls[9], deputy, "oral_commission")
