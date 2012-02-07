@@ -47,6 +47,19 @@ class AccessControlDict(dict):
 
         return a
 
+    def die_if_got_not_accessed_keys(self):
+        if self.get_not_accessed_keys():
+            print "\nError: untreated sections:"
+            for i in self.get_not_accessed_keys():
+                if isinstance(i, (str, unicode)):
+                    print "*", i
+                else:
+                    for j in i:
+                        print "    *", j
+            print "------------ stop ------------"
+            import sys
+            sys.exit(1)
+
 
 def clean_text(text):
     def rep(result):
@@ -597,17 +610,7 @@ def handle_document(document):
         document.document_senat = document_senat
 
     document.save()
-    if dico.get_not_accessed_keys():
-        print "\nError: untreated sections:"
-        for i in dico.get_not_accessed_keys():
-            if isinstance(i, (str, unicode)):
-                print "*", i
-            else:
-                for j in i:
-                    print "    *", j
-        print "------------ stop ------------"
-        import sys
-        sys.exit(1)
+    dico.die_if_got_not_accessed_keys()
 
 
 def commissions():
@@ -711,17 +714,7 @@ def written_questions():
                           url=link.a["href"],
                          )
 
-            if data.get_not_accessed_keys():
-                print "\nError: untreated sections:"
-                for i in data.get_not_accessed_keys():
-                    if isinstance(i, (str, unicode)):
-                        print "*", i
-                    else:
-                        for j in i:
-                            print "    *", j
-                print "------------ stop ------------"
-                import sys
-                sys.exit(1)
+            data.die_if_got_not_accessed_keys()
 
 
 def annual_reports():
