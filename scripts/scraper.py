@@ -512,6 +512,36 @@ def handle_document(document):
             document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
     def get_document_chambre(dico, document):
+        def get_authors(chambre_dico, document_chambre):
+            if chambre_dico.get('Auteur(s)'):
+                for dep, role in zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')):
+                    lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
+                    deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                    document_chambre.authors.append({
+                        "lachambre_id": deputy.lachambre_id,
+                        "id": deputy.id,
+                        "full_name": deputy.full_name,
+                        "role": role.text[1:-1]
+                    })
+
+        def get_next_documents(chambre_dico, document_chambre):
+            if chambre_dico.get('Document(s) suivant(s)'):
+                for d in document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']):
+                    print "add pdf %s" % clean_text(d[0].font.text)
+                    doc = OtherDocumentChambrePdf()
+                    doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                    doc.type = clean_text(d[0].font.text)
+                    doc.distribution_date = d[1]('td')[-1].text
+                    for dep in d[2:]:
+                        if dep.a:
+                            lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
+                            deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                            doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
+                        else:
+                            doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
+                    doc.save()
+                    document_chambre.other_pdfs.append(doc)
+
         if not dico.get("Document Chambre"):
             return
 
@@ -527,37 +557,13 @@ def handle_document(document):
         document_chambre.status = get_text_else_blank(chambre_dico, u'Statut')
         document_chambre.comments = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
 
-        if chambre_dico.get('Auteur(s)'):
-            for dep, role in zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')):
-                lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
-                deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                document_chambre.authors.append({
-                    "lachambre_id": deputy.lachambre_id,
-                    "id": deputy.id,
-                    "full_name": deputy.full_name,
-                    "role": role.text[1:-1]
-                })
+        get_authors(chambre_dico, document_chambre)
 
         url, tipe, session = clean_text(str(chambre_dico[u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
 
-        if chambre_dico.get('Document(s) suivant(s)'):
-            for d in document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']):
-                print "add pdf %s" % clean_text(d[0].font.text)
-                doc = OtherDocumentChambrePdf()
-                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-                doc.type = clean_text(d[0].font.text)
-                doc.distribution_date = d[1]('td')[-1].text
-                for dep in d[2:]:
-                    if dep.a:
-                        lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
-                        deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                        doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
-                    else:
-                        doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
-                doc.save()
-                document_chambre.other_pdfs.append(doc)
+        get_next_documents(chambre_dico, document_chambre)
 
         if chambre_dico.get(u'Document(s) joint(s)/lié(s)'):
             document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in chambre_dico[u'Document(s) joint(s)/lié(s)']]
