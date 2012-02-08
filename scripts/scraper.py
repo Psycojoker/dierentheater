@@ -413,6 +413,199 @@ def document_pdf_part_cutter(soup):
 
 
 def handle_document(document):
+    def get_first_level_data(dico, document):
+        if dico.get("Etat d'avancement"):
+            document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
+            document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
+
+        document.deposition_date = dico[u"Date de dépôt"].text
+        if dico.get("Article Constitution"):
+            document.constitution_article = clean_text(dico["Article Constitution"].text)
+        if dico.get("Descripteur Eurovoc principal"):
+            document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
+        if dico.get("Descripteurs Eurovoc"):
+            document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
+        if dico.get("Candidats-descripteurs Eurovoc"):
+            document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
+        if dico.get(u"Mots-clés libres"):
+            document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+        if dico.get(u'Vote Chambre'):
+            document.vote_date = dico["Vote Chambre"].text
+        if dico.get(u"Date de la loi"):
+            document.law_date = dico["Date de la loi"].text
+        if dico.get(u"Moniteur n°"):
+            document.moniteur_number = dico[u"Moniteur n°"].text
+        if dico.get(u"Date moniteur"):
+            document.moniteur_date = dico[u"Date moniteur"].text
+        if dico.get(u"Vote Sénat"):
+            document.vote_senat_date = dico[u"Vote Sénat"].text
+        if dico.get(u"Vote candidature"):
+            document.candidature_vote_date = dico[u"Vote candidature"].text
+        if dico.get("Documents principaux"):
+            document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
+
+    def get_in_charged_commissions(dico, document):
+        document.in_charge_commissions = []
+        for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
+            icc = InChargeCommissions()
+            icc.visibility = clean_text(dico[key]["head"].text).split()[-1]
+            icc.commission = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+            if dico[key].get("Rapporteur"):
+                # FIXME link to actual deputies
+                icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
+
+            icc.incident = []
+            if dico[key].get("Incident"):
+                for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
+                    icc.incident.append({"date": _date, "type": _type})
+
+            icc.agenda = []
+            if dico[key].get("Calendrier"):
+                for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
+                    icc.agenda.append({"date": _date, "type": _type})
+
+            if dico[key].get("Rapport"):
+                icc.rapport = {"url": dico[key]["Rapport"].a["href"], "date": clean_text(dico[key]["Rapport"].contents[-2])}
+
+            icc.save()
+            document.in_charge_commissions.append(icc)
+
+    def get_plenaries(dico, document):
+        document.plenaries = []
+        for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys()):
+            pl = DocumentPlenary()
+            pl.visibility = clean_text(dico[key]["head"].text).split()[-1]
+            pl.type = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+
+            pl.agenda = []
+            if dico[key].get("Calendrier"):
+                for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
+                    pl.agenda.append({"date": _date, "type": _type})
+
+            pl.incident = []
+            if dico[key].get("Incident"):
+                for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
+                    pl.incident.append({"date": _date, "type": _type})
+
+            pl.save()
+            document.plenaries.append(pl)
+
+    def get_senat_plenaries(dico, document):
+        document.senat_plenaries = []
+        for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE SENAT", x), dico.keys()):
+            spl = DocumentSenatPlenary()
+            spl.visibility = clean_text(dico[key]["head"].text).split()[-1]
+
+            spl.agenda = []
+            if dico[key].get("Calendrier"):
+                for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
+                    spl.agenda.append({"date": _date, "type": _type})
+
+            spl.save()
+            document.senat_plenaries.append(spl)
+
+    def get_competences(dico, document):
+        if dico.get(u"Compétence"):
+            document.timeline = []
+            for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
+                print "append time line", a, b
+                document.timeline.append(DocumentTimeLine.objects.create(title=b, date=a))
+        if dico.get("Analyse des interventions"):
+            document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
+
+    def get_document_chambre(dico, document):
+        if dico.get("Document Chambre"):
+            document_chambre = DocumentChambre()
+            document_chambre.deposition_date = dico['Document Chambre'][u'Date de dépôt'].text
+            document_chambre.type = dico['Document Chambre'][u'Type de document'].text
+            if dico['Document Chambre'].get(u'Prise en considération'):
+                document_chambre.taken_in_account_date = dico['Document Chambre'][u'Prise en considération'].text
+            if dico['Document Chambre'].get(u'Date de distribution'):
+                document_chambre.distribution_date = dico['Document Chambre'][u'Date de distribution'].text
+            if dico['Document Chambre'].get(u'Date d\'envoi'):
+                document_chambre.sending_date = dico['Document Chambre'][u'Date d\'envoi'].text
+            if dico['Document Chambre'].get(u'Date de fin'):
+                document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
+            if dico['Document Chambre'].get(u'Statut'):
+                document_chambre.status = dico['Document Chambre'][u'Statut'].text
+
+            if dico['Document Chambre'].get('Auteur(s)'):
+                for dep, role in zip(dico['Document Chambre'][u'Auteur(s)']('a'), dico['Document Chambre'][u'Auteur(s)']('i')):
+                    lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
+                    deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                    document_chambre.authors.append({
+                        "lachambre_id": deputy.lachambre_id,
+                        "id": deputy.id,
+                        "full_name": deputy.full_name,
+                        "role": role.text[1:-1]
+                    })
+
+            if dico['Document Chambre'].get(u'Commentaire'):
+                document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
+
+            url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
+            url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
+            document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+
+            if dico['Document Chambre'].get('Document(s) suivant(s)'):
+                for d in document_pdf_part_cutter(dico['Document Chambre'][u'Document(s) suivant(s)']):
+                    print "add pdf %s" % clean_text(d[0].font.text)
+                    doc = OtherDocumentChambrePdf()
+                    doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                    doc.type = clean_text(d[0].font.text)
+                    doc.distribution_date = d[1]('td')[-1].text
+                    for dep in d[2:]:
+                        if dep.a:
+                            lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
+                            deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                            doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
+                        else:
+                            doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
+                    doc.save()
+                    document_chambre.other_pdfs.append(doc)
+
+            if dico["Document Chambre"].get(u'Document(s) joint(s)/lié(s)'):
+                document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in dico['Document Chambre'][u'Document(s) joint(s)/lié(s)']]
+
+            document_chambre.save()
+            document.document_chambre = document_chambre
+
+    def get_document_senat(dico, document):
+        if dico.get(u"Document Sénat"):
+            document_senat = DocumentSenat()
+            document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
+            if dico[u"Document Sénat"].get(u"Date de fin"):
+                document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
+            document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
+            if dico[u'Document Sénat'].get(u'Commentaire'):
+                document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
+            if dico[u"Document Sénat"].get(u"Auteur(s)"):
+                document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
+            if dico[u'Document Sénat'].get(u'Commentaire'):
+                document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
+            if dico[u'Document Sénat'].get(u'Statut'):
+                document_senat.status = dico[u'Document Sénat'][u'Statut'].text
+
+            url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
+            url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
+            document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+
+            if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
+                for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
+                    print "add pdf %s" % clean_text(d[0].font.text)
+                    doc = OtherDocumentSenatPdf()
+                    doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                    doc.type = clean_text(d[0].font.text)
+                    doc.date = d[0]('td')[-1].contents[0]
+                    doc.authors = []
+                    for dep in d[1:]:
+                        doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
+                    doc.save()
+                    document_senat.other_pdfs.append(doc)
+
+            document_senat.save()
+            document.document_senat = document_senat
+
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
     document.title = soup.h4.text
@@ -421,193 +614,13 @@ def handle_document(document):
     table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
     dico = document_to_dico(list(table.table('tr', recursive=False)))
 
-    if dico.get("Etat d'avancement"):
-        document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
-        document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
-
-    document.deposition_date = dico[u"Date de dépôt"].text
-    if dico.get("Article Constitution"):
-        document.constitution_article = clean_text(dico["Article Constitution"].text)
-    if dico.get("Descripteur Eurovoc principal"):
-        document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
-    if dico.get("Descripteurs Eurovoc"):
-        document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
-    if dico.get("Candidats-descripteurs Eurovoc"):
-        document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
-    if dico.get(u"Mots-clés libres"):
-        document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
-    if dico.get(u'Vote Chambre'):
-        document.vote_date = dico["Vote Chambre"].text
-    if dico.get(u"Date de la loi"):
-        document.law_date = dico["Date de la loi"].text
-    if dico.get(u"Moniteur n°"):
-        document.moniteur_number = dico[u"Moniteur n°"].text
-    if dico.get(u"Date moniteur"):
-        document.moniteur_date = dico[u"Date moniteur"].text
-    if dico.get(u"Vote Sénat"):
-        document.vote_senat_date = dico[u"Vote Sénat"].text
-    if dico.get(u"Vote candidature"):
-        document.candidature_vote_date = dico[u"Vote candidature"].text
-    if dico.get("Documents principaux"):
-        document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
-
-    document.in_charge_commissions = []
-    for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
-        icc = InChargeCommissions()
-        icc.visibility = clean_text(dico[key]["head"].text).split()[-1]
-        icc.commission = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
-        if dico[key].get("Rapporteur"):
-            # FIXME link to actual deputies
-            icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
-
-        icc.incident = []
-        if dico[key].get("Incident"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
-                icc.incident.append({"date": _date, "type": _type})
-
-        icc.agenda = []
-        if dico[key].get("Calendrier"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
-                icc.agenda.append({"date": _date, "type": _type})
-
-        if dico[key].get("Rapport"):
-            icc.rapport = {"url": dico[key]["Rapport"].a["href"], "date": clean_text(dico[key]["Rapport"].contents[-2])}
-
-        icc.save()
-        document.in_charge_commissions.append(icc)
-
-    document.plenaries = []
-    for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys()):
-        pl = DocumentPlenary()
-        pl.visibility = clean_text(dico[key]["head"].text).split()[-1]
-        pl.type = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
-
-        pl.agenda = []
-        if dico[key].get("Calendrier"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
-                pl.agenda.append({"date": _date, "type": _type})
-
-        pl.incident = []
-        if dico[key].get("Incident"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
-                pl.incident.append({"date": _date, "type": _type})
-
-        pl.save()
-        document.plenaries.append(pl)
-
-    document.senat_plenaries = []
-    for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE SENAT", x), dico.keys()):
-        spl = DocumentSenatPlenary()
-        spl.visibility = clean_text(dico[key]["head"].text).split()[-1]
-
-        spl.agenda = []
-        if dico[key].get("Calendrier"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
-                spl.agenda.append({"date": _date, "type": _type})
-
-        spl.save()
-        document.senat_plenaries.append(spl)
-
-    if dico.get(u"Compétence"):
-        document.timeline = []
-        for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
-            print "append time line", a, b
-            document.timeline.append(DocumentTimeLine.objects.create(title=b, date=a))
-    if dico.get("Analyse des interventions"):
-        document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
-
-    # document chambre
-    if dico.get("Document Chambre"):
-        document_chambre = DocumentChambre()
-        document_chambre.deposition_date = dico['Document Chambre'][u'Date de dépôt'].text
-        document_chambre.type = dico['Document Chambre'][u'Type de document'].text
-        if dico['Document Chambre'].get(u'Prise en considération'):
-            document_chambre.taken_in_account_date = dico['Document Chambre'][u'Prise en considération'].text
-        if dico['Document Chambre'].get(u'Date de distribution'):
-            document_chambre.distribution_date = dico['Document Chambre'][u'Date de distribution'].text
-        if dico['Document Chambre'].get(u'Date d\'envoi'):
-            document_chambre.sending_date = dico['Document Chambre'][u'Date d\'envoi'].text
-        if dico['Document Chambre'].get(u'Date de fin'):
-            document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
-        if dico['Document Chambre'].get(u'Statut'):
-            document_chambre.status = dico['Document Chambre'][u'Statut'].text
-
-        if dico['Document Chambre'].get('Auteur(s)'):
-            for dep, role in zip(dico['Document Chambre'][u'Auteur(s)']('a'), dico['Document Chambre'][u'Auteur(s)']('i')):
-                lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
-                deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                document_chambre.authors.append({
-                    "lachambre_id": deputy.lachambre_id,
-                    "id": deputy.id,
-                    "full_name": deputy.full_name,
-                    "role": role.text[1:-1]
-                })
-
-        if dico['Document Chambre'].get(u'Commentaire'):
-            document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
-
-        url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
-        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-        document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
-
-        if dico['Document Chambre'].get('Document(s) suivant(s)'):
-            for d in document_pdf_part_cutter(dico['Document Chambre'][u'Document(s) suivant(s)']):
-                print "add pdf %s" % clean_text(d[0].font.text)
-                doc = OtherDocumentChambrePdf()
-                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-                doc.type = clean_text(d[0].font.text)
-                doc.distribution_date = d[1]('td')[-1].text
-                for dep in d[2:]:
-                    if dep.a:
-                        lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
-                        deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                        doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
-                    else:
-                        doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
-                doc.save()
-                document_chambre.other_pdfs.append(doc)
-
-        if dico["Document Chambre"].get(u'Document(s) joint(s)/lié(s)'):
-            document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in dico['Document Chambre'][u'Document(s) joint(s)/lié(s)']]
-
-        document_chambre.save()
-        document.document_chambre = document_chambre
-
-    # document senat
-    if dico.get(u"Document Sénat"):
-        document_senat = DocumentSenat()
-        document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
-        if dico[u"Document Sénat"].get(u"Date de fin"):
-            document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
-        document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
-        if dico[u'Document Sénat'].get(u'Commentaire'):
-            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-        if dico[u"Document Sénat"].get(u"Auteur(s)"):
-            document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
-        if dico[u'Document Sénat'].get(u'Commentaire'):
-            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-        if dico[u'Document Sénat'].get(u'Statut'):
-            document_senat.status = dico[u'Document Sénat'][u'Statut'].text
-
-        url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
-        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-        document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
-
-        if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
-            for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
-                print "add pdf %s" % clean_text(d[0].font.text)
-                doc = OtherDocumentSenatPdf()
-                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-                doc.type = clean_text(d[0].font.text)
-                doc.date = d[0]('td')[-1].contents[0]
-                doc.authors = []
-                for dep in d[1:]:
-                    doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
-                doc.save()
-                document_senat.other_pdfs.append(doc)
-
-        document_senat.save()
-        document.document_senat = document_senat
+    get_first_level_data(dico, document)
+    get_in_charged_commissions(dico, document)
+    get_plenaries(dico, document)
+    get_senat_plenaries(dico, document)
+    get_competences(dico, document)
+    get_document_chambre(dico, document)
+    get_document_senat(dico, document)
 
     document.save()
     dico.die_if_got_not_accessed_keys()
