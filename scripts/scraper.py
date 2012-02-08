@@ -571,40 +571,42 @@ def handle_document(document):
         document.document_chambre = document_chambre
 
     def get_document_senat(dico, document):
-        if dico.get(u"Document Sénat"):
-            document_senat = DocumentSenat()
-            document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
-            if dico[u"Document Sénat"].get(u"Date de fin"):
-                document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
-            document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
-            if dico[u'Document Sénat'].get(u'Commentaire'):
-                document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-            if dico[u"Document Sénat"].get(u"Auteur(s)"):
-                document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
-            if dico[u'Document Sénat'].get(u'Commentaire'):
-                document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-            if dico[u'Document Sénat'].get(u'Statut'):
-                document_senat.status = dico[u'Document Sénat'][u'Statut'].text
+        if not dico.get(u"Document Sénat"):
+            return
 
-            url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
-            url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-            document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+        document_senat = DocumentSenat()
+        document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
+        if dico[u"Document Sénat"].get(u"Date de fin"):
+            document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
+        document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
+        if dico[u'Document Sénat'].get(u'Commentaire'):
+            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
+        if dico[u"Document Sénat"].get(u"Auteur(s)"):
+            document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
+        if dico[u'Document Sénat'].get(u'Commentaire'):
+            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
+        if dico[u'Document Sénat'].get(u'Statut'):
+            document_senat.status = dico[u'Document Sénat'][u'Statut'].text
 
-            if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
-                for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
-                    print "add pdf %s" % clean_text(d[0].font.text)
-                    doc = OtherDocumentSenatPdf()
-                    doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-                    doc.type = clean_text(d[0].font.text)
-                    doc.date = d[0]('td')[-1].contents[0]
-                    doc.authors = []
-                    for dep in d[1:]:
-                        doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
-                    doc.save()
-                    document_senat.other_pdfs.append(doc)
+        url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
+        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
+        document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
 
-            document_senat.save()
-            document.document_senat = document_senat
+        if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
+            for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
+                print "add pdf %s" % clean_text(d[0].font.text)
+                doc = OtherDocumentSenatPdf()
+                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                doc.type = clean_text(d[0].font.text)
+                doc.date = d[0]('td')[-1].contents[0]
+                doc.authors = []
+                for dep in d[1:]:
+                    doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
+                doc.save()
+                document_senat.other_pdfs.append(doc)
+
+        document_senat.save()
+        document.document_senat = document_senat
 
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
