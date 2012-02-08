@@ -417,33 +417,36 @@ def document_pdf_part_cutter(soup):
 
 def handle_document(document):
     def get_first_level_data(dico, document):
+        document.deposition_date = dico[u"Date de dépôt"].text
+        document.constitution_article = clean_text(get_text_else_blank(dico, "Article Constitution"))
+        if dico.get("Descripteur Eurovoc principal"):
+            document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"]
+        document.vote_date = get_text_else_blank(dico, "Vote Chambre")
+        document.law_date = get_text_else_blank(dico, "Date de la loi")
+        document.moniteur_number = get_text_else_blank(dico, u"Moniteur n°")
+        document.moniteur_date = get_text_else_blank(dico, u"Date moniteur")
+        document.vote_senat_date = get_text_else_blank(dico, u"Vote Sénat")
+        document.candidature_vote_date = get_text_else_blank(dico, u"Vote candidature")
+
         if dico.get("Etat d'avancement"):
             document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
             document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
         document.deposition_date = dico[u"Date de dépôt"].text
-        if dico.get("Article Constitution"):
-            document.constitution_article = clean_text(dico["Article Constitution"].text)
-        if dico.get("Descripteur Eurovoc principal"):
-            document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"].text
+        document.constitution_article = clean_text(get_text_else_blank(dico, "Article Constitution"))
+        document.eurovoc_main_descriptor = get_text_else_blank(dico["Descripteur Eurovoc principal"], "head")
         if dico.get("Descripteurs Eurovoc"):
             document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
         if dico.get("Candidats-descripteurs Eurovoc"):
             document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
         if dico.get(u"Mots-clés libres"):
             document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
-        if dico.get(u'Vote Chambre'):
-            document.vote_date = dico["Vote Chambre"].text
-        if dico.get(u"Date de la loi"):
-            document.law_date = dico["Date de la loi"].text
-        if dico.get(u"Moniteur n°"):
-            document.moniteur_number = dico[u"Moniteur n°"].text
-        if dico.get(u"Date moniteur"):
-            document.moniteur_date = dico[u"Date moniteur"].text
-        if dico.get(u"Vote Sénat"):
-            document.vote_senat_date = dico[u"Vote Sénat"].text
-        if dico.get(u"Vote candidature"):
-            document.candidature_vote_date = dico[u"Vote candidature"].text
+        document.vote_date = get_text_else_blank(dico, "Vote Chambre")
+        document.law_date = get_text_else_blank(dico, "Date de la loi")
+        document.moniteur_number = get_text_else_blank(dico, u"Moniteur n°")
+        document.moniteur_date = get_text_else_blank(dico, u"Date moniteur")
+        document.vote_senat_date = get_text_else_blank(dico, u"Vote Sénat")
+        document.candidature_vote_date = get_text_else_blank(dico, u"Vote candidature")
         if dico.get("Documents principaux"):
             document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
 
