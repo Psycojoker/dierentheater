@@ -693,6 +693,46 @@ def written_questions():
             return dico[key].text
         return ""
 
+    def save_a_written_question(link):
+        def get_href_else_blank(dico, key):
+            return dico[key].a["href"] if dico.get(key) and dico[key].a else ""
+
+        def get_text_else_none(dico, key):
+            return dico[key].text if dico.get(key) and dico[key].a else None
+
+        def get_items_list_else_empty_list(dico, key):
+            return dico[key].text.split(" | ") if dico.get(key) else []
+
+        soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
+        data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
+        get_or_create(WrittenQuestion,
+                      _id="lachambre_id",
+                      lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
+                      title=data["Titre"].text,
+                      departement=data[u"Département"].text,
+                      sub_departement=data[u"Sous-département"].text,
+                      deposition_date=data[u"Date de dépôt"].text,
+                      delay_date=dico_get_text(data, u"Date de délai"),
+                      publication_date=dico_get_text(data, "Date publication"),
+                      # TODO: link to the actual deputy
+                      author=data[u"Auteur"].text,
+                      language=data[u"Langue"].text,
+                      question_status=dico_get_text(data, "Statut question"),
+                      status=dico_get_text(data, "Statut"),
+                      question=data["Question"],
+                      answer=dico_get_text(data, u"Réponse"),
+                      publication_reponse_pdf_url=get_href_else_blank(data, u"Publication réponse"),
+                      publication_question_pdf_url=get_href_else_blank(data, u"Publication question"),
+                      publication_reponse=get_text_else_none(data, u"Publication réponse"),
+                      publication_question=get_text_else_none(data, u"Publication question"),
+                      eurovoc_descriptors=get_items_list_else_empty_list(data, "Descripteurs Eurovoc"),
+                      eurovoc_candidats_descriptors=get_items_list_else_empty_list(data, "Candidats-descripteurs Eurovoc"),
+                      keywords=get_items_list_else_empty_list(data, u"Mots-clés libres"),
+                      url=link.a["href"],
+                     )
+
+        data.die_if_got_not_accessed_keys()
+
     get_written_question_bulletin()
 
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
@@ -702,35 +742,7 @@ def written_questions():
         for link in soup.find('table', 'txt')('tr', recursive=False):
             if link.a is None:
                 continue
-            soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
-            data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
-            get_or_create(WrittenQuestion,
-                          _id="lachambre_id",
-                          lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
-                          title=data["Titre"].text,
-                          departement=data[u"Département"].text,
-                          sub_departement=data[u"Sous-département"].text,
-                          deposition_date=data[u"Date de dépôt"].text,
-                          delay_date=dico_get_text(data, u"Date de délai"),
-                          publication_date=dico_get_text(data, "Date publication"),
-                          # TODO: link to the actual deputy
-                          author=data[u"Auteur"].text,
-                          language=data[u"Langue"].text,
-                          question_status=dico_get_text(data, "Statut question"),
-                          status=dico_get_text(data, "Statut"),
-                          question=data["Question"],
-                          answer=dico_get_text(data, u"Réponse"),
-                          publication_reponse_pdf_url=data[u"Publication réponse"].a["href"] if data.get(u"Publication réponse") and data[u"Publication réponse"].a else "",
-                          publication_question_pdf_url=data[u"Publication question"].a["href"] if data.get(u"Publication question") and data[u"Publication question"].a else "",
-                          publication_reponse=data[u"Publication réponse"].text if data.get(u"Publication réponse") and not data[u"Publication réponse"].a else None,
-                          publication_question=data[u"Publication question"].text if data.get(u"Publication question") and not data[u"Publication question"].a else None,
-                          eurovoc_descriptors=data["Descripteurs Eurovoc"].text.split(" | ") if data.get("Descripteurs Eurovoc") else [],
-                          eurovoc_candidats_descriptors=data["Candidats-descripteurs Eurovoc"].text.split(" | ") if data.get("Candidats-descripteurs Eurovoc") else [],
-                          keywords=data[u"Mots-clés libres"].text.split(" | ") if data.get(u"Mots-clés libres") else [],
-                          url=link.a["href"],
-                         )
-
-            data.die_if_got_not_accessed_keys()
+            save_a_written_question(link)
 
 
 def annual_reports():
