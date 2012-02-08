@@ -512,61 +512,63 @@ def handle_document(document):
             document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
     def get_document_chambre(dico, document):
-        if dico.get("Document Chambre"):
-            document_chambre = DocumentChambre()
-            document_chambre.deposition_date = dico['Document Chambre'][u'Date de dépôt'].text
-            document_chambre.type = dico['Document Chambre'][u'Type de document'].text
-            if dico['Document Chambre'].get(u'Prise en considération'):
-                document_chambre.taken_in_account_date = dico['Document Chambre'][u'Prise en considération'].text
-            if dico['Document Chambre'].get(u'Date de distribution'):
-                document_chambre.distribution_date = dico['Document Chambre'][u'Date de distribution'].text
-            if dico['Document Chambre'].get(u'Date d\'envoi'):
-                document_chambre.sending_date = dico['Document Chambre'][u'Date d\'envoi'].text
-            if dico['Document Chambre'].get(u'Date de fin'):
-                document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
-            if dico['Document Chambre'].get(u'Statut'):
-                document_chambre.status = dico['Document Chambre'][u'Statut'].text
+        if not dico.get("Document Chambre"):
+            return
 
-            if dico['Document Chambre'].get('Auteur(s)'):
-                for dep, role in zip(dico['Document Chambre'][u'Auteur(s)']('a'), dico['Document Chambre'][u'Auteur(s)']('i')):
-                    lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
-                    deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                    document_chambre.authors.append({
-                        "lachambre_id": deputy.lachambre_id,
-                        "id": deputy.id,
-                        "full_name": deputy.full_name,
-                        "role": role.text[1:-1]
-                    })
+        document_chambre = DocumentChambre()
+        document_chambre.deposition_date = dico['Document Chambre'][u'Date de dépôt'].text
+        document_chambre.type = dico['Document Chambre'][u'Type de document'].text
+        if dico['Document Chambre'].get(u'Prise en considération'):
+            document_chambre.taken_in_account_date = dico['Document Chambre'][u'Prise en considération'].text
+        if dico['Document Chambre'].get(u'Date de distribution'):
+            document_chambre.distribution_date = dico['Document Chambre'][u'Date de distribution'].text
+        if dico['Document Chambre'].get(u'Date d\'envoi'):
+            document_chambre.sending_date = dico['Document Chambre'][u'Date d\'envoi'].text
+        if dico['Document Chambre'].get(u'Date de fin'):
+            document_chambre.ending_date = dico['Document Chambre'][u'Date de fin'].text
+        if dico['Document Chambre'].get(u'Statut'):
+            document_chambre.status = dico['Document Chambre'][u'Statut'].text
 
-            if dico['Document Chambre'].get(u'Commentaire'):
-                document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
+        if dico['Document Chambre'].get('Auteur(s)'):
+            for dep, role in zip(dico['Document Chambre'][u'Auteur(s)']('a'), dico['Document Chambre'][u'Auteur(s)']('i')):
+                lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
+                deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                document_chambre.authors.append({
+                    "lachambre_id": deputy.lachambre_id,
+                    "id": deputy.id,
+                    "full_name": deputy.full_name,
+                    "role": role.text[1:-1]
+                })
 
-            url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
-            url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-            document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+        if dico['Document Chambre'].get(u'Commentaire'):
+            document_chambre.comments = dico['Document Chambre'][u'Commentaire'].text.split(' - ')
 
-            if dico['Document Chambre'].get('Document(s) suivant(s)'):
-                for d in document_pdf_part_cutter(dico['Document Chambre'][u'Document(s) suivant(s)']):
-                    print "add pdf %s" % clean_text(d[0].font.text)
-                    doc = OtherDocumentChambrePdf()
-                    doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-                    doc.type = clean_text(d[0].font.text)
-                    doc.distribution_date = d[1]('td')[-1].text
-                    for dep in d[2:]:
-                        if dep.a:
-                            lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
-                            deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                            doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
-                        else:
-                            doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
-                    doc.save()
-                    document_chambre.other_pdfs.append(doc)
+        url, tipe, session = clean_text(str(dico['Document Chambre'][u'head']).replace("&#160;", "")).split("<br />")
+        url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
+        document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
 
-            if dico["Document Chambre"].get(u'Document(s) joint(s)/lié(s)'):
-                document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in dico['Document Chambre'][u'Document(s) joint(s)/lié(s)']]
+        if dico['Document Chambre'].get('Document(s) suivant(s)'):
+            for d in document_pdf_part_cutter(dico['Document Chambre'][u'Document(s) suivant(s)']):
+                print "add pdf %s" % clean_text(d[0].font.text)
+                doc = OtherDocumentChambrePdf()
+                doc.url = d[0].a['href'] if d[0].a else d[0].td.text
+                doc.type = clean_text(d[0].font.text)
+                doc.distribution_date = d[1]('td')[-1].text
+                for dep in d[2:]:
+                    if dep.a:
+                        lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
+                        deputy = Deputy.objects.get(lachambre_id=lachambre_id)
+                        doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
+                    else:
+                        doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
+                doc.save()
+                document_chambre.other_pdfs.append(doc)
 
-            document_chambre.save()
-            document.document_chambre = document_chambre
+        if dico["Document Chambre"].get(u'Document(s) joint(s)/lié(s)'):
+            document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in dico['Document Chambre'][u'Document(s) joint(s)/lié(s)']]
+
+        document_chambre.save()
+        document.document_chambre = document_chambre
 
     def get_document_senat(dico, document):
         if dico.get(u"Document Sénat"):
