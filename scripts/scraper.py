@@ -520,16 +520,12 @@ def handle_document(document):
         document_chambre = DocumentChambre()
         document_chambre.deposition_date = chambre_dico[u'Date de dépôt'].text
         document_chambre.type = chambre_dico[u'Type de document'].text
-        if chambre_dico.get(u'Prise en considération'):
-            document_chambre.taken_in_account_date = chambre_dico[u'Prise en considération'].text
-        if chambre_dico.get(u'Date de distribution'):
-            document_chambre.distribution_date = chambre_dico[u'Date de distribution'].text
-        if chambre_dico.get(u'Date d\'envoi'):
-            document_chambre.sending_date = chambre_dico[u'Date d\'envoi'].text
-        if chambre_dico.get(u'Date de fin'):
-            document_chambre.ending_date = chambre_dico[u'Date de fin'].text
-        if chambre_dico.get(u'Statut'):
-            document_chambre.status = chambre_dico[u'Statut'].text
+        document_chambre.taken_in_account_date = get_text_else_blank(chambre_dico, u'Prise en considération')
+        document_chambre.distribution_date = get_text_else_blank(chambre_dico, u'Date de distribution')
+        document_chambre.sending_date = get_text_else_blank(chambre_dico, u'Date d\'envoi')
+        document_chambre.ending_date = get_text_else_blank(chambre_dico, u'Date de fin')
+        document_chambre.status = get_text_else_blank(chambre_dico, u'Statut')
+        document_chambre.comments = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
 
         if chambre_dico.get('Auteur(s)'):
             for dep, role in zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')):
@@ -541,9 +537,6 @@ def handle_document(document):
                     "full_name": deputy.full_name,
                     "role": role.text[1:-1]
                 })
-
-        if chambre_dico.get(u'Commentaire'):
-            document_chambre.comments = chambre_dico[u'Commentaire'].text.split(' - ')
 
         url, tipe, session = clean_text(str(chambre_dico[u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
