@@ -578,17 +578,12 @@ def handle_document(document):
 
         document_senat = DocumentSenat()
         document_senat.deposition_date = senat_dico[u"Date de dépôt"].text
-        if senat_dico.get(u"Date de fin"):
-            document_senat.ending_date = senat_dico[u"Date de fin"].text
+        document_senat.ending_date = get_text_else_blank(senat_dico, u"Date de fin")
         document_senat.type = senat_dico[u"Type de document"].text
-        if senat_dico.get(u'Commentaire'):
-            document_senat.comments = senat_dico[u'Commentaire'].text.split(' - ')
-        if senat_dico.get(u"Auteur(s)"):
-            document_senat.author = clean_text(senat_dico[u"Auteur(s)"].text)
-        if senat_dico.get(u'Commentaire'):
-            document_senat.comments = senat_dico[u'Commentaire'].text.split(' - ')
-        if senat_dico.get(u'Statut'):
-            document_senat.status = senat_dico[u'Statut'].text
+        document_senat.comments = get_text_else_blank(senat_dico, u'Commentaire').split(' - ')
+        document_senat.author = clean_text(get_text_else_blank(senat_dico, u"Auteur(s)"))
+        document_senat.comments = get_text_else_blank(senat_dico, u'Commentaire').split(' - ')
+        document_senat.status = get_text_else_blank(senat_dico, u'Statut')
 
         url, tipe, session = clean_text(str(senat_dico[u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
