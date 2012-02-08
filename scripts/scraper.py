@@ -26,6 +26,9 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
+def get_text_else_blank(dico, key):
+    return dico[key].text if dico.get(key) and dico[key].a else ""
+
 
 class AccessControlDict(dict):
     def __init__(self, *args, **kwargs):
@@ -697,9 +700,6 @@ def written_questions():
         def get_href_else_blank(dico, key):
             return dico[key].a["href"] if dico.get(key) and dico[key].a else ""
 
-        def get_text_else_none(dico, key):
-            return dico[key].text if dico.get(key) and dico[key].a else None
-
         def get_items_list_else_empty_list(dico, key):
             return dico[key].text.split(" | ") if dico.get(key) else []
 
@@ -723,8 +723,8 @@ def written_questions():
                       answer=dico_get_text(data, u"Réponse"),
                       publication_reponse_pdf_url=get_href_else_blank(data, u"Publication réponse"),
                       publication_question_pdf_url=get_href_else_blank(data, u"Publication question"),
-                      publication_reponse=get_text_else_none(data, u"Publication réponse"),
-                      publication_question=get_text_else_none(data, u"Publication question"),
+                      publication_reponse=get_text_else_blank(data, u"Publication réponse"),
+                      publication_question=get_text_else_blank(data, u"Publication question"),
                       eurovoc_descriptors=get_items_list_else_empty_list(data, "Descripteurs Eurovoc"),
                       eurovoc_candidats_descriptors=get_items_list_else_empty_list(data, "Candidats-descripteurs Eurovoc"),
                       keywords=get_items_list_else_empty_list(data, u"Mots-clés libres"),
