@@ -26,6 +26,7 @@ from deputies.models import Deputy, Party, CommissionMembership, Document, Quest
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
+
 def get_text_else_blank(dico, key):
     return dico[key].text if dico.get(key) and dico[key].a else ""
 
