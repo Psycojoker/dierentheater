@@ -574,26 +574,28 @@ def handle_document(document):
         if not dico.get(u"Document Sénat"):
             return
 
-        document_senat = DocumentSenat()
-        document_senat.deposition_date = dico[u"Document Sénat"][u"Date de dépôt"].text
-        if dico[u"Document Sénat"].get(u"Date de fin"):
-            document_senat.ending_date = dico[u"Document Sénat"][u"Date de fin"].text
-        document_senat.type = dico[u"Document Sénat"][u"Type de document"].text
-        if dico[u'Document Sénat'].get(u'Commentaire'):
-            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-        if dico[u"Document Sénat"].get(u"Auteur(s)"):
-            document_senat.author = clean_text(dico[u"Document Sénat"][u"Auteur(s)"].text)
-        if dico[u'Document Sénat'].get(u'Commentaire'):
-            document_senat.comments = dico[u'Document Sénat'][u'Commentaire'].text.split(' - ')
-        if dico[u'Document Sénat'].get(u'Statut'):
-            document_senat.status = dico[u'Document Sénat'][u'Statut'].text
+        senat_dico = dico[u"Document Sénat"]
 
-        url, tipe, session = clean_text(str(dico[u'Document Sénat'][u'head']).replace("&#160;", "")).split("<br />")
+        document_senat = DocumentSenat()
+        document_senat.deposition_date = senat_dico[u"Date de dépôt"].text
+        if senat_dico.get(u"Date de fin"):
+            document_senat.ending_date = senat_dico[u"Date de fin"].text
+        document_senat.type = senat_dico[u"Type de document"].text
+        if senat_dico.get(u'Commentaire'):
+            document_senat.comments = senat_dico[u'Commentaire'].text.split(' - ')
+        if senat_dico.get(u"Auteur(s)"):
+            document_senat.author = clean_text(senat_dico[u"Auteur(s)"].text)
+        if senat_dico.get(u'Commentaire'):
+            document_senat.comments = senat_dico[u'Commentaire'].text.split(' - ')
+        if senat_dico.get(u'Statut'):
+            document_senat.status = senat_dico[u'Statut'].text
+
+        url, tipe, session = clean_text(str(senat_dico[u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
 
-        if dico[u'Document Sénat'].get('Document(s) suivant(s)'):
-            for d in document_pdf_part_cutter(dico[u'Document Sénat'][u'Document(s) suivant(s)']):
+        if senat_dico.get('Document(s) suivant(s)'):
+            for d in document_pdf_part_cutter(senat_dico[u'Document(s) suivant(s)']):
                 print "add pdf %s" % clean_text(d[0].font.text)
                 doc = OtherDocumentSenatPdf()
                 doc.url = d[0].a['href'] if d[0].a else d[0].td.text
