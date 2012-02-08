@@ -433,21 +433,12 @@ def handle_document(document):
             document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
             document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
 
-        document.deposition_date = dico[u"Date de dépôt"].text
-        document.constitution_article = clean_text(get_text_else_blank(dico, "Article Constitution"))
-        document.eurovoc_main_descriptor = get_text_else_blank(dico["Descripteur Eurovoc principal"], "head")
         if dico.get("Descripteurs Eurovoc"):
             document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
         if dico.get("Candidats-descripteurs Eurovoc"):
             document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
         if dico.get(u"Mots-clés libres"):
             document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
-        document.vote_date = get_text_else_blank(dico, "Vote Chambre")
-        document.law_date = get_text_else_blank(dico, "Date de la loi")
-        document.moniteur_number = get_text_else_blank(dico, u"Moniteur n°")
-        document.moniteur_date = get_text_else_blank(dico, u"Date moniteur")
-        document.vote_senat_date = get_text_else_blank(dico, u"Vote Sénat")
-        document.candidature_vote_date = get_text_else_blank(dico, u"Vote candidature")
         if dico.get("Documents principaux"):
             document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
 
