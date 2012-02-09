@@ -75,7 +75,7 @@ def clean_text(text):
     return re.sub("(\r|\t|\n| )+", " ", re.sub("&#\d+;", rep, text)).strip()
 
 
-def hammer_time(function):
+def retry_on_access_error(function):
     "decorator to retry to download a page because La Chambre website sucks"
     def wrap(*args, **kwargs):
         reset = False
@@ -141,7 +141,7 @@ def clean():
     map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin, AnnualReport))
 
 
-@hammer_time
+@retry_on_access_error
 def deputies_list(reset=False):
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
 
@@ -169,7 +169,7 @@ def each_deputies():
         handle_deputy(deputy)
 
 
-@hammer_time
+@retry_on_access_error
 def handle_deputy(deputy, reset=False):
     soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
@@ -234,7 +234,7 @@ def split_deputy_full_name(deputy, soup):
         print [deputy.first_name], [deputy.last_name]
 
 
-#@hammer_time
+#@retry_on_access_error
 #def get_deputy_documents(url, deputy, role, type=None, reset=False):
     #print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
     #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
@@ -257,7 +257,7 @@ def split_deputy_full_name(deputy, soup):
                                      #keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
 
-#@hammer_time
+#@retry_on_access_error
 #def get_deputy_written_questions(url, deputy, reset=False):
     #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
     #deputy.questions_written_url = url
@@ -279,7 +279,7 @@ def split_deputy_full_name(deputy, soup):
                                      #url=i.a['href']))
 
 
-@hammer_time
+@retry_on_access_error
 def get_deputy_questions(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "questions_%s_url" % type, url)
@@ -303,7 +303,7 @@ def get_deputy_questions(url, deputy, type, reset=False):
                                      type=type))
 
 
-@hammer_time
+@retry_on_access_error
 def get_deputy_analysis(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "analysis_%s_url" % type, url)
