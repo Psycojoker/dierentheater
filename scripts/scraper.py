@@ -182,25 +182,27 @@ def handle_deputy(deputy, reset=False):
         deputy.sex = None
 
     split_deputy_full_name(deputy, soup)
-
-    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
-    # look at the bottom of each deputies' page
-    #membership = soup.find('td', rowspan="1")
-    #item = membership.h4
-    #role = None
-    #deputy.commissions = []
-    #while item.nextSibling:
-        #if hasattr(item, 'tag'):
-            #if item.name == 'h5':
-                #role = item.text[6:-1]
-            #elif item.name == 'div':
-                #print "linking deputy to commission", item.a.text
-                #commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
-                #deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
-        #item = item.nextSibling
-
+    #get_deputie_commissions(soup, deputy)
     #deputy_documents(soup, deputy)
     deputy.save()
+
+
+def get_deputie_commissions(soup, deputy):
+    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
+    # look at the bottom of each deputies' page
+    membership = soup.find('td', rowspan="1")
+    item = membership.h4
+    role = None
+    deputy.commissions = []
+    while item.nextSibling:
+        if hasattr(item, 'tag'):
+            if item.name == 'h5':
+                role = item.text[6:-1]
+            elif item.name == 'div':
+                print "linking deputy to commission", item.a.text
+                commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
+        item = item.nextSibling
 
 
 def split_deputy_full_name(deputy, soup):
