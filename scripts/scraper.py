@@ -1,7 +1,7 @@
 # -*- coding:Utf-8 -*-
 
 #  Dieren Theater - lachambre.be to json sausage machine
-#  Copyright (C) 2011  Laurent Peuch <cortex@worlddomination.be>
+#  Copyright (C) 2011-12  Laurent Peuch <cortex@worlddomination.be>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
