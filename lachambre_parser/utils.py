@@ -23,6 +23,8 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
+LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
+
 
 def get_or_create(klass, _id=None, **kwargs):
     if _id is None:

@@ -20,12 +20,10 @@ import re
 from BeautifulSoup import BeautifulSoup, NavigableString
 from lxml import etree
 
-from lachambre_parser.utils import retry_on_access_error, read_or_dl, get_or_create, get_text_else_blank, AccessControlDict, clean_text, lame_url, lxml_read_or_dl, table2dic
+from lachambre_parser.utils import retry_on_access_error, read_or_dl, get_or_create, get_text_else_blank, AccessControlDict, clean_text, lame_url, lxml_read_or_dl, table2dic, LACHAMBRE_PREFIX
 from lachambre_parser.reports import annual_reports
 
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin, AnnualReport
-
-LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 
 def clean():
