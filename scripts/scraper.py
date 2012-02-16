@@ -17,111 +17,14 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from os.path import exists
-from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup, NavigableString
 from lxml import etree
 
-from lachambre_parser.utils import retry_on_access_error
+from lachambre_parser.utils import retry_on_access_error, read_or_dl, get_or_create, get_text_else_blank, AccessControlDict, clean_text, lame_url, lxml_read_or_dl, table2dic
 
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin, AnnualReport
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
-
-
-def get_text_else_blank(dico, key):
-    return dico[key].text if dico.get(key) and dico[key].a else ""
-
-
-class AccessControlDict(dict):
-    def __init__(self, *args, **kwargs):
-        dict.__init__(self, *args, **kwargs)
-        self.accessed = set()
-
-    def __getitem__(self, key):
-        self.accessed.add(key)
-        return dict.__getitem__(self, key)
-
-    def get_not_accessed_keys(self):
-        a = []
-        for i in self.keys():
-            if i not in self.accessed:
-                a.append(i)
-            elif isinstance(self[i], AccessControlDict) and self[i].get_not_accessed_keys():
-                a.append(i)
-                a.append(self[i].get_not_accessed_keys())
-
-        return a
-
-    def die_if_got_not_accessed_keys(self):
-        if self.get_not_accessed_keys():
-            print "\nError: untreated sections:"
-            for i in self.get_not_accessed_keys():
-                if isinstance(i, (str, unicode)):
-                    print "*", i
-                else:
-                    for j in i:
-                        print "    *", j
-            print "------------ stop ------------"
-            import sys
-            sys.exit(1)
-
-
-def clean_text(text):
-    def rep(result):
-        string = result.group()                   # "&#xxx;"
-        n = int(string[2:-1])
-        uchar = unichr(n)                         # matching unicode char
-        return uchar
-
-    return re.sub("(\r|\t|\n| )+", " ", re.sub("&#\d+;", rep, text)).strip()
-
-
-def lame_url(url):
-    # convert super lame urls of lachambre.be into something uzable
-    return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
-
-
-def get_or_create(klass, _id=None, **kwargs):
-    if _id is None:
-        object = klass.objects.filter(**kwargs)
-    else:
-        object = klass.objects.filter(**{_id: kwargs[_id]})
-    if object:
-        return object[0]
-    else:
-        print "add new", klass.__name__, kwargs
-        return klass.objects.create(**kwargs)
-
-
-def read_or_dl(url, name, reset=False):
-    print "parsing", url
-    if not reset and exists('dump/%s' % name):
-        text = open('dump/%s' % name).read()
-    else:
-        text = urlopen(url).read()
-        open('dump/%s' % name, "w").write(text)
-    soup = BeautifulSoup(text)
-    if soup.title.text == "404 Not Found":
-        raise IndexError
-    return soup
-
-
-def lxml_read_or_dl(url, name, reset=False):
-    if not reset and exists('dump/%s' % name):
-        text = open('dump/%s' % name)
-    else:
-        text = urlopen(url)
-        open('dump/%s' % name, "w").write(text)
-    soup = etree.parse(text, etree.HTMLParser())
-    return soup
-
-
-def table2dic(table):
-    dico = {}
-    for x, y in zip(table[::2], table[1::2]):
-        dico[x.text] = y.text if y.a is None else y.a
-    return dico
 
 
 def clean():
