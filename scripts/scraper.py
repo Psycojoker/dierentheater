@@ -22,6 +22,8 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup, NavigableString
 from lxml import etree
 
+from lachambre_parser.utils import retry_on_access_error
+
 from deputies.models import Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, OtherDocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin, AnnualReport
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
@@ -73,20 +75,6 @@ def clean_text(text):
         return uchar
 
     return re.sub("(\r|\t|\n| )+", " ", re.sub("&#\d+;", rep, text)).strip()
-
-
-def retry_on_access_error(function):
-    "decorator to retry to download a page because La Chambre website sucks"
-    def wrap(*args, **kwargs):
-        reset = False
-        for i in xrange(4):
-            try:
-                return function(*args, reset=reset, **kwargs)
-            except (IndexError, AttributeError, TypeError), e:
-                print e
-                reset = True
-        print "WARNING, function keeps failling", function, args, kwargs
-    return wrap
 
 
 def lame_url(url):

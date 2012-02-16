@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django_extensions',
     'deputies',
+    'lachambre_parser',
 )
 
 # A sample logging configuration. The only tangible logging
