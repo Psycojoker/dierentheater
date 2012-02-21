@@ -100,7 +100,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'dierentuin.urls'
+ROOT_URLCONF = PROJECT + '.urls'
 
 TEMPLATE_DIRS = (
     PROJECT_PATH + '/templates',
@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django_extensions',
     'deputies',
+    'lachambre_parser',
 )
 
 # A sample logging configuration. The only tangible logging

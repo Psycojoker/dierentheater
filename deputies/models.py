@@ -18,11 +18,13 @@ from json import dumps
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
-LACHAMBRE_PREFIX="http://www.lachambre.be/kvvcr/"
+LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
+
 
 class Jsonify(object):
     def json(self):
         return dumps(self.__class__.objects.filter(pk=self.pk).values()[0], indent=4)
+
 
 class Deputy(models.Model, Jsonify):
     full_name = models.CharField(max_length=1337, unique=True)
@@ -62,6 +64,7 @@ class Deputy(models.Model, Jsonify):
 
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
+
 
 class Party(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
@@ -206,19 +209,33 @@ class DocumentTimeLine(models.Model):
 
 class WrittenQuestion(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
-    departement = models.CharField(max_length=1337, )
-    eurovoc_descriptors = ListField()
-    deposition_date = models.CharField(max_length=1337, )
+    departement = models.CharField(max_length=1337)
+    sub_departement = models.CharField(max_length=1337)
+    author = models.CharField(max_length=1337)
+    deposition_date = models.CharField(max_length=1337)
     delay_date = models.CharField(max_length=1337, null=True)
+    eurovoc_descriptors = ListField()
+    eurovoc_candidats_descriptors = ListField()
     keywords = ListField()
     url = models.URLField()
     lachambre_id = models.CharField(max_length=1337)
+    language = models.CharField(max_length=1337)
+    status = models.CharField(max_length=1337)
+    question_status = models.CharField(max_length=1337)
+    publication_date = models.CharField(max_length=1337)
+    question = models.CharField(max_length=1337)
+    answer = models.CharField(max_length=1337)
+    publication_reponse_pdf_url = models.CharField(max_length=1337)
+    publication_question_pdf_url = models.CharField(max_length=1337)
+    publication_reponse = models.CharField(max_length=1337, null=True)
+    publication_question = models.CharField(max_length=1337, null=True)
+
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     reunion_type = models.CharField(max_length=1337, null=True)
     reunion_date = models.CharField(max_length=1337, null=True)
-    session_id = models.CharField(max_length=1337, )
+    session_id = models.CharField(max_length=1337)
     eurovoc_descriptors = ListField()
     keywords = ListField()
     pdf_url = models.URLField(null=True)
@@ -226,9 +243,27 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
+
 class Analysis(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
     descriptor = models.CharField(max_length=1337)
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
+
+class WrittenQuestionBulletin(models.Model, Jsonify):
+    lachambre_id = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
+    publication_date = models.CharField(max_length=1337)
+    url = models.URLField(null=True)
+    pdf_url = models.URLField()
+    legislature = models.CharField(max_length=1337)
+
+
+class AnnualReport(models.Model, Jsonify):
+    title = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337)
+    law_and_article = models.CharField(max_length=1337)
+    periodicity = models.CharField(max_length=1337)
+    pdf_url = models.URLField()
