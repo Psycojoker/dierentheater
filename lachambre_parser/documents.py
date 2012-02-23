@@ -63,19 +63,19 @@ def handle_document(document):
     table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
     dico = document_to_dico(list(table.table('tr', recursive=False)))
 
-    get_first_level_data(dico, document)
-    get_in_charged_commissions(dico, document)
-    get_plenaries(dico, document)
-    get_senat_plenaries(dico, document)
-    get_competences(dico, document)
-    get_document_chambre(dico, document)
-    get_document_senat(dico, document)
+    _get_first_level_data(dico, document)
+    _get_in_charged_commissions(dico, document)
+    _get_plenaries(dico, document)
+    _get_senat_plenaries(dico, document)
+    _get_competences(dico, document)
+    _get_document_chambre(dico, document)
+    _get_document_senat(dico, document)
 
     document.save()
     dico.die_if_got_not_accessed_keys()
 
 
-def get_first_level_data(dico, document):
+def _get_first_level_data(dico, document):
     document.deposition_date = dico[u"Date de dépôt"].text
     document.constitution_article = clean_text(get_text_else_blank(dico, "Article Constitution"))
     if dico.get("Descripteur Eurovoc principal"):
@@ -101,7 +101,7 @@ def get_first_level_data(dico, document):
         document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
 
 
-def get_in_charged_commissions(dico, document):
+def _get_in_charged_commissions(dico, document):
     document.in_charge_commissions = []
     for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
         icc = InChargeCommissions()
@@ -128,7 +128,7 @@ def get_in_charged_commissions(dico, document):
         document.in_charge_commissions.append(icc)
 
 
-def get_plenaries(dico, document):
+def _get_plenaries(dico, document):
     document.plenaries = []
     for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys()):
         pl = DocumentPlenary()
@@ -149,7 +149,7 @@ def get_plenaries(dico, document):
         document.plenaries.append(pl)
 
 
-def get_senat_plenaries(dico, document):
+def _get_senat_plenaries(dico, document):
     document.senat_plenaries = []
     for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE SENAT", x), dico.keys()):
         spl = DocumentSenatPlenary()
@@ -164,7 +164,7 @@ def get_senat_plenaries(dico, document):
         document.senat_plenaries.append(spl)
 
 
-def get_competences(dico, document):
+def _get_competences(dico, document):
     if dico.get(u"Compétence"):
         document.timeline = []
         for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
@@ -174,7 +174,7 @@ def get_competences(dico, document):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
 
-def get_document_senat(dico, document):
+def _get_document_senat(dico, document):
     if not dico.get(u"Document Sénat"):
         return
 
@@ -210,7 +210,7 @@ def get_document_senat(dico, document):
     document.document_senat = document_senat
 
 
-def get_document_chambre(dico, document):
+def _get_document_chambre(dico, document):
     if not dico.get("Document Chambre"):
         return
 
@@ -226,13 +226,13 @@ def get_document_chambre(dico, document):
     document_chambre.status = get_text_else_blank(chambre_dico, u'Statut')
     document_chambre.comments = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
 
-    get_authors(chambre_dico, document_chambre)
+    _get_authors(chambre_dico, document_chambre)
 
     url, tipe, session = clean_text(str(chambre_dico[u'head']).replace("&#160;", "")).split("<br />")
     url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
     document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
 
-    get_next_documents(chambre_dico, document_chambre)
+    _get_next_documents(chambre_dico, document_chambre)
 
     if chambre_dico.get(u'Document(s) joint(s)/lié(s)'):
         document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in chambre_dico[u'Document(s) joint(s)/lié(s)']]
@@ -241,7 +241,7 @@ def get_document_chambre(dico, document):
     document.document_chambre = document_chambre
 
 
-def get_authors(chambre_dico, document_chambre):
+def _get_authors(chambre_dico, document_chambre):
     if chambre_dico.get('Auteur(s)'):
         for dep, role in zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')):
             lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
@@ -254,7 +254,7 @@ def get_authors(chambre_dico, document_chambre):
             })
 
 
-def get_next_documents(chambre_dico, document_chambre):
+def _get_next_documents(chambre_dico, document_chambre):
     if chambre_dico.get('Document(s) suivant(s)'):
         for d in document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']):
             print "add pdf %s" % clean_text(d[0].font.text)
