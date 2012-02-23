@@ -32,6 +32,29 @@ from utils import retry_on_access_error,\
                   lame_url,\
                   read_or_dl
 
+
+@retry_on_access_error
+def deputies_list(reset=False):
+    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
+
+    for dep in soup('table')[4]('tr'):
+        items = dep('td')
+        full_name = re.sub('  +', ' ', items[0].a.text).strip()
+        url = items[0].a['href']
+        party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
+        email = items[2].a.text
+        website = items[3].a['href'] if items[3].a else None
+        # yes, one deputies key contains a O instead of an 0, I'm not joking
+        lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
+        Deputy.objects.create(full_name=full_name,
+                              party=party,
+                              url=url,
+                              websites=[website] if website else [],
+                              lachambre_id=lachambre_id,
+                              emails=[email])
+        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
+
+
 def deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
@@ -85,28 +108,6 @@ def split_deputy_full_name(deputy, soup):
         deputy.first_name = deputy.full_name.split(" ")[1].strip()
         deputy.last_name = deputy.full_name.split(" ")[0].strip()
         print [deputy.first_name], [deputy.last_name]
-
-
-@retry_on_access_error
-def deputies_list(reset=False):
-    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
-
-    for dep in soup('table')[4]('tr'):
-        items = dep('td')
-        full_name = re.sub('  +', ' ', items[0].a.text).strip()
-        url = items[0].a['href']
-        party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
-        email = items[2].a.text
-        website = items[3].a['href'] if items[3].a else None
-        # yes, one deputies key contains a O instead of an 0, I'm not joking
-        lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
-        Deputy.objects.create(full_name=full_name,
-                              party=party,
-                              url=url,
-                              websites=[website] if website else [],
-                              lachambre_id=lachambre_id,
-                              emails=[email])
-        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
 
 def get_deputie_commissions(soup, deputy):
