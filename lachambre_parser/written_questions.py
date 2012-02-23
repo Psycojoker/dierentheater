@@ -30,7 +30,7 @@ from utils import read_or_dl,\
 
 
 def written_questions():
-    get_written_question_bulletin()
+    _get_written_question_bulletin()
 
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
@@ -39,10 +39,10 @@ def written_questions():
         for link in soup.find('table', 'txt')('tr', recursive=False):
             if link.a is None:
                 continue
-            save_a_written_question(link)
+            _save_a_written_question(link)
 
 
-def get_written_question_bulletin():
+def _get_written_question_bulletin():
     for i in range(48, 54):
         soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
         for b in soup('table')[4]('tr')[1:]:
@@ -66,7 +66,7 @@ def get_written_question_bulletin():
             print b('td')[0]('a')[-1].text.split()[-1]
 
 
-def save_a_written_question(link):
+def _save_a_written_question(link):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
     data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
     get_or_create(WrittenQuestion,
