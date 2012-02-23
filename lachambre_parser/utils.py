@@ -56,6 +56,20 @@ def get_text_else_blank(dico, key):
     return dico[key].text if dico.get(key) and dico[key].a else ""
 
 
+def get_href_else_blank(dico, key):
+    return dico[key].a["href"] if dico.get(key) and dico[key].a else ""
+
+
+def get_items_list_else_empty_list(dico, key):
+    return dico[key].text.split(" | ") if dico.get(key) else []
+
+
+def dico_get_text(dico, key):
+    if dico.get(key):
+        return dico[key].text
+    return ""
+
+
 class AccessControlDict(dict):
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)

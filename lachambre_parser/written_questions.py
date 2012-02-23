@@ -23,6 +23,9 @@ from utils import read_or_dl,\
                   LACHAMBRE_PREFIX,\
                   AccessControlDict,\
                   get_or_create,\
+                  get_href_else_blank,\
+                  get_items_list_else_empty_list,\
+                  dico_get_text,\
                   get_text_else_blank
 
 
@@ -63,19 +66,7 @@ def get_written_question_bulletin():
             print b('td')[0]('a')[-1].text.split()[-1]
 
 
-def dico_get_text(dico, key):
-    if dico.get(key):
-        return dico[key].text
-    return ""
-
-
 def save_a_written_question(link):
-    def get_href_else_blank(dico, key):
-        return dico[key].a["href"] if dico.get(key) and dico[key].a else ""
-
-    def get_items_list_else_empty_list(dico, key):
-        return dico[key].text.split(" | ") if dico.get(key) else []
-
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
     data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
     get_or_create(WrittenQuestion,
