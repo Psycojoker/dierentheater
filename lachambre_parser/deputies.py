@@ -58,11 +58,11 @@ def deputies_list(reset=False):
 def deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
-        handle_deputy(deputy)
+        _handle_deputy(deputy)
 
 
 @retry_on_access_error
-def handle_deputy(deputy, reset=False):
+def _handle_deputy(deputy, reset=False):
     soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
     deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
@@ -73,13 +73,13 @@ def handle_deputy(deputy, reset=False):
     else:
         deputy.sex = None
 
-    split_deputy_full_name(deputy, soup)
-    #get_deputie_commissions(soup, deputy)
-    #deputy_documents(soup, deputy)
+    _split_deputy_full_name(deputy, soup)
+    #_get_deputie_commissions(soup, deputy)
+    #_deputy_documents(soup, deputy)
     deputy.save()
 
 
-def split_deputy_full_name(deputy, soup):
+def _split_deputy_full_name(deputy, soup):
     # stupid special case
     if deputy.full_name == "Fernandez Fernandez Julie":
         deputy.first_name = "Julie"
@@ -110,7 +110,7 @@ def split_deputy_full_name(deputy, soup):
         print [deputy.first_name], [deputy.last_name]
 
 
-def get_deputie_commissions(soup, deputy):
+def _get_deputie_commissions(soup, deputy):
     # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
     # look at the bottom of each deputies' page
     membership = soup.find('td', rowspan="1")
@@ -129,7 +129,7 @@ def get_deputie_commissions(soup, deputy):
 
 
 #@retry_on_access_error
-#def get_deputy_documents(url, deputy, role, type=None, reset=False):
+#def _get_deputy_documents(url, deputy, role, type=None, reset=False):
     #print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
     #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
     #setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
@@ -152,7 +152,7 @@ def get_deputie_commissions(soup, deputy):
 
 
 #@retry_on_access_error
-#def get_deputy_written_questions(url, deputy, reset=False):
+#def _get_deputy_written_questions(url, deputy, reset=False):
     #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
     #deputy.questions_written_url = url
     #deputy.questions_written_list = []
@@ -174,7 +174,7 @@ def get_deputie_commissions(soup, deputy):
 
 
 @retry_on_access_error
-def get_deputy_questions(url, deputy, type, reset=False):
+def _get_deputy_questions(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "questions_%s_url" % type, url)
     setattr(deputy, "questions_%s_list" % type, [])
@@ -198,7 +198,7 @@ def get_deputy_questions(url, deputy, type, reset=False):
 
 
 @retry_on_access_error
-def get_deputy_analysis(url, deputy, type, reset=False):
+def _get_deputy_analysis(url, deputy, type, reset=False):
     soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s' % (deputy.full_name, type), reset)
     setattr(deputy, "analysis_%s_url" % type, url)
     setattr(deputy, "analysis_%s_list" % type, [])
@@ -216,19 +216,19 @@ def get_deputy_analysis(url, deputy, type, reset=False):
                                      type=type))
 
 
-def deputy_documents(soup, deputy):
+def _deputy_documents(soup, deputy):
     # here we are in the grey black box
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
-    #get_deputy_documents(urls[0], deputy, "author", "principal")
-    #get_deputy_documents(urls[1], deputy, "signator", "principal")
-    #get_deputy_documents(urls[2], deputy, "author", "next")
-    #get_deputy_documents(urls[3], deputy, "signator", "next")
-    #get_deputy_documents(urls[4], deputy, "rapporter")
-    #get_deputy_written_questions(urls[5], deputy)
+    #_get_deputy_documents(urls[0], deputy, "author", "principal")
+    #_get_deputy_documents(urls[1], deputy, "signator", "principal")
+    #_get_deputy_documents(urls[2], deputy, "author", "next")
+    #_get_deputy_documents(urls[3], deputy, "signator", "next")
+    #_get_deputy_documents(urls[4], deputy, "rapporter")
+    #_get_deputy_written_questions(urls[5], deputy)
     # no one seems to do any interpellations nor motions or maybe the website is just broken
-    get_deputy_questions(urls[8], deputy, "oral_plenary")
-    get_deputy_questions(urls[9], deputy, "oral_commission")
-    get_deputy_analysis(urls[10], deputy, "legislatif_work")
-    get_deputy_analysis(urls[11], deputy, "parlimentary_control")
-    get_deputy_analysis(urls[12], deputy, "divers")
+    _get_deputy_questions(urls[8], deputy, "oral_plenary")
+    _get_deputy_questions(urls[9], deputy, "oral_commission")
+    _get_deputy_analysis(urls[10], deputy, "legislatif_work")
+    _get_deputy_analysis(urls[11], deputy, "parlimentary_control")
+    _get_deputy_analysis(urls[12], deputy, "divers")
