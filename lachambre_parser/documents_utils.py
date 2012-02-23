@@ -19,6 +19,23 @@
 from utils import clean_text,\
                   AccessControlDict
 
+
+def document_pdf_part_cutter(soup):
+    result = []
+    blob = [soup('tr')[0]]
+    for i in soup('tr')[1:]:
+        if not clean_text(i.text):
+            continue
+        if not i.img or not i.img.get("class") or i.img["class"] != "picto":
+            blob.append(i)
+        else:
+            result.append(blob)
+            blob = [i]
+
+    result.append(blob)
+    return result
+
+
 def document_to_dico(table):
     is_pdf_section = lambda i: i.td.img
     is_noise = lambda i: i == u"\n" or i.td.text in ("&#13;", "&nbsp;", "&#160;")
@@ -70,19 +87,3 @@ def _build_first_level(i, dico):
         if dico.get(key):
             raise Exception("'%s' is already use as a key for '%s'" % (key, dico[key]))
         dico[key] = i('td')[1]
-
-
-def document_pdf_part_cutter(soup):
-    result = []
-    blob = [soup('tr')[0]]
-    for i in soup('tr')[1:]:
-        if not clean_text(i.text):
-            continue
-        if not i.img or not i.img.get("class") or i.img["class"] != "picto":
-            blob.append(i)
-        else:
-            result.append(blob)
-            blob = [i]
-
-    result.append(blob)
-    return result
