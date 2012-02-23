@@ -18,7 +18,7 @@
 
 import re
 
-from deputies.models import Party,\
+from lachambre.models import Party,\
                             CommissionMembership,\
                             Commission,\
                             Question,\

@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from deputies.models import AnnualReport
+from lachambre.models import AnnualReport
 from utils import read_or_dl, get_or_create
 
 

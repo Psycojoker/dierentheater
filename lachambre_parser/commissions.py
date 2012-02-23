@@ -16,7 +16,7 @@
 
 import re
 
-from deputies.models import Commission, CommissionMembership, Deputy
+from lachambre.models import Commission, CommissionMembership, Deputy
 from utils import read_or_dl, get_or_create, LACHAMBRE_PREFIX
 from BeautifulSoup import NavigableString
 

@@ -21,7 +21,7 @@ import re
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from deputies.models import Document,\
+from lachambre.models import Document,\
                             InChargeCommissions,\
                             DocumentPlenary,\
                             DocumentSenatPlenary,\

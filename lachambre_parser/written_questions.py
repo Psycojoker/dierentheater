@@ -18,7 +18,7 @@
 
 import re
 
-from deputies.models import WrittenQuestionBulletin, WrittenQuestion
+from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 from utils import read_or_dl,\
                   LACHAMBRE_PREFIX,\
                   AccessControlDict,\
