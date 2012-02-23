@@ -20,17 +20,20 @@ from utils import clean_text,\
                   AccessControlDict
 
 def document_to_dico(table):
+    is_pdf_section = lambda i: i.td.img
+    is_noise = lambda i: i == u"\n" or i.td.text in ("&#13;", "&nbsp;", "&#160;")
+    is_subsection = lambda i: i.td.b
     dico = AccessControlDict()
     sub_section = None
     for i in table:
-        if i == u"\n" or i.td.text in ("&#13;", "&nbsp;", "&#160;"):
+        if is_noise(i):
             continue
-        if i.td.b:
-            sub_section = build_sub_section(i, dico)
-        elif i.td.img:
-            build_pdf_sub_section(i, dico, sub_section)
-        else:
-            build_first_level(i, dico)
+        if is_subsection(i):
+            sub_section = _build_sub_section(i, dico)
+        elif is_pdf_section(i):
+            _build_pdf_sub_section(i, dico, sub_section)
+        else: # is first level
+            _build_first_level(i, dico)
     return dico
 
 
