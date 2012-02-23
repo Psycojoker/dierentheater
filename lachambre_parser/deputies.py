@@ -33,10 +33,6 @@ from utils import retry_on_access_error,\
                   read_or_dl
 
 def deputies():
-    each_deputies()
-
-
-def each_deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
         handle_deputy(deputy)
