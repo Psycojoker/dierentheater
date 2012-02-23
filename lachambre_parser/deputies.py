@@ -36,28 +36,6 @@ def deputies():
     each_deputies()
 
 
-@retry_on_access_error
-def deputies_list(reset=False):
-    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
-
-    for dep in soup('table')[4]('tr'):
-        items = dep('td')
-        full_name = re.sub('  +', ' ', items[0].a.text).strip()
-        url = items[0].a['href']
-        party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
-        email = items[2].a.text
-        website = items[3].a['href'] if items[3].a else None
-        # yes, one deputies key contains a O instead of an 0, I'm not joking
-        lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
-        Deputy.objects.create(full_name=full_name,
-                              party=party,
-                              url=url,
-                              websites=[website] if website else [],
-                              lachambre_id=lachambre_id,
-                              emails=[email])
-        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
-
-
 def each_deputies():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
@@ -80,24 +58,6 @@ def handle_deputy(deputy, reset=False):
     #get_deputie_commissions(soup, deputy)
     #deputy_documents(soup, deputy)
     deputy.save()
-
-
-def get_deputie_commissions(soup, deputy):
-    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
-    # look at the bottom of each deputies' page
-    membership = soup.find('td', rowspan="1")
-    item = membership.h4
-    role = None
-    deputy.commissions = []
-    while item.nextSibling:
-        if hasattr(item, 'tag'):
-            if item.name == 'h5':
-                role = item.text[6:-1]
-            elif item.name == 'div':
-                print "linking deputy to commission", item.a.text
-                commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
-                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
-        item = item.nextSibling
 
 
 def split_deputy_full_name(deputy, soup):
@@ -129,6 +89,46 @@ def split_deputy_full_name(deputy, soup):
         deputy.first_name = deputy.full_name.split(" ")[1].strip()
         deputy.last_name = deputy.full_name.split(" ")[0].strip()
         print [deputy.first_name], [deputy.last_name]
+
+
+@retry_on_access_error
+def deputies_list(reset=False):
+    soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
+
+    for dep in soup('table')[4]('tr'):
+        items = dep('td')
+        full_name = re.sub('  +', ' ', items[0].a.text).strip()
+        url = items[0].a['href']
+        party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
+        email = items[2].a.text
+        website = items[3].a['href'] if items[3].a else None
+        # yes, one deputies key contains a O instead of an 0, I'm not joking
+        lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
+        Deputy.objects.create(full_name=full_name,
+                              party=party,
+                              url=url,
+                              websites=[website] if website else [],
+                              lachambre_id=lachambre_id,
+                              emails=[email])
+        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
+
+
+def get_deputie_commissions(soup, deputy):
+    # here we will walk in a list of h4 .. h5 .. div+ .. h5 .. div+
+    # look at the bottom of each deputies' page
+    membership = soup.find('td', rowspan="1")
+    item = membership.h4
+    role = None
+    deputy.commissions = []
+    while item.nextSibling:
+        if hasattr(item, 'tag'):
+            if item.name == 'h5':
+                role = item.text[6:-1]
+            elif item.name == 'div':
+                print "linking deputy to commission", item.a.text
+                commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
+                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
+        item = item.nextSibling
 
 
 #@retry_on_access_error
