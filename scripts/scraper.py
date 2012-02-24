@@ -16,44 +16,14 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lachambre_parser.reports import annual_reports
-from lachambre_parser.commissions import commissions
-from lachambre_parser.written_questions import written_questions
-from lachambre_parser.documents import documents
-from lachambre_parser.deputies import deputies_list, deputies
-
-from deputies.models import Deputy,\
-                            Party,\
-                            CommissionMembership,\
-                            Document,\
-                            Question,\
-                            Analysis,\
-                            Commission,\
-                            WrittenQuestion,\
-                            DocumentTimeLine,\
-                            DocumentChambre,\
-                            DocumentChambrePdf,\
-                            OtherDocumentChambrePdf,\
-                            DocumentSenat,\
-                            DocumentSenatPdf,\
-                            InChargeCommissions,\
-                            DocumentPlenary,\
-                            DocumentSenatPlenary,\
-                            OtherDocumentSenatPdf,\
-                            WrittenQuestionBulletin,\
-                            AnnualReport
-
-
-def clean():
-    print "cleaning db"
-    map(lambda x: x.objects.all().delete(), (Deputy, Party, CommissionMembership, Document, Question, Analysis, Commission, WrittenQuestion, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, WrittenQuestionBulletin, AnnualReport, OtherDocumentChambrePdf))
-
+from lachambre_parser import reports
+from lachambre_parser import commissions
+from lachambre_parser import written_questions
+from lachambre_parser import documents
+from lachambre_parser import deputies
 
 def run():
-    clean()
-    deputies_list()
-    commissions()
-    deputies()
-    documents()
-    written_questions()
-    annual_reports()
+    modules = (reports, commissions, written_questions, documents, deputies)
+    map(lambda x: x.clean_models(), modules)
+    deputies.deputies_list()
+    map(lambda x: x.scrape(), modules)

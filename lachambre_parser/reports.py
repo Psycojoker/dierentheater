@@ -21,7 +21,12 @@ from lachambre.models import AnnualReport
 from utils import read_or_dl, get_or_create
 
 
-def annual_reports():
+def clean_models():
+    print "cleaning annual reports models"
+    map(lambda x: x.objects.all().delete(), (AnnualReport,))
+
+
+def scrape():
     for a, url in enumerate(('http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=y',
                          'http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=n')):
         soup = read_or_dl(url, "annual repports %i" % a)

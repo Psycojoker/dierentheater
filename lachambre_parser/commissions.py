@@ -22,7 +22,11 @@ from lachambre.models import Commission, CommissionMembership, Deputy
 from utils import read_or_dl, get_or_create, LACHAMBRE_PREFIX
 from BeautifulSoup import NavigableString
 
-def commissions():
+def clean_models():
+    print "cleaning commissions modèles"
+    map(lambda x: x.objects.all().delete(), (CommissionMembership, Commission))
+
+def scrape():
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
     _type = ""
     for i in soup("div", id="story")[1]:

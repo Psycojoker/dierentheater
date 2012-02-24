@@ -45,7 +45,13 @@ from utils import read_or_dl,\
 from documents_utils import document_pdf_part_cutter,\
                             document_to_dico
 
-def documents():
+
+def clean_models():
+    print "cleaning documents models"
+    map(lambda x: x.objects.all().delete(), (Document, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, OtherDocumentChambrePdf))
+
+
+def scrape():
     for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
         for soup in read_or_dl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)('table')[4]('tr', valign="top"):
             get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])

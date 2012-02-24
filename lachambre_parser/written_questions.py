@@ -29,7 +29,12 @@ from utils import read_or_dl,\
                   get_text_else_blank
 
 
-def written_questions():
+def clean_models():
+    print "cleaning written questions models"
+    map(lambda x: x.objects.all().delete(), (WrittenQuestion, WrittenQuestionBulletin))
+
+
+def scrape():
     _get_written_question_bulletin()
 
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):

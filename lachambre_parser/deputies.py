@@ -33,6 +33,11 @@ from utils import retry_on_access_error,\
                   read_or_dl
 
 
+def clean_models():
+    print "cleaning deputies models"
+    map(lambda x: x.objects.all().delete(), (Deputy, Party, Analysis))
+
+
 @retry_on_access_error
 def deputies_list(reset=False):
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
@@ -55,7 +60,7 @@ def deputies_list(reset=False):
         print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
 
 
-def deputies():
+def scrape():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         print index, deputy.full_name
         _handle_deputy(deputy)
