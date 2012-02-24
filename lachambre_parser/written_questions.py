@@ -38,7 +38,7 @@ def clean_models():
 def scrape():
     _get_written_question_bulletin()
 
-    for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
+    for bulletin in list(WrittenQuestionBulletin.objects.filter(done=False, url__isnull=False)):
         soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
         if not soup.find('table', 'txt'):
             continue
@@ -46,6 +46,8 @@ def scrape():
             if link.a is None:
                 continue
             _save_a_written_question(link)
+        bulletin.done = True
+        bulletin.save()
 
 
 def _get_written_question_bulletin():
