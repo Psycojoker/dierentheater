@@ -232,6 +232,9 @@ class WrittenQuestion(models.Model, Jsonify):
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
 
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
