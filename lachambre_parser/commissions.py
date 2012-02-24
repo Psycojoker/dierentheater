@@ -1,3 +1,5 @@
+# -*- coding:Utf-8 -*-
+
 #  Dieren Theater - lachambre.be to json sausage machine
 #  Copyright (C) 2012  Laurent Peuch <cortex@worlddomination.be>
 #
