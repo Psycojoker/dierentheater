@@ -264,8 +264,8 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
 
 
 class AnnualReport(models.Model, Jsonify):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     date = models.CharField(max_length=1337)
-    law_and_article = models.CharField(max_length=1337)
+    law_and_article = DictField()
     periodicity = models.CharField(max_length=1337)
     pdf_url = models.URLField()
