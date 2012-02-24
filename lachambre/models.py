@@ -82,10 +82,10 @@ class CommissionMembership(models.Model, Jsonify):
 
 class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
-    name = models.CharField(max_length=1337)
-    full_name = models.CharField(max_length=1337)
+    name = DictField()
+    full_name = DictField()
     url = models.URLField()
-    type = models.CharField(max_length=1337)
+    type = DictField()
     deputies = ListField(models.ForeignKey(CommissionMembership))
     seats = DictField()
 
