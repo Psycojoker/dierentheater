@@ -89,6 +89,9 @@ class Commission(models.Model, Jsonify):
     deputies = ListField(models.ForeignKey(CommissionMembership))
     seats = DictField()
 
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
 
 class Document(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
