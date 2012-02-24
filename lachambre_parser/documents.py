@@ -39,6 +39,7 @@ from utils import read_or_dl,\
                   LACHAMBRE_PREFIX,\
                   get_or_create,\
                   clean_text,\
+                  read_or_dl_with_nl,\
                   lxml_read_or_dl,\
                   get_text_else_blank
 
@@ -53,8 +54,9 @@ def clean_models():
 
 def scrape():
     for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
-        for soup in read_or_dl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)('table')[4]('tr', valign="top"):
-            get_or_create(Document, _id="lachambre_id", title=soup('div')[1].text, lachambre_id=soup.div.text, url=soup.a["href"])
+        soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
+        for soup, suppe in zip(soup('table')[4]('tr', valign="top"), suppe('table')[4]('tr', valign="top")):
+            get_or_create(Document, _id="lachambre_id", title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=soup.div.text, url=soup.a["href"])
 
     for document in list(Document.objects.all()):
         handle_document(document)
@@ -63,7 +65,6 @@ def scrape():
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
-    document.title = soup.h4.text
     # fucking stupid hack because BeautifulSoup fails to parse correctly the html
     soup = lxml_read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))

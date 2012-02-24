@@ -94,7 +94,7 @@ class Commission(models.Model, Jsonify):
 
 
 class Document(models.Model, Jsonify):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     url = models.CharField(max_length=1337)
     full_details_url = models.CharField(max_length=1337)
     status_chambre = models.CharField(max_length=1337, null=True)
