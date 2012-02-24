@@ -43,7 +43,12 @@ def scrape():
         if not soup.find('table', 'txt'):
             continue
         for link in soup.find('table', 'txt')('tr', recursive=False):
+            _id = re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]
             if link.a is None:
+                continue
+            # tempory
+            if WrittenQuestion.objects.filter(lachambre_id=_id):
+                print "pass %s, already parsed" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]
                 continue
             _save_a_written_question(link)
         bulletin.done = True
