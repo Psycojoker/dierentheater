@@ -37,7 +37,7 @@ class Deputy(models.Model, Jsonify):
     websites = ListField()
     lachambre_id = models.CharField(max_length=1337, unique=True)
     language = models.CharField(max_length=1337, null=True)
-    cv = models.CharField(max_length=1337)
+    cv = DictField()
     commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
     documents_principal_author_url = models.URLField()

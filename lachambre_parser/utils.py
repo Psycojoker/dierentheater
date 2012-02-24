@@ -119,6 +119,12 @@ def lame_url(url):
     return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
 
 
+def read_or_dl_with_nl(url, name, reset=False):
+    soup = read_or_dl(url, name, reset=reset)
+    suppe = read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
+    return soup, suppe
+
+
 def read_or_dl(url, name, reset=False):
     print "parsing", url
     if not reset and exists('dump/%s' % name):

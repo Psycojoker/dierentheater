@@ -30,6 +30,7 @@ from utils import retry_on_access_error,\
                   get_or_create,\
                   table2dic,\
                   lame_url,\
+                  read_or_dl_with_nl,\
                   read_or_dl
 
 
@@ -68,12 +69,13 @@ def scrape():
 
 @retry_on_access_error
 def _handle_deputy(deputy, reset=False):
-    soup = read_or_dl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
+    soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
-    deputy.cv = re.sub('  +', ' ', soup('table')[5].p.text)
-    if deputy.cv.encode("Utf-8").startswith("Députée"):
+    deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[5].p.text)
+    deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[5].p.text)
+    if deputy.cv["fr"].encode("Utf-8").startswith("Députée"):
         deputy.sex = "F"
-    elif deputy.cv.encode("Utf-8").startswith("Député"):
+    elif deputy.cv["fr"].encode("Utf-8").startswith("Député"):
         deputy.sex = "M"
     else:
         deputy.sex = None
