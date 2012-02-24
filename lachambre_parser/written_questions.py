@@ -20,6 +20,7 @@ import re
 
 from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 from utils import read_or_dl,\
+                  read_or_dl_with_nl,\
                   LACHAMBRE_PREFIX,\
                   AccessControlDict,\
                   get_or_create,\
@@ -52,51 +53,55 @@ def _get_written_question_bulletin():
         soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
         for b in soup('table')[4]('tr')[1:]:
             if i == 53:
-                WrittenQuestionBulletin.objects.create(
-                    legislature="53",
-                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                    date=b('td')[2].text,
-                    publication_date=b('td')[3].text,
-                    url=b('td')[1].a["href"],
-                    pdf_url=b('td')[0].a["href"],
-                )
+                get_or_create(WrittenQuestionBulletin,
+                              legislature="53",
+                              lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                              date=b('td')[2].text,
+                              publication_date=b('td')[3].text,
+                              url=b('td')[1].a["href"],
+                              pdf_url=b('td')[0].a["href"],
+                             )
             else:
-                WrittenQuestionBulletin.objects.create(
-                    legislature=str(i),
-                    lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                    publication_date=b('td')[2].text,
-                    url=b('td')[1].a["href"] if b('td')[1].a else None,
-                    pdf_url=b('td')[0].a["href"],
-                )
-            print b('td')[0]('a')[-1].text.split()[-1]
+                get_or_create(WrittenQuestionBulletin,
+                              legislature=str(i),
+                              lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                              publication_date=b('td')[2].text,
+                              url=b('td')[1].a["href"] if b('td')[1].a else None,
+                              pdf_url=b('td')[0].a["href"],
+                             )
+                print b('td')[0]('a')[-1].text.split()[-1]
 
 
 def _save_a_written_question(link):
-    soupsoup = read_or_dl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
+    soupsoup, suppesuppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0])
     data = AccessControlDict(((x.td.text, x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
+    data_nl = AccessControlDict(((x.td.text, x('td')[1]) for x in suppesuppe.find('table', 'txt')('tr') if x.td.text))
     get_or_create(WrittenQuestion,
                   _id="lachambre_id",
                   lachambre_id=re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0],
-                  title=data["Titre"].text,
-                  departement=data[u"Département"].text,
-                  sub_departement=data[u"Sous-département"].text,
+                  title={"fr": data["Titre"].text, "nl": data_nl["Titel"].text},
+                  departement={"fr": data[u"Département"].text, "nl": data_nl[u"Departement"].text},
+                  sub_departement={"fr": data[u"Sous-département"].text, "nl": data_nl[u"Sub-departement"].text},
                   deposition_date=data[u"Date de dépôt"].text,
                   delay_date=dico_get_text(data, u"Date de délai"),
                   publication_date=dico_get_text(data, "Date publication"),
                   # TODO: link to the actual deputy
                   author=data[u"Auteur"].text,
                   language=data[u"Langue"].text,
-                  question_status=dico_get_text(data, "Statut question"),
-                  status=dico_get_text(data, "Statut"),
-                  question=data["Question"],
-                  answer=dico_get_text(data, u"Réponse"),
+                  question_status={"fr": dico_get_text(data, "Statut question"), "nl": dico_get_text(data_nl, "Status vraag")},
+                  status={"fr": dico_get_text(data, "Statut"), "nl": dico_get_text(data_nl, "Status")},
+                  question={"fr": u"%s" % data["Question"], "nl": "%s" % data_nl["Vraag"]},
+                  answer={"fr": dico_get_text(data, u"Réponse"), "nl": dico_get_text(data_nl, u"Antwoord")},
                   publication_reponse_pdf_url=get_href_else_blank(data, u"Publication réponse"),
                   publication_question_pdf_url=get_href_else_blank(data, u"Publication question"),
                   publication_reponse=get_text_else_blank(data, u"Publication réponse"),
                   publication_question=get_text_else_blank(data, u"Publication question"),
-                  eurovoc_descriptors=get_items_list_else_empty_list(data, "Descripteurs Eurovoc"),
-                  eurovoc_candidats_descriptors=get_items_list_else_empty_list(data, "Candidats-descripteurs Eurovoc"),
-                  keywords=get_items_list_else_empty_list(data, u"Mots-clés libres"),
+                  eurovoc_descriptors={"fr": get_items_list_else_empty_list(data, "Descripteurs Eurovoc"),
+                                       "nl": get_items_list_else_empty_list(data_nl, "Eurovoc-descriptoren")},
+                  eurovoc_candidats_descriptors={"fr": get_items_list_else_empty_list(data, "Candidats-descripteurs Eurovoc"),
+                                                 "nl": get_items_list_else_empty_list(data_nl, "Eurovoc kandidaat-descriptoren")},
+                  keywords={"fr": get_items_list_else_empty_list(data, u"Mots-clés libres"),
+                            "nl": get_items_list_else_empty_list(data_nl, u"Vrije trefwoorden")},
                   url=link.a["href"],
                  )
 
