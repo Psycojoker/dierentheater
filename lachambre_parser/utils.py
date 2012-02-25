@@ -138,6 +138,12 @@ def read_or_dl(url, name, reset=False):
     return soup
 
 
+def lxml_read_or_dl_with_nl(url, name, reset=False):
+    soup = lxml_read_or_dl(url, name, reset)
+    suppe = lxml_read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
+    return soup, suppe
+
+
 def lxml_read_or_dl(url, name, reset=False):
     print "LXML parsing", url, "---", name
     if not reset and exists('dump/%s' % name):
