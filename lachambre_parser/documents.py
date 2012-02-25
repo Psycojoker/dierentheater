@@ -202,9 +202,9 @@ def _get_senat_plenaries(dico, dico_nl, document):
 def _get_competences(dico, document):
     if dico.get(u"Compétence"):
         document.timeline = []
-        for a, b in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
-            print "append time line", a, b
-            document.timeline.append(DocumentTimeLine.objects.create(title=b, date=a))
+        for _date, _title in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
+            print "append time line", _date, _title
+            document.timeline.append(DocumentTimeLine.objects.create(title=_title, date=_date))
     if dico.get("Analyse des interventions"):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
