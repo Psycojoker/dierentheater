@@ -74,7 +74,7 @@ def handle_document(document):
 
     _get_first_level_data(dico, dico_nl, document)
     _get_in_charged_commissions(dico, dico_nl, document)
-    _get_plenaries(dico, document)
+    _get_plenaries(dico, dico_nl, document)
     _get_senat_plenaries(dico, document)
     _get_competences(dico, document)
     _get_document_chambre(dico, document)
@@ -152,22 +152,29 @@ def _get_in_charged_commissions(dico, dico_nl, document):
         document.in_charge_commissions.append(icc)
 
 
-def _get_plenaries(dico, document):
+def _get_plenaries(dico, dico_nl, document):
     document.plenaries = []
-    for key in filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys()):
+    for key, key_nl in zip(sorted(filter(lambda x: re.match("(\d+. )?SEANCE PLENIERE CHAMBRE", x), dico.keys())),
+                           sorted(filter(lambda x: re.match("(\d+. )?PLENAIRE VERGADERING KAMER", x), dico_nl.keys()))):
         pl = DocumentPlenary()
-        pl.visibility = clean_text(dico[key]["head"].text).split()[-1]
-        pl.type = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+        pl.visibility["fr"] = clean_text(dico[key]["head"].text).split()[-1]
+        pl.visibility["nl"] = clean_text(dico_nl[key_nl]["head"].text).split()[-1]
+        pl.type["fr"] = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+        pl.type["nl"] = " ".join(clean_text(dico_nl[key_nl]["head"].text).split()[:-1])
 
         pl.agenda = []
         if dico[key].get("Calendrier"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
-                pl.agenda.append({"date": _date, "type": _type})
+            fr = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2])))
+            nl = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico_nl[key_nl]["Kalender"].contents[::2])))
+            for (_date, _type), (_, _type_nl) in zip(fr, nl):
+                pl.agenda.append({"date": _date, "type": {"fr": _type, "nl": _type_nl}})
 
         pl.incident = []
         if dico[key].get("Incident"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
-                pl.incident.append({"date": _date, "type": _type})
+            fr = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2])))
+            nl = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico_nl[key_nl]["Incident"].contents[::2])))
+            for (_date, _type), (_, _type_nl) in zip(fr, nl):
+                pl.incident.append({"date": _date, "type": {"fr": _type, "nl": _type_nl}})
 
         pl.save()
         document.plenaries.append(pl)
