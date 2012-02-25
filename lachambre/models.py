@@ -154,14 +154,14 @@ class DocumentSenatPlenary(models.Model):
 
 class DocumentChambre(models.Model):
     deposition_date = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     taken_in_account_date = models.CharField(max_length=1337)
     distribution_date = models.CharField(max_length=1337)
     sending_date = models.CharField(max_length=1337)
     ending_date = models.CharField(max_length=1337)
-    status = models.CharField(max_length=1337)
+    status = DictField()
     authors = ListField()
-    comments = ListField()
+    comments = DictField()
     pdf = EmbeddedModelField('DocumentChambrePdf')
     other_pdfs = ListField(EmbeddedModelField('OtherDocumentChambrePdf'))
     joint_pdfs = ListField()
@@ -170,7 +170,7 @@ class DocumentChambre(models.Model):
 class DocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
 
 
 class DocumentSenat(models.Model):
@@ -200,7 +200,7 @@ class OtherDocumentSenatPdf(models.Model):
 
 class OtherDocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     distribution_date = models.CharField(max_length=1337)
     authors = ListField()
 

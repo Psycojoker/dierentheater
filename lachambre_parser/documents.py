@@ -77,7 +77,7 @@ def handle_document(document):
     _get_plenaries(dico, dico_nl, document)
     _get_senat_plenaries(dico, dico_nl, document)
     _get_competences(dico, dico_nl, document)
-    _get_document_chambre(dico, document)
+    _get_document_chambre(dico, dico_nl, document)
     _get_document_senat(dico, document)
 
     document.done = True
@@ -246,64 +246,71 @@ def _get_document_senat(dico, document):
     document.document_senat = document_senat
 
 
-def _get_document_chambre(dico, document):
+def _get_document_chambre(dico, dico_nl, document):
     if not dico.get("Document Chambre"):
         return
 
     chambre_dico = dico['Document Chambre']
+    chambre_dico_nl = dico_nl['Document Kamer']
 
     document_chambre = DocumentChambre()
     document_chambre.deposition_date = chambre_dico[u'Date de dépôt'].text
-    document_chambre.type = chambre_dico[u'Type de document'].text
+    document_chambre.type["fr"] = chambre_dico[u'Type de document'].text
+    document_chambre.type["nl"] = chambre_dico_nl[u'Document type'].text
     document_chambre.taken_in_account_date = get_text_else_blank(chambre_dico, u'Prise en considération')
     document_chambre.distribution_date = get_text_else_blank(chambre_dico, u'Date de distribution')
     document_chambre.sending_date = get_text_else_blank(chambre_dico, u'Date d\'envoi')
     document_chambre.ending_date = get_text_else_blank(chambre_dico, u'Date de fin')
-    document_chambre.status = get_text_else_blank(chambre_dico, u'Statut')
-    document_chambre.comments = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
+    document_chambre.status["fr"] = get_text_else_blank(chambre_dico, u'Statut')
+    document_chambre.status["nl"] = get_text_else_blank(chambre_dico_nl, u'Status')
+    document_chambre.comments["fr"] = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
+    document_chambre.comments["nl"] = get_text_else_blank(chambre_dico_nl, u'Commentaar').split(' ')
 
-    _get_authors(chambre_dico, document_chambre)
+    _get_authors(chambre_dico, chambre_dico_nl, document_chambre)
 
     url, tipe, session = clean_text(str(chambre_dico[u'head']).replace("&#160;", "")).split("<br />")
+    _, tipe_nl, _ = clean_text(str(chambre_dico_nl[u'head']).replace("&#160;", "")).split("<br />")
     url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-    document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+    document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type={"fr": tipe.strip(), "nl": tipe_nl.strip()}, session=session.split()[-2])
 
-    _get_next_documents(chambre_dico, document_chambre)
+    _get_next_documents(chambre_dico, chambre_dico_nl, document_chambre)
 
     if chambre_dico.get(u'Document(s) joint(s)/lié(s)'):
-        document_chambre.joint_pdfs = [{"url": x.a["href"], "title": x.contents[0][1:-1]} for x in chambre_dico[u'Document(s) joint(s)/lié(s)']]
+        document_chambre.joint_pdfs = [{"url": x.a["href"], "title": {"fr": x.contents[0][1:-1], "nl": y.contents[0][1:-1]}} for x, y in zip(chambre_dico[u'Document(s) joint(s)/lié(s)'],
+                                                                                                                                             chambre_dico_nl[u'Gekoppeld(e)/verbonden document(en)'],)]
 
     document_chambre.save()
     document.document_chambre = document_chambre
 
 
-def _get_authors(chambre_dico, document_chambre):
+def _get_authors(chambre_dico, chambre_dico_nl, document_chambre):
     if chambre_dico.get('Auteur(s)'):
-        for dep, role in zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')):
+        for (dep, role), (_, role_nl) in zip(zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i')), zip(chambre_dico[u'Auteur(s)']('a'), chambre_dico[u'Auteur(s)']('i'))):
             lachambre_id = re.search('key=(\d+)', dep['href']).groups()[0]
             deputy = Deputy.objects.get(lachambre_id=lachambre_id)
             document_chambre.authors.append({
                 "lachambre_id": deputy.lachambre_id,
                 "id": deputy.id,
                 "full_name": deputy.full_name,
-                "role": role.text[1:-1]
+                "role": {"fr": role.text[1:-1], "nl": role_nl.text[1:-1]}
             })
 
 
-def _get_next_documents(chambre_dico, document_chambre):
+def _get_next_documents(chambre_dico, chambre_dico_nl, document_chambre):
     if chambre_dico.get('Document(s) suivant(s)'):
-        for d in document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']):
+        for d, d_nl in zip(document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']), document_pdf_part_cutter(chambre_dico_nl[u'Opvolgend(e) document(en)'])):
             print "add pdf %s" % clean_text(d[0].font.text)
             doc = OtherDocumentChambrePdf()
             doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-            doc.type = clean_text(d[0].font.text)
+            doc.type["fr"] = clean_text(d[0].font.text)
+            doc.type["nl"] = clean_text(d_nl[0].font.text)
             doc.distribution_date = d[1]('td')[-1].text
-            for dep in d[2:]:
+            for dep, dep_nl in zip(d[2:], d_nl[2:]):
                 if dep.a:
                     lachambre_id = re.search('key=(\d+)', dep.a["href"]).groups()[0]
                     deputy = Deputy.objects.get(lachambre_id=lachambre_id)
-                    doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": dep('td')[-1].i.text[1:-1]})
+                    doc.authors.append({"lachambre_id": deputy.lachambre_id, "id": deputy.id, "full_name": deputy.full_name, "role": {"fr": dep('td')[-1].i.text[1:-1], "nl": dep_nl('td')[-1].i.text[1:-1]}})
                 else:
-                    doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": dep('td')[-1].i.text[1:-1]})
+                    doc.authors.append({"lachambre_id": -1, "id": -1, "full_name": dep('td')[-1].contents[2].strip(), "role": {"fr": dep('td')[-1].i.text[1:-1], "nl": dep_nl('td')[-1].i.text[1:-1]}})
             doc.save()
             document_chambre.other_pdfs.append(doc)
