@@ -58,7 +58,7 @@ def scrape():
         for soup, suppe in zip(soup('table')[4]('tr', valign="top"), suppe('table')[4]('tr', valign="top")):
             get_or_create(Document, _id="lachambre_id", title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=soup.div.text, url=soup.a["href"])
 
-    for document in list(Document.objects.all()):
+    for document in list(Document.objects.filter(done=False)):
         handle_document(document)
 
 
