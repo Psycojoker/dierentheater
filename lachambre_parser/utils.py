@@ -139,6 +139,7 @@ def read_or_dl(url, name, reset=False):
 
 
 def lxml_read_or_dl(url, name, reset=False):
+    print "LXML parsing", url, "---", name
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name)
     else:
