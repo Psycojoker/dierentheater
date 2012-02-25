@@ -144,7 +144,7 @@ def lxml_read_or_dl(url, name, reset=False):
         text = open('dump/%s' % name)
     else:
         text = urlopen(url)
-        open('dump/%s' % name, "w").write(text)
+        open('dump/%s' % name, "w").write(urlopen(url).read())
     soup = etree.parse(text, etree.HTMLParser())
     return soup
 
