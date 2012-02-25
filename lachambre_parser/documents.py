@@ -76,7 +76,7 @@ def handle_document(document):
     _get_in_charged_commissions(dico, dico_nl, document)
     _get_plenaries(dico, dico_nl, document)
     _get_senat_plenaries(dico, dico_nl, document)
-    _get_competences(dico, document)
+    _get_competences(dico, dico_nl, document)
     _get_document_chambre(dico, document)
     _get_document_senat(dico, document)
 
@@ -199,12 +199,13 @@ def _get_senat_plenaries(dico, dico_nl, document):
         document.senat_plenaries.append(spl)
 
 
-def _get_competences(dico, document):
+def _get_competences(dico, dico_nl, document):
     if dico.get(u"Compétence"):
         document.timeline = []
-        for _date, _title in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
-            print "append time line", _date, _title
-            document.timeline.append(DocumentTimeLine.objects.create(title=_title, date=_date))
+        for (_date, _title), (_, _title_nl) in zip([clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]],
+                                                   [clean_text(x).split(u" \xa0 ", 1) for x in dico_nl[u"Bevoegdheid"]["head"].contents[::2]]):
+            print "append time line", _date, _title, _title_nl
+            document.timeline.append(DocumentTimeLine.objects.create(title={"fr": _title, "nl": _title_nl}, date=_date))
     if dico.get("Analyse des interventions"):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 

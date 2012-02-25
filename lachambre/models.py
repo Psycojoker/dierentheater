@@ -205,7 +205,7 @@ class OtherDocumentChambrePdf(models.Model):
 
 
 class DocumentTimeLine(models.Model):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     date = models.CharField(max_length=1337)
 
 
