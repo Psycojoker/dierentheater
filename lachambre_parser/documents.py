@@ -73,7 +73,7 @@ def handle_document(document):
     dico_nl = document_to_dico(list(table_nl.table('tr', recursive=False)))
 
     _get_first_level_data(dico, dico_nl, document)
-    _get_in_charged_commissions(dico, document)
+    _get_in_charged_commissions(dico, dico_nl, document)
     _get_plenaries(dico, document)
     _get_senat_plenaries(dico, document)
     _get_competences(dico, document)
@@ -119,25 +119,31 @@ def _get_first_level_data(dico, dico_nl, document):
         document.main_docs["nl"] = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico_nl["Hoodfdocumenten"].contents))
 
 
-def _get_in_charged_commissions(dico, document):
+def _get_in_charged_commissions(dico, dico_nl, document):
     document.in_charge_commissions = []
-    for key in filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys()):
+    for key, key_nl in zip(sorted(filter(lambda x: re.match("(\d+. )?COMMISSION CHAMBRE", x), dico.keys())), sorted(filter(lambda x: re.match("(\d+. )?COMMISSIE KAMER", x), dico_nl.keys()))):
         icc = InChargeCommissions()
-        icc.visibility = clean_text(dico[key]["head"].text).split()[-1]
-        icc.commission = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+        icc.visibility["fr"] = clean_text(dico[key]["head"].text).split()[-1]
+        icc.visibility["nl"] = clean_text(dico_nl[key_nl]["head"].text).split()[-1]
+        icc.commission["fr"] = " ".join(clean_text(dico[key]["head"].text).split()[:-1])
+        icc.commission["nl"] = " ".join(clean_text(dico_nl[key_nl]["head"].text).split()[:-1])
         if dico[key].get("Rapporteur"):
             # FIXME link to actual deputies
             icc.rapporters = map(clean_text, dico[key]["Rapporteur"].text.split("\n\t\t\t\t\t"))
 
         icc.incident = []
         if dico[key].get("Incident"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2]))):
-                icc.incident.append({"date": _date, "type": _type})
+            fr = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Incident"].contents[::2])))
+            nl = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico_nl[key_nl]["Incident"].contents[::2])))
+            for (_date, _type), (_, _type_nl) in zip(fr, nl):
+                icc.incident.append({"date": _date, "type": {"fr": _type, "nl": _type_nl}})
 
         icc.agenda = []
         if dico[key].get("Calendrier"):
-            for _date, _type in filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2]))):
-                icc.agenda.append({"date": _date, "type": _type})
+            fr = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico[key]["Calendrier"].contents[::2])))
+            nl = filter(lambda x: x[0], map(lambda x: x.split(u" \xa0 ", 1), map(clean_text, dico_nl[key_nl]["Kalender"].contents[::2])))
+            for (_date, _type), (_, _type_nl) in zip(fr, nl):
+                icc.agenda.append({"date": _date, "type": {"fr": _type, "nl": _type_nl}})
 
         if dico[key].get("Rapport"):
             icc.rapport = {"url": dico[key]["Rapport"].a["href"], "date": clean_text(dico[key]["Rapport"].contents[-2])}

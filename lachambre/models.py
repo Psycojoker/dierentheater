@@ -129,10 +129,10 @@ class Document(models.Model, Jsonify):
 
 
 class InChargeCommissions(models.Model):
-    visibility = models.CharField(max_length=1337)
+    visibility = DictField()
     # need to turn that into a EmbeddedModelField(commissions) in the futur
     # when the commissions will be parsed
-    commission = models.CharField(max_length=1337)
+    commission = DictField()
     rapporters = ListField()
     agenda = ListField()
     incident = ListField()
