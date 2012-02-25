@@ -58,7 +58,7 @@ def deputies_list(reset=False):
                               websites=[website] if website else [],
                               lachambre_id=lachambre_id,
                               emails=[email])
-        print 'adding new deputy', lachambre_id, full_name, party, email, website if website else ''
+        print 'adding new deputy', lachambre_id.encode("Utf-8"), full_name.encode("Utf-8"), party, email.encode("Utf-8"), website.encode("Utf-8") if website else ''
 
 
 def scrape():
