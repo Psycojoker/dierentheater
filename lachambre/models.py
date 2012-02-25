@@ -147,7 +147,7 @@ class DocumentPlenary(models.Model):
 
 
 class DocumentSenatPlenary(models.Model):
-    visibility = models.CharField(max_length=1337)
+    visibility = DictField()
     agenda = ListField()
 
 
