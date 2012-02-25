@@ -78,7 +78,7 @@ def handle_document(document):
     _get_senat_plenaries(dico, dico_nl, document)
     _get_competences(dico, dico_nl, document)
     _get_document_chambre(dico, dico_nl, document)
-    _get_document_senat(dico, document)
+    _get_document_senat(dico, dico_nl, document)
 
     document.done = True
     document.save()
@@ -210,35 +210,40 @@ def _get_competences(dico, dico_nl, document):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
 
-def _get_document_senat(dico, document):
+def _get_document_senat(dico, dico_nl, document):
     if not dico.get(u"Document Sénat"):
         return
 
     senat_dico = dico[u"Document Sénat"]
+    senat_dico_nl = dico_nl[u"Document Senaat"]
 
     document_senat = DocumentSenat()
     document_senat.deposition_date = senat_dico[u"Date de dépôt"].text
     document_senat.ending_date = get_text_else_blank(senat_dico, u"Date de fin")
-    document_senat.type = senat_dico[u"Type de document"].text
-    document_senat.comments = get_text_else_blank(senat_dico, u'Commentaire').split(' - ')
+    document_senat.type["fr"] = senat_dico[u"Type de document"].text
+    document_senat.type["nl"] = senat_dico_nl[u"Document type"].text
+    document_senat.comments["fr"] = get_text_else_blank(senat_dico, u'Commentaire').split(' - ')
+    document_senat.comments["nl"] = get_text_else_blank(senat_dico_nl, u'Commentaar').split(' - ')
     document_senat.author = clean_text(get_text_else_blank(senat_dico, u"Auteur(s)"))
-    document_senat.comments = get_text_else_blank(senat_dico, u'Commentaire').split(' - ')
-    document_senat.status = get_text_else_blank(senat_dico, u'Statut')
+    document_senat.status["fr"] = get_text_else_blank(senat_dico, u'Statut')
+    document_senat.status["nl"] = get_text_else_blank(senat_dico_nl, u'Status')
 
     url, tipe, session = clean_text(str(senat_dico[u'head']).replace("&#160;", "")).split("<br />")
+    _, tipe_nl, _ = clean_text(str(senat_dico_nl[u'head']).replace("&#160;", "")).split("<br />")
     url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
-    document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type=tipe.strip(), session=session.split()[-2])
+    document_senat.pdf = DocumentSenatPdf.objects.create(url=url, type={"fr": tipe.strip(), "nl": tipe_nl.strip()}, session=session.split()[-2])
 
     if senat_dico.get('Document(s) suivant(s)'):
-        for d in document_pdf_part_cutter(senat_dico[u'Document(s) suivant(s)']):
+        for d, d_nl in zip(document_pdf_part_cutter(senat_dico[u'Document(s) suivant(s)']), document_pdf_part_cutter(senat_dico_nl[u'Opvolgend(e) document(en)'])):
             print "add pdf %s" % clean_text(d[0].font.text)
             doc = OtherDocumentSenatPdf()
             doc.url = d[0].a['href'] if d[0].a else d[0].td.text
-            doc.type = clean_text(d[0].font.text)
+            doc.type["fr"] = clean_text(d[0].font.text)
+            doc.type["nl"] = clean_text(d_nl[0].font.text)
             doc.date = d[0]('td')[-1].contents[0]
             doc.authors = []
-            for dep in d[1:]:
-                doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": dep('td')[-1].i.text[1:-1]})
+            for dep, dep_nl in zip(d[1:], d_nl[1:]):
+                doc.authors.append({"full_name": unicode(dep('td')[-1].contents[2]).strip(), "role": {"fr": dep('td')[-1].i.text[1:-1], "nl": dep_nl('td')[-1].i.text[1:-1]}})
             doc.save()
             document_senat.other_pdfs.append(doc)
 

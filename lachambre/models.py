@@ -175,25 +175,25 @@ class DocumentChambrePdf(models.Model):
 
 class DocumentSenat(models.Model):
     deposition_date = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
-    comments = ListField()
+    type = DictField()
+    comments = DictField()
     ending_date = models.CharField(max_length=1337)
     author = models.CharField(max_length=1337)
     pdf = EmbeddedModelField('DocumentSenatPdf')
-    comments = ListField()
-    status = models.CharField(max_length=1337)
+    comments = DictField()
+    status = DictField()
     other_pdfs = ListField(EmbeddedModelField('OtherDocumentSenatPdf'))
 
 
 class DocumentSenatPdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
 
 
 class OtherDocumentSenatPdf(models.Model):
     url = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     date = models.CharField(max_length=1337)
     authors = ListField()
 
