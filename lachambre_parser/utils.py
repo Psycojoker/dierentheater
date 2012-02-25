@@ -126,7 +126,7 @@ def read_or_dl_with_nl(url, name, reset=False):
 
 
 def read_or_dl(url, name, reset=False):
-    print "parsing", url
+    print "parsing", url, "---", name
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name).read()
     else:
