@@ -2,14 +2,14 @@
 <html>
     <head>
         <title>Dieren Theater</title>
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/docs.css">
+        <link rel="stylesheet" href="/static/css/bootstrap/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/bootstrap/docs.css">
     </head>
     <body>
         <div class="topbar" data-scrollspy="scrollspy" >
           <div class="topbar-inner">
             <div class="container">
-              <a class="brand" href="#">Dieren Theater</a>
+              <a class="brand" href="{% url home %}">Dieren Theater</a>
 
               <ul class="nav">
                 <li><a href="{% url deputies:deputy-list %}">Deputies</a></li>

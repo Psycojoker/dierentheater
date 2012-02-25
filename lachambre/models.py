@@ -37,7 +37,7 @@ class Deputy(models.Model, Jsonify):
     websites = ListField()
     lachambre_id = models.CharField(max_length=1337, unique=True)
     language = models.CharField(max_length=1337, null=True)
-    cv = models.CharField(max_length=1337)
+    cv = DictField()
     commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
     documents_principal_author_url = models.URLField()
@@ -83,30 +83,33 @@ class CommissionMembership(models.Model, Jsonify):
 
 class Commission(models.Model, Jsonify):
     lachambre_id = models.IntegerField(unique=True)
-    name = models.CharField(max_length=1337)
-    full_name = models.CharField(max_length=1337)
+    name = DictField()
+    full_name = DictField()
     url = models.URLField()
-    type = models.CharField(max_length=1337)
+    type = DictField()
     deputies = ListField(models.ForeignKey(CommissionMembership))
     seats = DictField()
 
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
 
 class Document(models.Model, Jsonify):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     url = models.CharField(max_length=1337)
     full_details_url = models.CharField(max_length=1337)
-    status_chambre = models.CharField(max_length=1337, null=True)
-    status_senat = models.CharField(max_length=1337, null=True)
-    eurovoc_main_descriptor = models.CharField(max_length=1337, null=True)
+    status_chambre = DictField()
+    status_senat = DictField()
     deposition_date = models.CharField(max_length=1337, null=True)
-    constitution_article = models.CharField(max_length=1337)
+    constitution_article = DictField()
     in_charge_commissions = ListField(EmbeddedModelField('InChargeCommissions'))
     plenaries = ListField(EmbeddedModelField('DocumentPlenary'))
     senat_plenaries = ListField(EmbeddedModelField('DocumentSenatPlenary'))
     timeline = ListField(EmbeddedModelField('DocumentTimeLine'))
-    eurovoc_descriptors = ListField()
-    eurovoc_candidats_descriptors = ListField()
-    keywords = ListField()
+    eurovoc_main_descriptor = DictField()
+    eurovoc_descriptors = DictField()
+    eurovoc_candidats_descriptors = DictField()
+    keywords = DictField()
     lachambre_id = models.IntegerField(unique=True)
     analysis = EmbeddedModelField('Analysis', null=True)
     document_chambre = EmbeddedModelField('DocumentChambre', null=True)
@@ -116,8 +119,9 @@ class Document(models.Model, Jsonify):
     law_date = models.CharField(max_length=1337)
     moniteur_number = models.CharField(max_length=1337)
     moniteur_date = models.CharField(max_length=1337)
-    main_docs = ListField()
+    main_docs = DictField()
     candidature_vote_date = models.CharField(max_length=1337)
+    done = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
@@ -127,10 +131,10 @@ class Document(models.Model, Jsonify):
 
 
 class InChargeCommissions(models.Model):
-    visibility = models.CharField(max_length=1337)
+    visibility = DictField()
     # need to turn that into a EmbeddedModelField(commissions) in the futur
     # when the commissions will be parsed
-    commission = models.CharField(max_length=1337)
+    commission = DictField()
     rapporters = ListField()
     agenda = ListField()
     incident = ListField()
@@ -138,27 +142,27 @@ class InChargeCommissions(models.Model):
 
 
 class DocumentPlenary(models.Model):
-    visibility = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    visibility = DictField()
+    type = DictField()
     agenda = ListField()
     incident = ListField()
 
 
 class DocumentSenatPlenary(models.Model):
-    visibility = models.CharField(max_length=1337)
+    visibility = DictField()
     agenda = ListField()
 
 
 class DocumentChambre(models.Model):
     deposition_date = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     taken_in_account_date = models.CharField(max_length=1337)
     distribution_date = models.CharField(max_length=1337)
     sending_date = models.CharField(max_length=1337)
     ending_date = models.CharField(max_length=1337)
-    status = models.CharField(max_length=1337)
+    status = DictField()
     authors = ListField()
-    comments = ListField()
+    comments = DictField()
     pdf = EmbeddedModelField('DocumentChambrePdf')
     other_pdfs = ListField(EmbeddedModelField('OtherDocumentChambrePdf'))
     joint_pdfs = ListField()
@@ -167,68 +171,71 @@ class DocumentChambre(models.Model):
 class DocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
 
 
 class DocumentSenat(models.Model):
     deposition_date = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
-    comments = ListField()
+    type = DictField()
+    comments = DictField()
     ending_date = models.CharField(max_length=1337)
     author = models.CharField(max_length=1337)
     pdf = EmbeddedModelField('DocumentSenatPdf')
-    comments = ListField()
-    status = models.CharField(max_length=1337)
+    comments = DictField()
+    status = DictField()
     other_pdfs = ListField(EmbeddedModelField('OtherDocumentSenatPdf'))
 
 
 class DocumentSenatPdf(models.Model):
     url = models.CharField(max_length=1337)
     session = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
 
 
 class OtherDocumentSenatPdf(models.Model):
     url = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     date = models.CharField(max_length=1337)
     authors = ListField()
 
 
 class OtherDocumentChambrePdf(models.Model):
     url = models.CharField(max_length=1337)
-    type = models.CharField(max_length=1337)
+    type = DictField()
     distribution_date = models.CharField(max_length=1337)
     authors = ListField()
 
 
 class DocumentTimeLine(models.Model):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     date = models.CharField(max_length=1337)
 
 
 class WrittenQuestion(models.Model, Jsonify):
-    title = models.CharField(max_length=1337)
-    departement = models.CharField(max_length=1337)
-    sub_departement = models.CharField(max_length=1337)
+    title = DictField()
+    departement = DictField()
+    sub_departement = DictField()
     author = models.CharField(max_length=1337)
     deposition_date = models.CharField(max_length=1337)
     delay_date = models.CharField(max_length=1337, null=True)
-    eurovoc_descriptors = ListField()
-    eurovoc_candidats_descriptors = ListField()
-    keywords = ListField()
+    eurovoc_descriptors = DictField()
+    eurovoc_candidats_descriptors = DictField()
+    keywords = DictField()
     url = models.URLField()
     lachambre_id = models.CharField(max_length=1337)
     language = models.CharField(max_length=1337)
-    status = models.CharField(max_length=1337)
-    question_status = models.CharField(max_length=1337)
+    status = DictField()
+    question_status = DictField()
     publication_date = models.CharField(max_length=1337)
-    question = models.CharField(max_length=1337)
-    answer = models.CharField(max_length=1337)
+    question = DictField()
+    answer = DictField()
     publication_reponse_pdf_url = models.CharField(max_length=1337)
     publication_question_pdf_url = models.CharField(max_length=1337)
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 class Question(models.Model, Jsonify):
@@ -259,11 +266,12 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     url = models.URLField(null=True)
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
+    done = models.BooleanField(default=False)
 
 
 class AnnualReport(models.Model, Jsonify):
-    title = models.CharField(max_length=1337)
+    title = DictField()
     date = models.CharField(max_length=1337)
-    law_and_article = models.CharField(max_length=1337)
+    law_and_article = DictField()
     periodicity = models.CharField(max_length=1337)
     pdf_url = models.URLField()

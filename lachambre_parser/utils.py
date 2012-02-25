@@ -23,6 +23,8 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
+LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
+
 
 def get_or_create(klass, _id=None, **kwargs):
     if _id is None:
@@ -52,6 +54,20 @@ def retry_on_access_error(function):
 
 def get_text_else_blank(dico, key):
     return dico[key].text if dico.get(key) and dico[key].a else ""
+
+
+def get_href_else_blank(dico, key):
+    return dico[key].a["href"] if dico.get(key) and dico[key].a else ""
+
+
+def get_items_list_else_empty_list(dico, key):
+    return dico[key].text.split(" | ") if dico.get(key) else []
+
+
+def dico_get_text(dico, key):
+    if dico.get(key):
+        return dico[key].text
+    return ""
 
 
 class AccessControlDict(dict):
@@ -103,8 +119,14 @@ def lame_url(url):
     return quote(url.encode("iso-8859-1"), safe="%/:=&?~#+!$,;'@()*[]")
 
 
+def read_or_dl_with_nl(url, name, reset=False):
+    soup = read_or_dl(url, name, reset=reset)
+    suppe = read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
+    return soup, suppe
+
+
 def read_or_dl(url, name, reset=False):
-    print "parsing", url
+    print "parsing", url, "---", name
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name).read()
     else:
@@ -116,12 +138,19 @@ def read_or_dl(url, name, reset=False):
     return soup
 
 
+def lxml_read_or_dl_with_nl(url, name, reset=False):
+    soup = lxml_read_or_dl(url, name, reset)
+    suppe = lxml_read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
+    return soup, suppe
+
+
 def lxml_read_or_dl(url, name, reset=False):
+    print "LXML parsing", url, "---", name
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name)
     else:
         text = urlopen(url)
-        open('dump/%s' % name, "w").write(text)
+        open('dump/%s' % name, "w").write(urlopen(url).read())
     soup = etree.parse(text, etree.HTMLParser())
     return soup
 
