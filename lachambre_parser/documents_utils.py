@@ -66,7 +66,7 @@ def _build_sub_section(i, dico):
 def _build_pdf_sub_section(i, dico, sub_section):
     key = clean_text(i.td.text)
     # we can have a list on joined documents
-    if unicode(key) == u'Document(s) joint(s)/lié(s)':
+    if unicode(key) in (u'Document(s) joint(s)/lié(s)', u'Gekoppeld(e)/verbonden document(en)'):
         if not dico[sub_section].get(key):
             dico[sub_section][key] = []
         dico[sub_section][key].append(i('td')[1])
@@ -79,7 +79,7 @@ def _build_pdf_sub_section(i, dico, sub_section):
 def _build_first_level(i, dico):
     key = clean_text(i.td.text)
     # we can get severals Moniter erratum
-    if unicode(key) == 'Moniteur erratum':
+    if unicode(key) in ('Moniteur erratum', 'Staatsblad erratum'):
         if not dico.get(key):
             dico[key] = []
         dico[key].append(i('td')[1])

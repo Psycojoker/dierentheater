@@ -40,7 +40,7 @@ from utils import read_or_dl,\
                   get_or_create,\
                   clean_text,\
                   read_or_dl_with_nl,\
-                  lxml_read_or_dl,\
+                  lxml_read_or_dl_with_nl,\
                   get_text_else_blank
 
 from documents_utils import document_pdf_part_cutter,\
@@ -66,11 +66,13 @@ def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
     # fucking stupid hack because BeautifulSoup fails to parse correctly the html
-    soup = lxml_read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+    soup, suppe = lxml_read_or_dl_with_nl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
+    table_nl = BeautifulSoup(etree.tostring(suppe.xpath('//table')[4], pretty_print=True))
     dico = document_to_dico(list(table.table('tr', recursive=False)))
+    dico_nl = document_to_dico(list(table_nl.table('tr', recursive=False)))
 
-    _get_first_level_data(dico, document)
+    _get_first_level_data(dico, dico_nl, document)
     _get_in_charged_commissions(dico, document)
     _get_plenaries(dico, document)
     _get_senat_plenaries(dico, document)
@@ -78,15 +80,18 @@ def handle_document(document):
     _get_document_chambre(dico, document)
     _get_document_senat(dico, document)
 
+    document.done = True
     document.save()
     dico.die_if_got_not_accessed_keys()
 
 
-def _get_first_level_data(dico, document):
+def _get_first_level_data(dico, dico_nl, document):
     document.deposition_date = dico[u"Date de dépôt"].text
-    document.constitution_article = clean_text(get_text_else_blank(dico, "Article Constitution"))
+    document.constitution_article["fr"] = clean_text(get_text_else_blank(dico, "Article Constitution"))
+    document.constitution_article["nl"] = clean_text(get_text_else_blank(dico_nl, "Artikel Grondwet"))
     if dico.get("Descripteur Eurovoc principal"):
-        document.eurovoc_main_descriptor = dico["Descripteur Eurovoc principal"]["head"]
+        document.eurovoc_main_descriptor["fr"] = dico["Descripteur Eurovoc principal"]["head"].text
+        document.eurovoc_main_descriptor["nl"] = dico_nl["Eurovoc-hoofddescriptor"]["head"].text
     document.vote_date = get_text_else_blank(dico, "Vote Chambre")
     document.law_date = get_text_else_blank(dico, "Date de la loi")
     document.moniteur_number = get_text_else_blank(dico, u"Moniteur n°")
@@ -95,17 +100,23 @@ def _get_first_level_data(dico, document):
     document.candidature_vote_date = get_text_else_blank(dico, u"Vote candidature")
 
     if dico.get("Etat d'avancement"):
-        document.status_chambre = clean_text(dico["Etat d'avancement"].contents[0])
-        document.status_senat = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
+        document.status_chambre["fr"] = clean_text(dico["Etat d'avancement"].contents[0])
+        document.status_senat["fr"] = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
+        document.status_chambre["nl"] = clean_text(dico_nl["Stand van zaken"].contents[0])
+        document.status_senat["nl"] = clean_text(dico_nl["Stand van zaken"].contents[2]) if len(dico_nl["Stand van zaken"]) >= 3 else None
 
     if dico.get("Descripteurs Eurovoc"):
-        document.eurovoc_descriptors = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
+        document.eurovoc_descriptors["fr"] = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
+        document.eurovoc_descriptors["nl"] = map(lambda x: x.strip(), dico_nl["Eurovoc descriptoren"]["head"].text.split("|"))
     if dico.get("Candidats-descripteurs Eurovoc"):
-        document.eurovoc_candidats_descriptors = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
+        document.eurovoc_candidats_descriptors["fr"] = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
+        document.eurovoc_candidats_descriptors["nl"] = map(lambda x: x.strip(), dico_nl["Eurovoc kandidaat-descriptoren"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
-        document.keywords = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+        document.keywords["fr"] = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+        document.keywords["nl"] = map(lambda x: x.strip(), dico_nl[u"Vrije trefwoorden"]["head"].text.split("|"))
     if dico.get("Documents principaux"):
-        document.main_docs = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
+        document.main_docs["fr"] = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
+        document.main_docs["nl"] = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico_nl["Hoodfdocumenten"].contents))
 
 
 def _get_in_charged_commissions(dico, document):
