@@ -86,7 +86,7 @@ def handle_document(document):
 
 
 def _get_first_level_data(dico, dico_nl, document):
-    document.deposition_date = dico[u"Date de dépôt"].text
+    document.deposition_date = get_text_else_blank(dico, u"Date de dépôt")
     document.constitution_article["fr"] = clean_text(get_text_else_blank(dico, "Article Constitution"))
     document.constitution_article["nl"] = clean_text(get_text_else_blank(dico_nl, "Artikel Grondwet"))
     if dico.get("Descripteur Eurovoc principal"):
