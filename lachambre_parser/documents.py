@@ -259,7 +259,7 @@ def _get_document_chambre(dico, dico_nl, document):
     chambre_dico_nl = dico_nl['Document Kamer']
 
     document_chambre = DocumentChambre()
-    document_chambre.deposition_date = chambre_dico[u'Date de dépôt'].text
+    document_chambre.deposition_date = get_text_else_blank(chambre_dico, u'Date de dépôt')
     document_chambre.type["fr"] = chambre_dico[u'Type de document'].text
     document_chambre.type["nl"] = chambre_dico_nl[u'Document type'].text
     document_chambre.taken_in_account_date = get_text_else_blank(chambre_dico, u'Prise en considération')
