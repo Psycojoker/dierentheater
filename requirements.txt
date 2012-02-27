@@ -5,10 +5,4 @@ django_extensions
 beautifulsoup
 json_diff
 lxml
-
-# hacked-on version of tastypie
--e git+https://github.com/andresdouglas/django-tastypie.git@nonrel#egg=tastypie
-# tastypie requirements
-mimeparse>=0.1.3
-python-dateutil
 git+git://github.com/Psycojoker/django-tastypie-nonrel.git
