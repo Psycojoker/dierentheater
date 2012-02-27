@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+<h1>Commissions</h1>
+{% endblock %}
+
+{% block content %}
+<div style="padding-top: 10px;" class="page-header">
+    <h1>List of available annual reports</h1>
+</div>
+
+<ul>
+{% for report in object_list %}
+    <li><a href="{% url deputies:annual-report report.id %}">{{ report.id }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
