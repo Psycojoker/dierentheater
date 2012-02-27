@@ -8,6 +8,10 @@
 <div style="padding-top: 10px;" class="page-header">
     <h1>Json document <small>yes, there will be a real api later</small></h1>
 </div>
+
+{% block documentation %}
+{% endblock %}
+
 <pre>{{ object.json }}</pre>
 
 {% if object.get_url %}
