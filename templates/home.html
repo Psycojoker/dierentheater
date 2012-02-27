@@ -17,33 +17,29 @@ This is, for the moment, only my personal initiative.
 {% block content %}
 
 <div style="padding-top: 15px;" class="page-header">
-    <h1>List of available json documents</h1>
+    <h1>Parsed data list</h1>
 </div>
 <div class="row">
-    <div class="span4">
-        <h2>Deputies</h2>
+    <div class="span5">
+        <h2>Available documents</h2>
         <ul>
-            <li><a href="{% url deputies:deputy-list %}">All</a></li>
+            <li><a href="{% url deputies:deputy-list %}">Deputies</a></li>
             <li><a href="{% url deputies:commission-list %}">Commissions</a></li>
+            <li><a href="{% url deputies:document-list %}">Law projects/texts</a></li>
+            <li><a href="{% url deputies:written-question-list %}">Written questions</a></li>
         </ul>
     </div>
-    <div class="span4">
-        <h2>Documents</h2>
+    <div class="span5">
+        <h2>Work in progress documents</h2>
         <ul>
-            <li><a href="{% url deputies:document-list %}">All</a></li>
+            <li><a href="{% url deputies:question-list %}">Others questions</a></li>
+            <li><a href="{% url deputies:analysis-list %}">Analysis</a></li>
         </ul>
     </div>
-    <div class="span4">
-        <h2>Questions</h2>
+    <div class="span5">
+        <h2>Planned documents</h2>
         <ul>
-            <li><a href="{% url deputies:written-question-list %}">Written</a></li>
-            <li><a href="{% url deputies:question-list %}">Others</a></li>
-        </ul>
-    </div>
-    <div class="span4">
-        <h2>Analysis</h2>
-        <ul>
-            <li><a href="{% url deputies:analysis-list %}">All</a></li>
+            <li>Commissions agenda</li>
         </ul>
     </div>
 </div>
