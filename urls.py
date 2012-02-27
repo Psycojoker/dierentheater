@@ -17,6 +17,15 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import TemplateView
 
+from tastypie.api import Api
+from lachambre.api import DeputyResource, CommissionResource, DocumentResource, WrittenQuestionResource
+
+v1_api = Api(api_name='v1')
+v1_api.register(DeputyResource())
+v1_api.register(CommissionResource())
+v1_api.register(DocumentResource())
+v1_api.register(WrittenQuestionResource())
+
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -24,6 +33,7 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('',
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^lachambre/', include('lachambre.urls', namespace='deputies')),
+    url(r'^api/', include(v1_api.urls)),
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # url(r'^admin/', include(admin.site.urls)),
 )

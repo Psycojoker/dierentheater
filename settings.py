@@ -120,6 +120,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'lachambre',
     'lachambre_parser',
+    'tastypie',
+    'tastypie_nonrel',
 )
 
 # A sample logging configuration. The only tangible logging
