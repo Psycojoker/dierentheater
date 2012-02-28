@@ -91,4 +91,8 @@ This is, for the moment, only my personal initiative.
 
 <p>Available formats are <span class="label success">json</span>, <span class="label success">xml</span> and <span class="label success">yaml</span> (just replace <i>json</i> with <i>xml</i> or <i>yaml</i> in the url).</p>
 <p>I hope you'll have fun playing with it!</p>
+<div style="padding-top: 15px;" class="page-header">
+    <h1>Technical details</h1>
+</div>
+<p>This website is build in <a href="http://www.python.org/">Python</a>, using <a href="http://django-mongoDB.org/">django-nonrel</a>, a fork of <a href="https://www.djangoproject.com/">django</a> to use <a href="http://www.mongodb.org/">mongoDB</a> instead of a SQL database. Parsing is done using the very awesome <a href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a> with long sessions under <a href="http://ipython.org/">IPython</a>. The API is done with a <a href="https://github.com/Psycojoker/django-tastypie-nonrel">patched version</a> of <a href="https://github.com/andresdouglas/django-tastypie-nonrel">tastypie-nonrel</a>. And I use <a href="http://twitter.github.com/bootstrap/">boostrap</a> to make you believe that I know how to do a pretty website.</p>
 {% endblock %}
