@@ -6,3 +6,4 @@ beautifulsoup
 json_diff
 lxml
 git+git://github.com/Psycojoker/django-tastypie-nonrel.git
+pyyaml
