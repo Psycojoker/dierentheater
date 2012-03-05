@@ -69,4 +69,4 @@ Not official-but-still-in-the-readme demo: http://dieren.vnurpa.ethylix.be
 
 # Licence
 
-agplv3+
+agplv3+ for code and ODbL for data
