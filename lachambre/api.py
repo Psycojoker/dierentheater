@@ -42,3 +42,4 @@ class WrittenQuestionResource(MongoResource):
         filtering = {
             "lachambre_id": ALL,
         }
+        resource_name = 'written-question'
