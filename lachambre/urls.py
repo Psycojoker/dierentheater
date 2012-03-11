@@ -17,7 +17,7 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic import ListView, DetailView
 
-from models import Deputy, Commission, Document, Question, Analysis, WrittenQuestion, AnnualReport
+from models import Deputy, Commission, Document, Question, Analysis, WrittenQuestion, AnnualReport, CommissionMembership
 
 urlpatterns = patterns('',
     url(r'^deputy/$', ListView.as_view(model=Deputy), name='deputy-list'),
@@ -25,6 +25,8 @@ urlpatterns = patterns('',
     url(r'^deputy/(?P<slug>[O0-9]+)/$', DetailView.as_view(model=Deputy, slug_field="lachambre_id"), name='deputy'),
     url(r'^commission/$', ListView.as_view(model=Commission), name='commission-list'),
     url(r'^commission/(?P<slug>[0-9]+)/$', DetailView.as_view(model=Commission, slug_field="lachambre_id"), name='commission'),
+    url(r'^commission-membership/$', ListView.as_view(model=CommissionMembership), name='commission-membership-list'),
+    url(r'^commission-membership/(?P<pk>[-a-zA-Z0-9]+)/$', DetailView.as_view(model=CommissionMembership), name='commission-membership'),
     url(r'^document/$', ListView.as_view(model=Document), name='document-list'),
     url(r'^document/(?P<slug>[0-9]+)/$', DetailView.as_view(model=Document, slug_field="lachambre_id"), name='document'),
     url(r'^written-question/$', ListView.as_view(model=WrittenQuestion), name='written-question-list'),
