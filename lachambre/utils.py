@@ -19,7 +19,7 @@ from os.path import exists
 from django.conf import settings
 
 STATIC_FOLDER = settings.PROJECT_PATH + "/lachambre/static/dumps/"
-MODELS = ("annualreport", "commission", "deputy", "document", "writtenquestion")
+MODELS = ("annualreport", "commission", "deputy", "document", "writtenquestion", "commissionmembership")
 
 OBDL = """\
 This DATABASE is made available under the Open Database License:
