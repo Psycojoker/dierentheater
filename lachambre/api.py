@@ -1,7 +1,12 @@
 from tastypie_nonrel.resources import MongoResource
 from tastypie.constants import ALL
 from tastypie import fields
-from models import Deputy, Document, Commission, WrittenQuestion, CommissionMembership
+from models import Deputy, Document, Commission, WrittenQuestion, CommissionMembership, AnnualReport
+
+class AnnualReportRessource(MongoResource):
+    class Meta:
+        queryset = AnnualReport.objects.all()
+        resource_name = 'annual-report'
 
 class DeputyResource(MongoResource):
     class Meta:
