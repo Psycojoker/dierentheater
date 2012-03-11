@@ -34,6 +34,7 @@ class CommissionMembershipRessource(MongoResource):
     commission = fields.ForeignKey(CommissionResource, 'commission')
     class Meta:
         queryset = CommissionMembership.objects.all()
+        resource_name = 'commission-membership'
 
 class WrittenQuestionResource(MongoResource):
     class Meta:
