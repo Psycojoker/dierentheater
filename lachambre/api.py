@@ -1,6 +1,7 @@
 from tastypie_nonrel.resources import MongoResource
 from tastypie.constants import ALL
-from models import Deputy, Document, Commission, WrittenQuestion
+from tastypie import fields
+from models import Deputy, Document, Commission, WrittenQuestion, CommissionMembership
 
 class DeputyResource(MongoResource):
     class Meta:
@@ -22,6 +23,12 @@ class CommissionResource(MongoResource):
         filtering = {
             "lachambre_id": ALL,
         }
+
+class CommissionMembershipRessource(MongoResource):
+    deputy = fields.ForeignKey(DeputyResource, 'deputy')
+    commission = fields.ForeignKey(CommissionResource, 'commission')
+    class Meta:
+        queryset = CommissionMembership.objects.all()
 
 class WrittenQuestionResource(MongoResource):
     class Meta:
