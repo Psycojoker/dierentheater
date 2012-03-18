@@ -1,4 +1,5 @@
 from tastypie_nonrel.resources import MongoResource
+from tastypie_nonrel.fields import ForeignKeysListField
 from tastypie.constants import ALL
 from tastypie import fields
 from models import Deputy, Document, Commission, WrittenQuestion, CommissionMembership, AnnualReport
@@ -23,6 +24,7 @@ class DocumentResource(MongoResource):
         }
 
 class CommissionResource(MongoResource):
+    deputies = ForeignKeysListField('lachambre.api.CommissionMembershipRessource', 'deputies')
     class Meta:
         queryset = Commission.objects.all()
         filtering = {
