@@ -51,18 +51,6 @@ To launch the dev server:
 
     python manage.py runserver
 
-# Parsing progress
-
-### Done
-
-- get the list of all the active deputies
-- get informations from each deputies pages
-- store a link and some meta data of each documents related to a deputies
-
-### WIP
-
-- parse a law pdf to reconstruct structured informations
-
 # Public instance
 
 Not official-but-still-in-the-readme demo: http://dieren.vnurpa.ethylix.be
