@@ -5,4 +5,5 @@ operations = {
     "reparse_all_documents": documents.parse_every_documents,
     "parse_a_document": documents.handle_document,
     "reparse_all_deputies": deputies.scrape,
+    "check_for_new_deputies": deputies.check_for_new_deputies,
 }
