@@ -3,6 +3,9 @@ import logging
 logger = logging.getLogger('')
 
 import pika
+
+from django.conf import settings
+
 from operations import operations
 
 def run_downloader():
@@ -19,6 +22,8 @@ def run_downloader():
             logger.warn(" /!\ unknow signal: %s" % body)
 
     channel.basic_consume(callback, queue='dierentheater', no_ack=True)
+
+    settings.CACHE_SCRAPING = False
 
     logging.info(' [*] Waiting for events. To exit press CTRL+C')
 

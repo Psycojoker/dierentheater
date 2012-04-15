@@ -27,6 +27,8 @@ if not logger.handlers:
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+CACHE_SCRAPING = True
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )

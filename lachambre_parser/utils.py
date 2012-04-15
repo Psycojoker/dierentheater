@@ -25,6 +25,8 @@ from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
+from django.conf import settings
+
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 
@@ -129,7 +131,7 @@ def read_or_dl_with_nl(url, name, reset=False):
 
 def read_or_dl(url, name, reset=False):
     logger.debug("parsing %s --- %s" % (url, name))
-    if not reset and exists('dump/%s' % name):
+    if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
         text = open('dump/%s' % name).read()
     else:
         text = urlopen(url).read()
