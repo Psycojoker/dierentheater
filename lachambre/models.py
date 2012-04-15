@@ -70,7 +70,7 @@ def history(klass):
 class Deputy(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
-    full_name = models.CharField(max_length=1337, unique=True)
+    full_name = models.CharField(max_length=1337)
     first_name = models.CharField(max_length=1337)
     last_name = models.CharField(max_length=1337)
     sex = models.CharField(max_length=1337, null=True)
@@ -78,7 +78,7 @@ class Deputy(models.Model, Jsonify):
     party = models.ForeignKey('Party')
     url = models.CharField(max_length=1337)
     websites = ListField()
-    lachambre_id = models.CharField(max_length=1337, unique=True)
+    lachambre_id = models.CharField(max_length=1337)
     language = models.CharField(max_length=1337, null=True)
     cv = DictField()
     #commissions = ListField(EmbeddedModelField('CommissionMembership'))
