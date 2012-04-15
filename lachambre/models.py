@@ -66,6 +66,11 @@ def history(klass):
     return klass
 
 
+class HistoryManager(models.Manager):
+    def get_query_set(self):
+        return super(HistoryManager, self).get_query_set().filter(current=True)
+
+
 @history
 class Deputy(models.Model, Jsonify):
     current = models.BooleanField(default=True)
@@ -81,6 +86,9 @@ class Deputy(models.Model, Jsonify):
     lachambre_id = models.CharField(max_length=1337)
     language = models.CharField(max_length=1337, null=True)
     cv = DictField()
+
+    with_history = models.Manager()
+    objects = HistoryManager()
     #commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
     #documents_principal_author_url = models.URLField()
