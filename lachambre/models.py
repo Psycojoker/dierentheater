@@ -32,9 +32,22 @@ def diff(row, other):
 
     for field in map(lambda x: x.attname, row._meta.fields):
         if not isinstance(field, (EmbeddedModelField)):
-            if getattr(row, field) != getattr(other, field):
-                logger.info("[%s] '%s' != '%s'" % (field, getattr(row, field), getattr(other, field)))
-                return True
+            print type(getattr(row, field)), getattr(row, field)
+            if not isinstance(getattr(row, field), (models.Model, list)):
+                if getattr(row, field) != getattr(other, field):
+                    logger.info("[%s] '%s' != '%s'" % (field, getattr(row, field), getattr(other, field)))
+                    return True
+            elif isinstance(getattr(row, field), list):
+                for i, j in zip(getattr(row, field), getattr(row, field)):
+                    if not isinstance(i, models.Model):
+                        if i != j:
+                            return True
+                    else:
+                        if diff(i, j):
+                            return True
+            else:
+                if diff(getattr(row, field), getattr(other, field)):
+                    return True
 
     return False
 
