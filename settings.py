@@ -145,6 +145,7 @@ INSTALLED_APPS = (
     'tastypie',
     'tastypie_nonrel',
     'scheduler',
+    'django_crontab',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -169,3 +170,8 @@ LOGGING = {
         },
     }
 }
+
+CRONTAB_PYTHON_EXECUTABLE = PROJECT_PATH + "/ve/bin/python"
+
+CRONJOBS = [
+]
