@@ -72,6 +72,21 @@ def get_new_documents():
             get_or_create(Document, _id="lachambre_id", title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=soup.div.text, url=soup.a["href"])
 
 
+def check_for_new_documents():
+    for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
+        soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
+        for soup, suppe in zip(soup('table')[4]('tr', valign="top"), suppe('table')[4]('tr', valign="top")):
+            if not Document.objects.filter(lachambre_id=soup.div.text):
+                url = soup.a["href"]
+                title = soup("div")[1].text
+                lachambre_id = soup.div.text
+                logger.info("find a new document: %s - [%s] -  %s" % (LACHAMBRE_PREFIX + url, lachambre_id, title))
+                Document.objects.create(title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=lachambre_id, url=soup.a["href"])
+            else:
+                # I won't find any new documents here
+                return
+
+
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
