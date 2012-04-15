@@ -379,9 +379,6 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
-    with_history = models.Manager()
-    objects = HistoryManager()
-
     class Meta:
         ordering = ["lachambre_id"]
 
@@ -397,9 +394,6 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
-
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     class Meta:
         ordering = ["lachambre_id"]
@@ -418,9 +412,6 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
-
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     class Meta:
         ordering = ["lachambre_id"]
