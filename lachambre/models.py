@@ -54,7 +54,10 @@ def diff(row, other):
 
 class Jsonify(object):
     def json(self):
-        return dumps(self.__class__.objects.filter(pk=self.pk).values()[0], indent=4)
+        data = self.__class__.objects.filter(pk=self.pk).values()[0]
+        del data["creation_datetime"]
+        del data["current"]
+        return dumps(data, indent=4)
 
 
 def history(klass):
