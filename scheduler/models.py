@@ -9,3 +9,11 @@ class Task(models.Model):
 
     def __unicode__(self):
         return "%s(%s)" % (self.function, ", ".join(self.args))
+
+    class Meta:
+        ordering = ["datetime"]
+
+    class MongoMeta:
+        indexes = [
+            [("datetime", 1)]
+        ]

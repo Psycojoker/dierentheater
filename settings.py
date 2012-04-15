@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'lachambre_parser',
     'tastypie',
     'tastypie_nonrel',
+    'scheduler',
 )
 
 # A sample logging configuration. The only tangible logging
