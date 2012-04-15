@@ -50,7 +50,7 @@ def scrape():
                 continue
             # tempory
             if WrittenQuestion.objects.filter(lachambre_id=_id):
-                logger.debug("pass %s, already parsed %s" % (re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]))
+                logger.debug("pass %s, already parsed" % (re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]))
                 continue
             _save_a_written_question(link)
         bulletin.done = True
