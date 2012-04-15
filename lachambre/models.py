@@ -19,6 +19,7 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
+
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 
