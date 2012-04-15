@@ -65,6 +65,14 @@ class Deputy(models.Model, Jsonify):
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
 
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
+
 
 class Party(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
@@ -92,6 +100,14 @@ class Commission(models.Model, Jsonify):
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
 
 
 class Document(models.Model, Jsonify):
@@ -128,6 +144,14 @@ class Document(models.Model, Jsonify):
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
+    class Meta:
+        ordering = ["-lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", -1)]
+        ]
 
 
 class InChargeCommissions(models.Model):
@@ -237,6 +261,14 @@ class WrittenQuestion(models.Model, Jsonify):
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
+
 
 class Question(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
@@ -250,6 +282,14 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
+
 
 class Analysis(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
@@ -257,6 +297,14 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
 
 
 class WrittenQuestionBulletin(models.Model, Jsonify):
@@ -267,6 +315,14 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
 
 
 class AnnualReport(models.Model, Jsonify):
