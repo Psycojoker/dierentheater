@@ -85,7 +85,7 @@ def _handle_deputy(deputy, reset=False):
     _split_deputy_full_name(deputy, soup)
     #_get_deputie_commissions(soup, deputy)
     #_deputy_documents(soup, deputy)
-    deputy.save()
+    deputy.save_with_history()
 
 
 def _split_deputy_full_name(deputy, soup):
