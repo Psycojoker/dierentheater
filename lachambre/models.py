@@ -67,6 +67,7 @@ def history(klass):
 
 
 class Deputy(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
     full_name = models.CharField(max_length=1337, unique=True)
     first_name = models.CharField(max_length=1337)
