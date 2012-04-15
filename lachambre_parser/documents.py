@@ -111,6 +111,7 @@ def handle_document(lachambre_id):
 
     document.done = True
     document.save()
+    logger.info("parsed document [%s] %s" % (lachambre_id, document.title["fr"]))
     dico.die_if_got_not_accessed_keys()
 
 
