@@ -17,6 +17,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import logging
+logger = logging.getLogger('')
 
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
@@ -48,7 +50,7 @@ from documents_utils import document_pdf_part_cutter,\
 
 
 def clean_models():
-    print "cleaning documents models"
+    logger.debug("cleaning documents models")
     map(lambda x: x.objects.all().delete(), (Document, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, OtherDocumentChambrePdf))
 
 
@@ -208,7 +210,7 @@ def _get_competences(dico, dico_nl, document):
         document.timeline = []
         for (_date, _title), (_, _title_nl) in zip([clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]],
                                                    [clean_text(x).split(u" \xa0 ", 1) for x in dico_nl[u"Bevoegdheid"]["head"].contents[::2]]):
-            print "append time line", _date, _title, _title_nl
+            logger.debug("append time line %s %s %s" % (_date, _title, _title_nl))
             document.timeline.append(DocumentTimeLine.objects.create(title={"fr": _title, "nl": _title_nl}, date=_date))
     if dico.get("Analyse des interventions"):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
@@ -239,7 +241,7 @@ def _get_document_senat(dico, dico_nl, document):
 
     if senat_dico.get('Document(s) suivant(s)'):
         for d, d_nl in zip(document_pdf_part_cutter(senat_dico[u'Document(s) suivant(s)']), document_pdf_part_cutter(senat_dico_nl[u'Opvolgend(e) document(en)'])):
-            print "add pdf %s" % clean_text(d[0].font.text)
+            logger.debug("add pdf %s" % clean_text(d[0].font.text))
             doc = OtherDocumentSenatPdf()
             doc.url = d[0].a['href'] if d[0].a else d[0].td.text
             doc.type["fr"] = clean_text(d[0].font.text)
@@ -308,7 +310,7 @@ def _get_authors(chambre_dico, chambre_dico_nl, document_chambre):
 def _get_next_documents(chambre_dico, chambre_dico_nl, document_chambre):
     if chambre_dico.get('Document(s) suivant(s)'):
         for d, d_nl in zip(document_pdf_part_cutter(chambre_dico[u'Document(s) suivant(s)']), document_pdf_part_cutter(chambre_dico_nl[u'Opvolgend(e) document(en)'])):
-            print "add pdf %s" % clean_text(d[0].font.text)
+            logger.debug("add pdf %s" % clean_text(d[0].font.text))
             doc = OtherDocumentChambrePdf()
             doc.url = d[0].a['href'] if d[0].a else d[0].td.text
             doc.type["fr"] = clean_text(d[0].font.text)

@@ -17,6 +17,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import logging
+logger = logging.getLogger('')
 
 from lachambre.models import Party,\
                             CommissionMembership,\
@@ -35,7 +37,7 @@ from utils import retry_on_access_error,\
 
 
 def clean_models():
-    print "cleaning deputies models"
+    logger.debug("cleaning deputies models")
     map(lambda x: x.objects.all().delete(), (Deputy, Party, Analysis))
 
 
@@ -58,12 +60,12 @@ def deputies_list(reset=False):
                               websites=[website] if website else [],
                               lachambre_id=lachambre_id,
                               emails=[email])
-        print 'adding new deputy', lachambre_id.encode("Utf-8"), full_name.encode("Utf-8"), party, email.encode("Utf-8"), website.encode("Utf-8") if website else ''
+        logger.debug('adding new deputy %s %s %s %s %s' % (lachambre_id.encode("Utf-8"), full_name.encode("Utf-8"), party, email.encode("Utf-8"), website.encode("Utf-8") if website else ''))
 
 
 def scrape():
     for index, deputy in enumerate(list(Deputy.objects.all())):
-        print index, deputy.full_name
+        logger.debug("%s %s" % (index, deputy.full_name))
         _handle_deputy(deputy)
 
 
@@ -104,17 +106,17 @@ def _split_deputy_full_name(deputy, soup):
             if soup.h2.text.split(" ")[it] != deputy.full_name.split(" ")[-(it + 1)]:
                 break
             it += 1
-            print it, soup.h2.text.split(" ")[it], deputy.full_name.split(" ")[-(it + 1)]
+            logger.debug("%s %s %s" % (it, soup.h2.text.split(" ")[it], deputy.full_name.split(" ")[-(it + 1)]))
         if not it:
             raise Exception
         deputy.first_name = " ".join(soup.h2.text.split(" ")[:it]).strip()
         deputy.last_name = " ".join(soup.h2.text.split(" ")[it:]).strip()
-        print [deputy.first_name], [deputy.last_name]
+        logger.debug("%s %s" % ([deputy.first_name], [deputy.last_name]))
     else:
         # if there is only 2 words just split this in 2
         deputy.first_name = deputy.full_name.split(" ")[1].strip()
         deputy.last_name = deputy.full_name.split(" ")[0].strip()
-        print [deputy.first_name], [deputy.last_name]
+        logger.debug("%s %s" % ([deputy.first_name], [deputy.last_name]))
 
 
 def _get_deputie_commissions(soup, deputy):
@@ -129,7 +131,7 @@ def _get_deputie_commissions(soup, deputy):
             if item.name == 'h5':
                 role = item.text[6:-1]
             elif item.name == 'div':
-                print "linking deputy to commission", item.a.text
+                logger.debug("linking deputy to commission %s" % item.a.text)
                 commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
                 deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
         item = item.nextSibling
@@ -137,14 +139,14 @@ def _get_deputie_commissions(soup, deputy):
 
 #@retry_on_access_error
 #def _get_deputy_documents(url, deputy, role, type=None, reset=False):
-    #print "working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index])
+    #logger.debug("working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index]))
     #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
     #setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
     #setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
     #for i in soupsoup('table')[3]('tr', valign="top"):
-        #print "add", type if type else '', role, i.tr('td')[1].text
+        #logger.debug("add %s %s %s" % (type if type else '', role, i.tr('td')[1].text))
         #dico = table2dic(i.table('td'))
-        #print dico
+        #logger.debug("%s" % dico)
         #getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
                 #append(get_or_create(Document, _id="lachambre_id",
                                      #lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
@@ -164,9 +166,9 @@ def _get_deputie_commissions(soup, deputy):
     #deputy.questions_written_url = url
     #deputy.questions_written_list = []
     #for i in soupsoup('table')[3]('tr', valign="top"):
-        #print "add", type, i.tr('td')[1].text.strip()
+        #logger.debug("add", type, i.tr('td')[1].text.strip())
         #dico = table2dic(i.table('td'))
-        #print dico
+        #logger.debug("%s" % dico)
         #deputy.questions_written_list.\
                 #append(get_or_create(WrittenQuestion,
                                      #_id="lachambre_id",
@@ -186,9 +188,9 @@ def _get_deputy_questions(url, deputy, type, reset=False):
     setattr(deputy, "questions_%s_url" % type, url)
     setattr(deputy, "questions_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", type, i.tr('td')[1].text.strip()
+        logger.debug("add", type, i.tr('td')[1].text.strip())
         dico = table2dic(i.table('td'))
-        print dico
+        logger.debug("%s" % dico)
         getattr(deputy, "questions_%s_list" % type).\
                 append(get_or_create(Question,
                                      _id="lachambre_id",
@@ -210,9 +212,9 @@ def _get_deputy_analysis(url, deputy, type, reset=False):
     setattr(deputy, "analysis_%s_url" % type, url)
     setattr(deputy, "analysis_%s_list" % type, [])
     for i in soupsoup('table')[3]('tr', valign="top"):
-        print "add", type, i.tr('td')[1].text.strip()
+        logger.debug("add", type, i.tr('td')[1].text.strip())
         dico = table2dic(i.table('td'))
-        print dico
+        logger.debug("%s" % dico)
         getattr(deputy, "analysis_%s_list" % type).\
                 append(get_or_create(Analysis,
                                      _id="lachambre_id",

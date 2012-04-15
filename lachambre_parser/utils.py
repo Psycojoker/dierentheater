@@ -18,6 +18,8 @@
 
 
 import re
+import logging
+logger = logging.getLogger('')
 from os.path import exists
 from urllib import urlopen, quote
 from BeautifulSoup import BeautifulSoup
@@ -34,7 +36,7 @@ def get_or_create(klass, _id=None, **kwargs):
     if object:
         return object[0]
     else:
-        print "add new", klass.__name__, kwargs
+        logger.debug("add new %s %s" % (klass.__name__, kwargs))
         return klass.objects.create(**kwargs)
 
 
@@ -46,9 +48,9 @@ def retry_on_access_error(function):
             try:
                 return function(*args, reset=reset, **kwargs)
             except (IndexError, AttributeError, TypeError), e:
-                print e
+                logger.debug("%s" % e)
                 reset = True
-        print "WARNING, function keeps failling", function, args, kwargs
+        logger.debug("WARNING, function keeps failling %s %s %s" % (function, args, kwargs))
     return wrap
 
 
@@ -92,14 +94,14 @@ class AccessControlDict(dict):
 
     def die_if_got_not_accessed_keys(self):
         if self.get_not_accessed_keys():
-            print "\nError: untreated sections:"
+            logger.debug("\nError: untreated sections:")
             for i in self.get_not_accessed_keys():
                 if isinstance(i, (str, unicode)):
-                    print "*", i
+                    logger.debug("* %s" % i)
                 else:
                     for j in i:
-                        print "    *", j
-            print "------------ stop ------------"
+                        logger.debug("    * %s" % j)
+            logger.debug("------------ stop ------------")
             import sys
             sys.exit(1)
 
@@ -126,7 +128,7 @@ def read_or_dl_with_nl(url, name, reset=False):
 
 
 def read_or_dl(url, name, reset=False):
-    print "parsing", url, "---", name
+    logger.debug("parsing %s --- %s" % (url, name))
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name).read()
     else:
@@ -145,7 +147,7 @@ def lxml_read_or_dl_with_nl(url, name, reset=False):
 
 
 def lxml_read_or_dl(url, name, reset=False):
-    print "LXML parsing", url, "---", name
+    logger.debug("LXML parsing %s --- %s" % (url, name))
     if not reset and exists('dump/%s' % name):
         text = open('dump/%s' % name)
     else:

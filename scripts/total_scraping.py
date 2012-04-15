@@ -16,6 +16,10 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+logger = logging.getLogger('')
+logger.handlers[1].setLevel(logging.DEBUG)
+
 from lachambre_parser import reports
 from lachambre_parser import commissions
 from lachambre_parser import written_questions

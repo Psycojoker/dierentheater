@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import sys
+import logging
+logger = logging.getLogger('')
+
 import pika
 from operations import operations
 
@@ -10,15 +12,15 @@ def run_downloader():
 
     def callback(ch, method, properties, body):
         if body in operations.keys():
-            print " [x] Received %r, processing..." % (body,)
+            logger.info(" [x] Received %r, processing..." % (body,))
             operations[body]()
-            print " [x] End, waiting for next event"
+            logger.info(" [x] End, waiting for next event")
         else:
-            print >>sys.stderr, " /!\ unknow signal: %s" % body
+            logger.warn(" /!\ unknow signal: %s" % body)
 
     channel.basic_consume(callback, queue='dierentheater', no_ack=True)
 
-    print ' [*] Waiting for events. To exit press CTRL+C'
+    logging.info(' [*] Waiting for events. To exit press CTRL+C')
 
     try:
         channel.start_consuming()

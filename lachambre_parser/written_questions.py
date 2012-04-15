@@ -17,6 +17,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import logging
+logger = logging.getLogger('')
 
 from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 from utils import read_or_dl,\
@@ -31,7 +33,7 @@ from utils import read_or_dl,\
 
 
 def clean_models():
-    print "cleaning written questions models"
+    logger.debug("cleaning written questions models")
     map(lambda x: x.objects.all().delete(), (WrittenQuestion, WrittenQuestionBulletin))
 
 
@@ -48,7 +50,7 @@ def scrape():
                 continue
             # tempory
             if WrittenQuestion.objects.filter(lachambre_id=_id):
-                print "pass %s, already parsed" % re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]
+                logger.debug("pass %s, already parsed %s" % (re.search("dossierID=([0-9A-Z-]+).xml", link.a["href"]).groups()[0]))
                 continue
             _save_a_written_question(link)
         bulletin.done = True
@@ -76,7 +78,7 @@ def _get_written_question_bulletin():
                               url=b('td')[1].a["href"] if b('td')[1].a else None,
                               pdf_url=b('td')[0].a["href"],
                              )
-                print b('td')[0]('a')[-1].text.split()[-1]
+                logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
 
 
 def _save_a_written_question(link):

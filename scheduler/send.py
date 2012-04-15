@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import logging
+logger = logging.getLogger('')
+
 import pika
 
 def send(message):
@@ -7,6 +10,6 @@ def send(message):
     channel.queue_declare(queue='dierentheater')
 
     channel.basic_publish(exchange='', routing_key='dierentheater', body=message)
-    print " [x] Sent '%s'" % message
+    logging.info(" [x] Sent '%s'" % message)
 
     connection.close()

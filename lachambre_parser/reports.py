@@ -17,12 +17,14 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import logging
+logger = logging.getLogger('')
 from lachambre.models import AnnualReport
 from utils import read_or_dl_with_nl, get_or_create
 
 
 def clean_models():
-    print "cleaning annual reports models"
+    logger.debug("cleaning annual reports models")
     map(lambda x: x.objects.all().delete(), (AnnualReport,))
 
 

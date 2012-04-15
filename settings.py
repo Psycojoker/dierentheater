@@ -4,6 +4,26 @@ import os
 PROJECT_PATH = os.path.abspath(os.path.split(__file__)[0])
 PROJECT = os.path.split(PROJECT_PATH)[1]
 
+import logging
+from os.path import exists
+
+if not exists(PROJECT_PATH + "/log/"):
+    os.mkdir(PROJECT_PATH + "/log/")
+
+logger = logging.getLogger('')
+# only set loggers once
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(PROJECT_PATH + "/log/debug")
+    fh.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

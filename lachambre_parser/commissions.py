@@ -17,13 +17,15 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import logging
+logger = logging.getLogger('')
 
 from lachambre.models import Commission, CommissionMembership, Deputy
 from utils import read_or_dl_with_nl, get_or_create, LACHAMBRE_PREFIX
 from BeautifulSoup import NavigableString
 
 def clean_models():
-    print "cleaning commissions modèles"
+    logger.debug("cleaning commissions modèles")
     map(lambda x: x.objects.all().delete(), (CommissionMembership, Commission))
 
 def scrape():
