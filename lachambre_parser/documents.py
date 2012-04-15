@@ -62,7 +62,7 @@ def scrape():
 def parse_every_documents():
     # list otherwise mongodb will timeout if we stay in a query mode
     for document in list(Document.objects.filter(done=False)):
-        handle_document(document)
+        handle_document(document.lachambre_id)
 
 
 def get_new_documents():
@@ -87,7 +87,8 @@ def check_for_new_documents():
                 return
 
 
-def handle_document(document):
+def handle_document(lachambre_id):
+    document = Document.objects.get(lachambre_id=lachambre_id)
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
     # fucking stupid hack because BeautifulSoup fails to parse correctly the html
