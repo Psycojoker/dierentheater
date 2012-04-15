@@ -8,3 +8,4 @@ lxml
 git+git://github.com/Psycojoker/django-tastypie-nonrel.git
 pyyaml
 git+https://github.com/andresdouglas/django-tastypie.git@nonrel#egg=tastypie
+django-crontab
