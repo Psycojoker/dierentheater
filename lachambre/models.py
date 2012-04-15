@@ -138,22 +138,37 @@ class Deputy(models.Model, Jsonify):
         ]
 
 
+@history
 class Party(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     name = models.CharField(max_length=1337)
     url = models.URLField()
+
+    with_history = models.Manager()
+    objects = HistoryManager()
 
     def __unicode__(self):
         return self.name
 
 
+@history
 class CommissionMembership(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     role = models.CharField(max_length=1337)
     role_en = models.CharField(max_length=1337)
     commission = models.ForeignKey("Commission")
     deputy = models.ForeignKey("Deputy")
 
+    with_history = models.Manager()
+    objects = HistoryManager()
 
+
+@history
 class Commission(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     lachambre_id = models.IntegerField(unique=True)
     name = DictField()
     full_name = DictField()
@@ -161,6 +176,9 @@ class Commission(models.Model, Jsonify):
     type = DictField()
     deputies = ListField(models.ForeignKey(CommissionMembership))
     seats = DictField()
+
+    with_history = models.Manager()
+    objects = HistoryManager()
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
@@ -174,7 +192,10 @@ class Commission(models.Model, Jsonify):
         ]
 
 
+@history
 class Document(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     title = DictField()
     url = models.CharField(max_length=1337)
     full_details_url = models.CharField(max_length=1337)
@@ -202,6 +223,9 @@ class Document(models.Model, Jsonify):
     main_docs = DictField()
     candidature_vote_date = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
+
+    with_history = models.Manager()
+    objects = HistoryManager()
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title)
@@ -299,7 +323,10 @@ class DocumentTimeLine(models.Model):
     date = models.CharField(max_length=1337)
 
 
+@history
 class WrittenQuestion(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     title = DictField()
     departement = DictField()
     sub_departement = DictField()
@@ -321,6 +348,9 @@ class WrittenQuestion(models.Model, Jsonify):
     publication_question_pdf_url = models.CharField(max_length=1337)
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
+
+    with_history = models.Manager()
+    objects = HistoryManager()
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
@@ -346,6 +376,9 @@ class Question(models.Model, Jsonify):
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
 
+    with_history = models.Manager()
+    objects = HistoryManager()
+
     class Meta:
         ordering = ["lachambre_id"]
 
@@ -361,6 +394,9 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
+
+    with_history = models.Manager()
+    objects = HistoryManager()
 
     class Meta:
         ordering = ["lachambre_id"]
@@ -380,6 +416,9 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
     legislature = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
 
+    with_history = models.Manager()
+    objects = HistoryManager()
+
     class Meta:
         ordering = ["lachambre_id"]
 
@@ -389,9 +428,15 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
         ]
 
 
+@history
 class AnnualReport(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
     title = DictField()
     date = models.CharField(max_length=1337)
     law_and_article = DictField()
     periodicity = models.CharField(max_length=1337)
     pdf_url = models.URLField()
+
+    with_history = models.Manager()
+    objects = HistoryManager()
