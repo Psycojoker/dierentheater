@@ -66,6 +66,7 @@ def history(klass):
     return klass
 
 
+@history
 class Deputy(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
