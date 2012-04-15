@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from json import dumps
+from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
@@ -27,6 +28,7 @@ class Jsonify(object):
 
 
 class Deputy(models.Model, Jsonify):
+    creation_datetime = models.DateTimeField(default=datetime.now)
     full_name = models.CharField(max_length=1337, unique=True)
     first_name = models.CharField(max_length=1337)
     last_name = models.CharField(max_length=1337)
