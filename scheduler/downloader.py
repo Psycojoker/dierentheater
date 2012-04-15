@@ -14,9 +14,11 @@ def run_downloader():
     channel.queue_declare(queue='dierentheater')
 
     def callback(ch, method, properties, body):
-        if body in operations.keys():
+        function = body.split(";")[0]
+        args = body.split(";")[1:]
+        if function in operations.keys():
             logger.info(" [x] Received %r, processing..." % (body,))
-            operations[body]()
+            operations[function](*args)
             logger.info(" [x] End, waiting for next event")
         else:
             logger.warn(" /!\ unknow signal: %s" % body)
