@@ -2,14 +2,10 @@
 import logging
 logger = logging.getLogger('')
 
-import pika
+from models import Task
 
-def send(message):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='dierentheater')
-
-    channel.basic_publish(exchange='', routing_key='dierentheater', body=message)
-    logging.info(" [x] Sent '%s'" % message)
-
-    connection.close()
+def send(function, args=None):
+    if args is None:
+        args = []
+    Task.objects.create(function=function, args=args)
+    logging.info(" [x] Sent %s(%s)" % (function, ", ".join(args)))

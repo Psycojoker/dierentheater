@@ -2,35 +2,35 @@
 import logging
 logger = logging.getLogger('')
 
-import pika
+from time import sleep
 
 from django.conf import settings
 
 from operations import operations
+from models import Task
 
 def run_downloader():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='dierentheater')
-
-    def callback(ch, method, properties, body):
-        function = body.split(";")[0]
-        args = body.split(";")[1:]
-        if function in operations.keys():
-            logger.info(" [x] Received %r, processing..." % (body,))
-            operations[function](*args)
-            logger.info(" [x] End, waiting for next event")
-        else:
-            logger.warn(" /!\ unknow signal: %s" % body)
-
-    channel.basic_consume(callback, queue='dierentheater', no_ack=True)
+    def loop():
+        while True:
+            for task in Task.objects.all():
+                if task.function in operations.keys():
+                    logger.info(" [x] Received %r, processing..." % (task,))
+                    operations[task.function](*task.args)
+                    logger.info(" [x] End, waiting for next event")
+                else:
+                    logger.warn(" /!\ unknow signal: %s" % task)
+                task.delete()
+            sleep(3)
 
     settings.CACHE_SCRAPING = False
+
+    # clean task list before starting
+    Task.objects.all().delete()
 
     logging.info(' [*] Waiting for events. To exit press CTRL+C')
 
     try:
-        channel.start_consuming()
+        loop()
     except KeyboardInterrupt:
         pass
 
