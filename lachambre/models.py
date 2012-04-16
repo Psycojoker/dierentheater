@@ -172,7 +172,7 @@ class CommissionMembership(models.Model, Jsonify):
 class Commission(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
-    lachambre_id = models.IntegerField(unique=True)
+    lachambre_id = models.IntegerField()
     name = DictField()
     full_name = DictField()
     url = models.URLField()
@@ -214,7 +214,7 @@ class Document(models.Model, Jsonify):
     eurovoc_descriptors = DictField()
     eurovoc_candidats_descriptors = DictField()
     keywords = DictField()
-    lachambre_id = models.IntegerField(unique=True)
+    lachambre_id = models.IntegerField()
     analysis = EmbeddedModelField('Analysis', null=True)
     document_chambre = EmbeddedModelField('DocumentChambre', null=True)
     document_senat = EmbeddedModelField('DocumentSenat', null=True)
