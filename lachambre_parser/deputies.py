@@ -139,7 +139,7 @@ def _get_deputie_commissions(soup, deputy):
             elif item.name == 'div':
                 logger.debug("linking deputy to commission %s" % item.a.text)
                 commission = get_or_create(Commission, url=item.a['href'], lachambre_id=int(re.search("com=(\d+)", item.a["href"]).groups()[0]))
-                deputy.commissions.append(CommissionMembership.objects.create(commission=commission, role=role))
+                deputy.commissions.append(get_or_create(CommissionMembership, commission=commission, role=role))
         item = item.nextSibling
 
 
