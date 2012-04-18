@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from scheduler import send
 from scheduler.operations import operations
 
+
 def run():
     if len(sys.argv) == 3:
         print >>sys.stderr, "You need to give me an operation as first parameters"
@@ -13,6 +14,7 @@ def run():
         print >>sys.stderr
         sys.exit(1)
     send(sys.argv[3])
+
 
 class Command(BaseCommand):
     args = '<message message ...>'
