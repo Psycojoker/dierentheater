@@ -234,7 +234,7 @@ class Document(models.Model, Jsonify):
     objects = HistoryManager()
 
     def __unicode__(self):
-        return "%s - %s" % (self.lachambre_id, self.title)
+        return "%s - %s" % (self.lachambre_id, self.title["fr"])
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
