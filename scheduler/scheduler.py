@@ -16,15 +16,15 @@ def run_scheduler():
         while True:
             for task in Task.objects.all():
                 if task.function in operations.keys():
-                    logger.info(" [x] Received %r, processing..." % task)
+                    logger.info("[x] Received %r, processing..." % task)
                     try:
                         operations[task.function](*task.args)
-                        logger.info(" [x] End, waiting for next event")
+                        logger.info("[x] End, waiting for next event")
                     except Exception, e:
                         traceback.print_exc(file=sys.stdout)
-                        logger.error(" /!\ %s didn't succed! Error: %s" % (task, e))
+                        logger.error("/!\ %s didn't succed! Error: %s" % (task, e))
                 else:
-                    logger.warn(" /!\ unknow signal: %s" % task)
+                    logger.warn("/!\ unknow signal: %s" % task)
                 task.delete()
             sleep(3)
 
@@ -33,7 +33,7 @@ def run_scheduler():
     # clean task list before starting
     Task.objects.all().delete()
 
-    logging.info(' [*] Waiting for events. To exit press CTRL+C')
+    logging.info('[*] Waiting for events. To exit press CTRL+C')
 
     try:
         loop()
