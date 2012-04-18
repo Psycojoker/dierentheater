@@ -11,7 +11,7 @@ from django.conf import settings
 from operations import operations
 from models import Task
 
-def run_downloader():
+def run_scheduler():
     def loop():
         while True:
             for task in Task.objects.all():
@@ -41,4 +41,4 @@ def run_downloader():
         pass
 
 if __name__ == "__main__":
-    run_downloader()
+    run_scheduler()
