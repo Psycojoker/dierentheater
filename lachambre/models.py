@@ -22,6 +22,7 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
+from utils import irc
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
@@ -64,6 +65,7 @@ def history(klass):
     def save(self, *args, **kwargs):
         in_db = self.__class__.objects.filter(id=self.id)
         if not in_db:
+            irc("[NEW] %s - %s" % (self, self.get_url()))
             return models.Model.save(self, *args, **kwargs)
         assert len(in_db) == 1
         in_db = in_db[0]
@@ -75,6 +77,7 @@ def history(klass):
                                                     for x in in_db._meta.fields
                                                         if not isinstance(x, models.AutoField)
                                                            and x.attname != "current"))
+            irc("[MODIFIED] %s - %s" % (self, self.get_url()))
 
         return models.Model.save(self, *args, **kwargs)
 
