@@ -83,11 +83,8 @@ def check_for_new_documents():
                 title = soup("div")[1].text
                 lachambre_id = soup.div.text
                 logger.info("find a new document: %s - [%s] -  %s" % (LACHAMBRE_PREFIX + url, lachambre_id, title))
-                Document.objects.create(title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=lachambre_id, url=soup.a["href"])
-                send("parse_a_document", [soup.div.text])
-            else:
-                # I won't find any new documents here
-                return
+                document = Document(title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=lachambre_id, url=soup.a["href"])
+                handle_document(document)
 
 
 def handle_document(document):
