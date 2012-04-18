@@ -1,0 +1,9 @@
+*.pyc
+*.swp
+*.swo
+*~
+ve/
+pdfs/
+log/
+build/
+dump/
