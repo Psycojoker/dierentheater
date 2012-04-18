@@ -87,6 +87,10 @@ def check_for_new_documents():
                 handle_document(document)
 
 
+def parse_a_document(lachambre_id):
+    handle_document(Document.object.get(lachambre_id=lachambre_id))
+
+
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
     document.full_details_url = soup('table')[4].a["href"]
