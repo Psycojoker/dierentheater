@@ -8,7 +8,7 @@ from time import sleep
 
 from django.conf import settings
 
-from lachambre_parser.utils import irc
+from history.utils import irc
 
 from operations import operations
 from models import Task
