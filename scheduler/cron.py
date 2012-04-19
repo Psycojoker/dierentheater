@@ -1,4 +1,4 @@
-from scheduler import send
+from send import send
 
 def check_for_new_documents():
     send("check_for_new_documents")
