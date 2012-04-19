@@ -42,7 +42,3 @@ def dump_db():
         system("cd %s && if [ -e %s.xz ]; then rm %s.xz; fi && xz %s" %(STATIC_FOLDER, model, model, model))
     print "done"
     open("%s/LICENCE" % STATIC_FOLDER, "w").write(OBDL)
-
-
-def irc(message):
-    open(settings.PROJECT_PATH + "/log/irc", "a").write(message.strip() + "\n")
