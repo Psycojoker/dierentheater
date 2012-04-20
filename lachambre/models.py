@@ -30,8 +30,10 @@ LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 class Jsonify(object):
     def json(self):
         data = self.__class__.objects.filter(pk=self.pk).values()[0]
-        del data["creation_datetime"]
-        del data["current"]
+        if data.has_key("creation_datetime"):
+            del data["creation_datetime"]
+        if data.has_key("current"):
+            del data["current"]
         return dumps(data, indent=4)
 
 
