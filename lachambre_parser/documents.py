@@ -48,8 +48,6 @@ from utils import read_or_dl,\
 from documents_utils import document_pdf_part_cutter,\
                             document_to_dico
 
-from scheduler import send
-
 
 def clean_models():
     logger.debug("cleaning documents models")
