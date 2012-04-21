@@ -39,7 +39,9 @@ def loop():
                     traceback.print_exc(file=sys.stdout)
                     logger.error("/!\ %s didn't succed! Error: %s" % (task, e))
                     irc("\x034%s didn't succed! Error: %s\x03" % (task, e))
-                    from ipdb import set_trace; set_trace()
+                    e, m, tb = sys.exc_info()
+                    from ipdb import post_mortem; post_mortem(tb)
+
             else:
                 logger.warn("/!\ unknow signal: %s" % task)
             task.delete()
