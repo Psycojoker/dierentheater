@@ -131,9 +131,9 @@ def _get_first_level_data(dico, dico_nl, document):
     document.deposition_date = get_text_else_blank(dico, u"Date de dépôt")
     document.constitution_article["fr"] = clean_text(get_text_else_blank(dico, "Article Constitution"))
     document.constitution_article["nl"] = clean_text(get_text_else_blank(dico_nl, "Artikel Grondwet"))
-    if dico.get("Descripteur Eurovoc principal"):
-        document.eurovoc_main_descriptor["fr"] = dico["Descripteur Eurovoc principal"]["head"].text
-        document.eurovoc_main_descriptor["nl"] = dico_nl["Eurovoc-hoofddescriptor"]["head"].text
+    if dico.get("Descripteur Eurovoc principal") or dico.get("Eurovoc-hoofddescriptor"):
+        document.eurovoc_main_descriptor["fr"] = get_text_else_blank(dico["Descripteur Eurovoc principal"], "head")
+        document.eurovoc_main_descriptor["nl"] = get_text_else_blank(dico_nl["Eurovoc-hoofddescriptor"], "head")
     document.vote_date = get_text_else_blank(dico, "Vote Chambre")
     document.law_date = get_text_else_blank(dico, "Date de la loi")
     document.moniteur_number = get_text_else_blank(dico, u"Moniteur n°")
