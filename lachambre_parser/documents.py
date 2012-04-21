@@ -74,7 +74,9 @@ def parse_every_documents():
             traceback.print_exc(file=sys.stdout)
             logger.error("/!\ %s didn't succed! Error: while reparsing document %s" % (document.lachambre_id, e))
             irc("\x034%s didn't succed! Error: while reparsing document %s\x03" % (document.lachambre_id, e))
-            from ipdb import set_trace; set_trace()
+            irc("Bram: entering ipdb shell")
+            e, m, tb = sys.exc_info()
+            from ipdb import post_mortem; post_mortem(tb)
 
 
 def get_new_documents():
