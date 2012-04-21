@@ -8,7 +8,7 @@ class Task(models.Model):
     datetime = models.DateTimeField(default=datetime.now)
 
     def __unicode__(self):
-        return "%s(%s)" % (self.function, ", ".join(self.args))
+        return "%s(%s)" % (self.function, ", ".join(map(lambda x: "%s" % x, self.args)))
 
     class Meta:
         ordering = ["datetime"]
