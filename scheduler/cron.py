@@ -6,7 +6,7 @@ from lachambre.models import Document
 
 def reparse_all_documents():
     for document in Document.objects.all():
-        send("parse_a_document;%s" % document.lachambre_id)
+        send("parse_a_document", [document.lachambre_id])
         sleep(30)
 
 
