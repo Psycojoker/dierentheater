@@ -17,7 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import logging
+import traceback
 logger = logging.getLogger('')
 
 from BeautifulSoup import BeautifulSoup
