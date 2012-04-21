@@ -61,24 +61,27 @@ def _get_written_question_bulletin():
     for i in range(48, 54):
         soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
         for b in soup('table')[4]('tr')[1:]:
-            if i == 53:
-                get_or_create(WrittenQuestionBulletin,
-                              legislature="53",
-                              lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                              date=b('td')[2].text,
-                              publication_date=b('td')[3].text,
-                              url=b('td')[1].a["href"],
-                              pdf_url=b('td')[0].a["href"],
-                             )
-            else:
-                get_or_create(WrittenQuestionBulletin,
-                              legislature=str(i),
-                              lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                              publication_date=b('td')[2].text,
-                              url=b('td')[1].a["href"] if b('td')[1].a else None,
-                              pdf_url=b('td')[0].a["href"],
-                             )
-                logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
+            try:
+                if i == 53:
+                    get_or_create(WrittenQuestionBulletin,
+                                  legislature="53",
+                                  lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                                  date=b('td')[2].text,
+                                  publication_date=b('td')[3].text,
+                                  url=b('td')[1].a["href"],
+                                  pdf_url=b('td')[0].a["href"],
+                                 )
+                else:
+                    get_or_create(WrittenQuestionBulletin,
+                                  legislature=str(i),
+                                  lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                                  publication_date=b('td')[2].text,
+                                  url=b('td')[1].a["href"] if b('td')[1].a else None,
+                                  pdf_url=b('td')[0].a["href"],
+                                 )
+                    logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
+            except TypeError:
+                continue
 
 
 def _save_a_written_question(link):

@@ -27,7 +27,8 @@ from lachambre_parser import documents
 from lachambre_parser import deputies
 
 def run():
-    modules = (reports, commissions, written_questions, documents, deputies)
+    #modules = (reports, commissions, written_questions, documents, deputies)
+    modules = (written_questions,)
     map(lambda x: x.clean_models(), modules)
-    deputies.deputies_list()
+    #deputies.deputies_list()
     map(lambda x: x.scrape(), modules)

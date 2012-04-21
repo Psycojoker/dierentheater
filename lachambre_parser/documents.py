@@ -64,6 +64,8 @@ def scrape():
 def parse_every_documents():
     # list otherwise mongodb will timeout if we stay in a query mode
     for document in list(Document.objects.filter(done=False)):
+        if document.lachambre_id == 25:
+            continue
         try:
             handle_document(document)
         except Exception, e:
