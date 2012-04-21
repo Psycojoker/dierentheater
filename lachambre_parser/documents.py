@@ -17,7 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import logging
+import traceback
 logger = logging.getLogger('')
 
 from BeautifulSoup import BeautifulSoup
@@ -70,8 +72,8 @@ def parse_every_documents():
             handle_document(document)
         except Exception, e:
             traceback.print_exc(file=sys.stdout)
-            logger.error("/!\ %s didn't succed! Error: %s" % (task, e))
-            irc("\x034%s didn't succed! Error: %s\x03" % (task, e))
+            logger.error("/!\ %s didn't succed! Error: while reparsing document %s" % (document.lachambre_id, e))
+            irc("\x034%s didn't succed! Error: while reparsing document %s\x03" % (document.lachambre_id, e))
             from ipdb import set_trace; set_trace()
 
 
