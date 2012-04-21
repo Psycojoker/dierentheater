@@ -48,6 +48,8 @@ from utils import read_or_dl,\
 from documents_utils import document_pdf_part_cutter,\
                             document_to_dico
 
+from history.utils import irc
+
 
 def clean_models():
     logger.debug("cleaning documents models")
@@ -62,7 +64,12 @@ def scrape():
 def parse_every_documents():
     # list otherwise mongodb will timeout if we stay in a query mode
     for document in list(Document.objects.filter(done=False)):
-        handle_document(document)
+        try:
+            handle_document(document)
+        except Exception, e:
+            traceback.print_exc(file=sys.stdout)
+            logger.error("/!\ %s didn't succed! Error: %s" % (task, e))
+            irc("\x034%s didn't succed! Error: %s\x03" % (task, e))
 
 
 def get_new_documents():
