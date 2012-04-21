@@ -124,5 +124,5 @@ CRONTAB_PYTHON_EXECUTABLE = PROJECT_PATH + "/ve/bin/python"
 
 CRONJOBS = [
     ('1 10,17 * * *', 'scheduler.cron.check_for_new_documents'),
-    ('3 11 * * 3', 'scheduler.cron.reparse_all_documents'),
+    ('3 3 * * 3', 'scheduler.cron.reparse_all_documents'),
 ]
