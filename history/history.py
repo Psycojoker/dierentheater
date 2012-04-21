@@ -23,7 +23,7 @@ def history(klass):
                                                     for x in in_db._meta.fields
                                                         if not isinstance(x, models.AutoField)
                                                            and x.attname != "current"))
-            irc(u"[MODIFIED] %s - %s".encode("Utf-8") % (self, self.get_url()))
+            irc(u"[MODIFIED] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
 
         return models.Model.save(self, *args, **kwargs)
 
