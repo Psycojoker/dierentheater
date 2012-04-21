@@ -98,7 +98,7 @@ def check_for_new_documents():
 
 
 def parse_a_document(lachambre_id):
-    handle_document(Document.object.get(lachambre_id=lachambre_id))
+    handle_document(Document.objects.get(lachambre_id=lachambre_id))
 
 
 def handle_document(document):
