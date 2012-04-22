@@ -33,7 +33,17 @@ def loop():
             if task.function in operations.keys():
                 logger.info("[x] Received %r, processing..." % task)
                 try:
-                    operations[task.function](*task.args)
+                    for i in range(3):
+                        try:
+                            operations[task.function](*task.args)
+                        except IOError:
+                            # http Errors, sleep and retry
+                            sleep(i*i*60)
+                            logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
+                        else:
+                            break
+                    else:
+                        raise Exception("can't perform %s because of IOError" % task)
                     logger.info("[x] End, waiting for next event")
                 except Exception, e:
                     traceback.print_exc(file=sys.stdout)
