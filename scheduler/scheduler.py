@@ -47,19 +47,27 @@ def loop():
             task.delete()
         sleep(3)
 
+
+def retry(times):
+    def retry_wrapper(func):
+        def wrapper(task):
+            for i in range(times):
+                try:
+                    return func(task)
+                except IOError:
+                    # http Errors, sleep and retry
+                    sleep(i*i*60)
+                    logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
+            else:
+                raise Exception("can't perform %s because of IOError" % task)
+            logger.info("[x] End, waiting for next event")
+        return wrapper
+    return retry_wrapper
+
+
+@retry(times=3)
 def perform_task(task):
-    for i in range(3):
-        try:
-            operations[task.function](*task.args)
-        except IOError:
-            # http Errors, sleep and retry
-            sleep(i*i*60)
-            logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
-        else:
-            break
-    else:
-        raise Exception("can't perform %s because of IOError" % task)
-    logger.info("[x] End, waiting for next event")
+    operations[task.function](*task.args)
 
 
 if __name__ == "__main__":
