@@ -33,18 +33,7 @@ def loop():
             if task.function in operations.keys():
                 logger.info("[x] Received %r, processing..." % task)
                 try:
-                    for i in range(3):
-                        try:
-                            operations[task.function](*task.args)
-                        except IOError:
-                            # http Errors, sleep and retry
-                            sleep(i*i*60)
-                            logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
-                        else:
-                            break
-                    else:
-                        raise Exception("can't perform %s because of IOError" % task)
-                    logger.info("[x] End, waiting for next event")
+                    perform_task(task)
                 except Exception, e:
                     traceback.print_exc(file=sys.stdout)
                     logger.error("/!\ %s didn't succed! Error: %s" % (task, e))
@@ -57,6 +46,20 @@ def loop():
                 logger.warn("/!\ unknow signal: %s" % task)
             task.delete()
         sleep(3)
+
+def perform_task(task):
+    for i in range(3):
+        try:
+            operations[task.function](*task.args)
+        except IOError:
+            # http Errors, sleep and retry
+            sleep(i*i*60)
+            logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
+        else:
+            break
+    else:
+        raise Exception("can't perform %s because of IOError" % task)
+    logger.info("[x] End, waiting for next event")
 
 
 if __name__ == "__main__":
