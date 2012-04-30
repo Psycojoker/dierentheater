@@ -34,6 +34,10 @@ Now, install the dependencies (this can take a little bit of time):
 
     pip install -r requirements.txt
 
+And install the indices:
+
+    python manage.py syncdb
+
 # Usage
 
 To launch the scraping (this is *long*, do this in a screen):
