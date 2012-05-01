@@ -41,7 +41,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_engine',
-        'NAME': 'dierentuin',
+        'NAME': 'dierentheater',
     }
 }
 
