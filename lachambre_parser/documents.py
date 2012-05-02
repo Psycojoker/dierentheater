@@ -120,7 +120,7 @@ def handle_document(document):
     _get_document_senat(dico, dico_nl, document)
 
     document.done = True
-    document.save_with_history()
+    document.save()
     logger.info("parsed document [%s] %s" % (document.lachambre_id, document.title["fr"]))
     dico.die_if_got_not_accessed_keys()
 

@@ -33,7 +33,7 @@ def history(klass):
 
         return models.Model.save(self, *args, **kwargs)
 
-    klass.save_with_history = save
+    klass.save = save
     return klass
 
 
