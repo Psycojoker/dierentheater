@@ -148,6 +148,7 @@ def _get_first_level_data(dico, dico_nl, document):
 
     if dico.get("Descripteurs Eurovoc"):
         document.eurovoc_descriptors["fr"] = map(lambda x: x.strip(), dico["Descripteurs Eurovoc"]["head"].text.split("|"))
+    if dico.get("Eurovoc descriptoren"):
         document.eurovoc_descriptors["nl"] = map(lambda x: x.strip(), dico_nl["Eurovoc descriptoren"]["head"].text.split("|"))
     if dico.get("Candidats-descripteurs Eurovoc"):
         document.eurovoc_candidats_descriptors["fr"] = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
