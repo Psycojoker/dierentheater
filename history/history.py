@@ -11,7 +11,10 @@ def history(klass):
     def save(self, *args, **kwargs):
         in_db = self.__class__.objects.filter(id=self.id)
         if not in_db:
-            irc(u"[NEW] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
+            if hasattr(self, "get_url"):
+                irc(u"[NEW] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
+            else:
+                irc(u"[NEW] %s".encode("Utf-8") % self)
             return models.Model.save(self, *args, **kwargs)
         assert len(in_db) == 1
         in_db = in_db[0]
@@ -23,11 +26,14 @@ def history(klass):
                                                     for x in in_db._meta.fields
                                                         if not isinstance(x, models.AutoField)
                                                            and x.attname != "current"))
-            irc(u"[MODIFIED] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
+            if hasattr(self, "get_url"):
+                irc(u"[MODIFIED] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
+            else:
+                irc(u"[MODIFIED] %s".encode("Utf-8") % self)
 
         return models.Model.save(self, *args, **kwargs)
 
-    klass.save_with_history = save
+    klass.save = save
     return klass
 
 

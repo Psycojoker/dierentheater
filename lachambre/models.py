@@ -90,6 +90,9 @@ class Deputy(models.Model, Jsonify):
             [("lachambre_id", 1)]
         ]
 
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
 
 @history
 class Party(models.Model, Jsonify):
@@ -103,6 +106,9 @@ class Party(models.Model, Jsonify):
 
     def __unicode__(self):
         return self.name
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 @history
@@ -337,6 +343,9 @@ class Question(models.Model, Jsonify):
             [("lachambre_id", 1)]
         ]
 
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
 
 class Analysis(models.Model, Jsonify):
     title = models.CharField(max_length=1337)
@@ -352,6 +361,9 @@ class Analysis(models.Model, Jsonify):
         indexes = [
             [("lachambre_id", 1)]
         ]
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 class WrittenQuestionBulletin(models.Model, Jsonify):
@@ -370,6 +382,9 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
         indexes = [
             [("lachambre_id", 1)]
         ]
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 @history
