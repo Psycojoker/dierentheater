@@ -10,6 +10,9 @@ from os.path import exists
 if not exists(PROJECT_PATH + "/log/"):
     os.mkdir(PROJECT_PATH + "/log/")
 
+if not exists(PROJECT_PATH + "/dump/"):
+    os.mkdir(PROJECT_PATH + "/dump/")
+
 logger = logging.getLogger('')
 # only set loggers once
 if not logger.handlers:
