@@ -56,7 +56,7 @@ To launch the dev server:
 
 # Public instance
 
-Not official-but-still-in-the-readme demo: http://dieren.vnurpa.ethylix.be
+http://www.dierentheater.be
 
 # Licence
 

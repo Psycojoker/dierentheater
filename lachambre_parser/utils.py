@@ -39,7 +39,9 @@ def get_or_create(klass, _id=None, **kwargs):
         return object[0]
     else:
         logger.debug("add new %s %s" % (klass.__name__, kwargs))
-        return klass.objects.create(**kwargs)
+        result = klass(**kwargs)
+        result.save()
+        return result
 
 
 def retry_on_access_error(function):
