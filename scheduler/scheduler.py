@@ -13,11 +13,12 @@ from history.utils import irc
 from operations import operations
 from models import Task
 
-def run_scheduler():
+def run_scheduler(continue_previous_tasks):
     settings.CACHE_SCRAPING = False
 
-    # clean task list before starting
-    Task.objects.all().delete()
+    if not continue_previous_tasks:
+        # clean task list before starting
+        Task.objects.all().delete()
 
     logging.info('[*] Waiting for events. To exit press CTRL+C')
 
