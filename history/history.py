@@ -21,11 +21,12 @@ def history(klass):
         if diff(self, in_db):
             # duplicated the in_db data into another model that contains the old data
             logger.info("[%s]'%s' has been modified" % (self.lachambre_id if hasattr(self, "lachambre_id") else self.id, self))
-            self.__class__.objects.create(current=False,
+            to_save = self.__class__(current=False,
                                           **dict((x.attname, getattr(in_db, x.attname))
                                                     for x in in_db._meta.fields
                                                         if not isinstance(x, models.AutoField)
                                                            and x.attname != "current"))
+            to_save._save(force_insert=True)
             if hasattr(self, "get_url"):
                 irc(u"[MODIFIED] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
             else:
@@ -33,6 +34,7 @@ def history(klass):
 
         return models.Model.save(self, *args, **kwargs)
 
+    klass._save = klass.save
     klass.save = save
     return klass
 
