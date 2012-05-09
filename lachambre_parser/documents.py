@@ -145,6 +145,7 @@ def _get_first_level_data(dico, dico_nl, document):
     if dico.get("Etat d'avancement"):
         document.status_chambre["fr"] = clean_text(dico["Etat d'avancement"].contents[0])
         document.status_senat["fr"] = clean_text(dico["Etat d'avancement"].contents[2]) if len(dico["Etat d'avancement"]) >= 3 else None
+    if dico.get("Stand van zaken"):
         document.status_chambre["nl"] = clean_text(dico_nl["Stand van zaken"].contents[0])
         document.status_senat["nl"] = clean_text(dico_nl["Stand van zaken"].contents[2]) if len(dico_nl["Stand van zaken"]) >= 3 else None
 
@@ -154,12 +155,15 @@ def _get_first_level_data(dico, dico_nl, document):
         document.eurovoc_descriptors["nl"] = map(lambda x: x.strip(), dico_nl["Eurovoc descriptoren"]["head"].text.split("|"))
     if dico.get("Candidats-descripteurs Eurovoc"):
         document.eurovoc_candidats_descriptors["fr"] = map(lambda x: x.strip(), dico["Candidats-descripteurs Eurovoc"]["head"].text.split("|"))
+    if dico.get("Eurovoc kandidaat-descriptoren"):
         document.eurovoc_candidats_descriptors["nl"] = map(lambda x: x.strip(), dico_nl["Eurovoc kandidaat-descriptoren"]["head"].text.split("|"))
     if dico.get(u"Mots-clés libres"):
         document.keywords["fr"] = map(lambda x: x.strip(), dico[u"Mots-clés libres"]["head"].text.split("|"))
+    if dico.get(u"Vrije trefwoorden"):
         document.keywords["nl"] = map(lambda x: x.strip(), dico_nl[u"Vrije trefwoorden"]["head"].text.split("|"))
     if dico.get("Documents principaux"):
         document.main_docs["fr"] = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico["Documents principaux"].contents))
+    if dico.get("Hoodfdocumenten"):
         document.main_docs["nl"] = map(lambda x: x.strip(), filter(lambda x: x != "<br>", dico_nl["Hoodfdocumenten"].contents))
 
 
@@ -244,7 +248,8 @@ def _get_senat_plenaries(dico, dico_nl, document):
 
 
 def _get_competences(dico, dico_nl, document):
-    if dico.get(u"Compétence"):
+    # FIXME don't get data if only one of the two is present
+    if dico.get(u"Compétence") and dico_nl.get(u"Bevoegdheid"):
         document.timeline = []
         for (_date, _title), (_, _title_nl) in zip([clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]],
                                                    [clean_text(x).split(u" \xa0 ", 1) for x in dico_nl[u"Bevoegdheid"]["head"].contents[::2]]):
