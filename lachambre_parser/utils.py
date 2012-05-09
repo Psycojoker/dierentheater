@@ -27,6 +27,8 @@ from lxml import etree
 
 from django.conf import settings
 
+from history.utils import irc
+
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
 
@@ -99,13 +101,17 @@ class AccessControlDict(dict):
     def die_if_got_not_accessed_keys(self):
         if self.get_not_accessed_keys():
             logger.error("\nError: untreated sections:")
+            irc("\nError: untreated sections:")
             for i in self.get_not_accessed_keys():
                 if isinstance(i, (str, unicode)):
                     logger.error("* %s" % i)
+                    irc("* %s" % i)
                 else:
                     for j in i:
                         logger.error("    * %s" % j)
+                        irc("    * %s" % j)
             logger.error("------------ stop ------------")
+            irc("Error: dico got un-accessed keys, die")
             import sys
             sys.exit(1)
 
