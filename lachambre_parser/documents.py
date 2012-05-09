@@ -246,13 +246,23 @@ def _get_senat_plenaries(dico, dico_nl, document):
 
 
 def _get_competences(dico, dico_nl, document):
-    # FIXME don't get data if only one of the two is present
+    # FIXME: meh, DRY
     if dico.get(u"Compétence") and dico_nl.get(u"Bevoegdheid"):
         document.timeline = []
         for (_date, _title), (_, _title_nl) in zip([clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]],
                                                    [clean_text(x).split(u" \xa0 ", 1) for x in dico_nl[u"Bevoegdheid"]["head"].contents[::2]]):
             logger.debug("append time line %s %s %s" % (_date, _title, _title_nl))
             document.timeline.append(DocumentTimeLine.objects.create(title={"fr": _title, "nl": _title_nl}, date=_date))
+    elif dico.get(u"Compétence"):
+        document.timeline = []
+        for (_date, _title) in [clean_text(x).split(u" \xa0 ", 1) for x in dico[u"Compétence"]["head"].contents[::2]]:
+            logger.debug("append time line %s %s %s" % (_date, _title, ""))
+            document.timeline.append(DocumentTimeLine.objects.create(title={"fr": _title, "nl": ""}, date=_date))
+    elif dico_nl.get(u"Bevoegdheid"):
+        document.timeline = []
+        for (_date, _title_nl) in [clean_text(x).split(u" \xa0 ", 1) for x in dico_nl[u"Bevoegdheid"]["head"].contents[::2]]:
+            logger.debug("append time line %s %s %s" % (_date, "", _title_nl))
+            document.timeline.append(DocumentTimeLine.objects.create(title={"fr": "", "nl": _title_nl}, date=_date))
     if dico.get("Analyse des interventions"):
         document.analysis = get_or_create(Analysis, _id="lachambre_id", lachambre_id=dico["Analyse des interventions"]["head"].a.text, url=dico["Analyse des interventions"]["head"].a["href"])
 
