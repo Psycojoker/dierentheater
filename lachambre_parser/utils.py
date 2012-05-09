@@ -105,11 +105,11 @@ class AccessControlDict(dict):
             for i in self.get_not_accessed_keys():
                 if isinstance(i, (str, unicode)):
                     logger.error("* %s" % i)
-                    irc("* %s" % i)
+                    irc("* %s" % i.encode("Utf-8"))
                 else:
                     for j in i:
                         logger.error("    * %s" % j)
-                        irc("    * %s" % j)
+                        irc("    * %s" % j.encode("Utf-8"))
             logger.error("------------ stop ------------")
             irc("Error: dico got un-accessed keys, die")
             import sys
