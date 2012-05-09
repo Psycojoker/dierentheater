@@ -158,7 +158,7 @@ def lxml_read_or_dl_with_nl(url, name, reset=False):
 
 def lxml_read_or_dl(url, name, reset=False):
     logger.debug("LXML parsing %s --- %s" % (url, name))
-    if not reset and exists('dump/%s' % name):
+    if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
         text = open('dump/%s' % name)
     else:
         text = urlopen(url)
