@@ -111,7 +111,7 @@ class AccessControlDict(dict):
                         logger.error("    * %s" % j)
                         irc("    * %s" % j.encode("Utf-8"))
             logger.error("------------ stop ------------")
-            irc("Error: dico got un-accessed keys, die")
+            irc("Bram: Error: dico got un-accessed keys, die")
             import sys
             sys.exit(1)
 
