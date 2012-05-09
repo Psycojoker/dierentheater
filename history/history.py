@@ -15,7 +15,7 @@ def history(klass):
                 irc(u"[NEW] %s - %s".encode("Utf-8") % (self, self.get_url().encode("Utf-8")))
             else:
                 irc(u"[NEW] %s".encode("Utf-8") % self)
-            return models.Model.save(self, *args, **kwargs)
+            return self._save(*args, **kwargs)
         assert len(in_db) == 1
         in_db = in_db[0]
         if diff(self, in_db):
@@ -32,7 +32,7 @@ def history(klass):
             else:
                 irc(u"[MODIFIED] %s".encode("Utf-8") % self)
 
-        return models.Model.save(self, *args, **kwargs)
+        return self._save(*args, **kwargs)
 
     klass._save = klass.save
     klass.save = save
