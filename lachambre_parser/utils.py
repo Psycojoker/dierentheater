@@ -98,14 +98,14 @@ class AccessControlDict(dict):
 
     def die_if_got_not_accessed_keys(self):
         if self.get_not_accessed_keys():
-            logger.debug("\nError: untreated sections:")
+            logger.error("\nError: untreated sections:")
             for i in self.get_not_accessed_keys():
                 if isinstance(i, (str, unicode)):
-                    logger.debug("* %s" % i)
+                    logger.error("* %s" % i)
                 else:
                     for j in i:
-                        logger.debug("    * %s" % j)
-            logger.debug("------------ stop ------------")
+                        logger.error("    * %s" % j)
+            logger.error("------------ stop ------------")
             import sys
             sys.exit(1)
 
