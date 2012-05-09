@@ -46,6 +46,7 @@ def loop():
             else:
                 logger.warn("/!\ unknow signal: %s" % task)
             task.delete()
+            logger.info("[x] End, waiting for next event")
         sleep(3)
 
 
@@ -61,7 +62,7 @@ def retry(times):
                     logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
             else:
                 raise Exception("can't perform %s because of IOError" % task)
-            logger.info("[x] End, waiting for next event")
+            logger.warning("[x] WARNING: task didn't succeded due to IOError, %s" % task)
         return wrapper
     return retry_wrapper
 
