@@ -46,6 +46,7 @@ def loop():
             else:
                 logger.warn("/!\ unknow signal: %s" % task)
             task.delete()
+            logger.info("[x] End, waiting for next event")
         sleep(3)
 
 
