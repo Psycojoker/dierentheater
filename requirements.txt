@@ -1,6 +1,10 @@
-hg+https://bitbucket.org/wkornewald/django-nonrel
-hg+https://bitbucket.org/wkornewald/djangotoolbox
-git+https://github.com/django-nonrel/mongodb-engine
+-e hg+http://bitbucket.org/wkornewald/django-nonrel@be48c152abc6b15e45155e2bbcfd69c665ccb536#egg=Django-dev
+-e git+https://github.com/django-nonrel/mongodb-engine@52257b5d90dcfaa564e708264a9cfe591d301fe6#egg=django_mongodb_engine-dev
+-e hg+https://bitbucket.org/wkornewald/djangotoolbox@a8cdf61ba9c0cdc7cbbbd37d693e9a222d9a8e5f#egg=djangotoolbox-dev
+
+pymongo==2.2.1
+pytz==2012d
+
 django_extensions
 beautifulsoup
 json_diff
