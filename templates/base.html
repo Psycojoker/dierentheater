@@ -9,14 +9,14 @@
         <div class="topbar" data-scrollspy="scrollspy" >
           <div class="topbar-inner">
             <div class="container">
-              <a class="brand" href="{% url home %}">Dieren Theater</a>
+              <a class="brand" href="{% url 'home' %}">Dieren Theater</a>
 
               <ul class="nav">
-                <li><a href="{% url deputies:deputy-list %}">Deputies</a></li>
-                <li><a href="{% url deputies:commission-list %}">Commissions</a></li>
-                <li><a href="{% url deputies:document-list %}">Law projects or texts</a></li>
-                <li><a href="{% url deputies:written-question-list %}">Written questions</a></li>
-                <li><a href="{% url deputies:annual-report-list %}">Annual reports</a></li>
+                <li><a href="{% url 'deputies:deputy-list' %}">Deputies</a></li>
+                <li><a href="{% url 'deputies:commission-list' %}">Commissions</a></li>
+                <li><a href="{% url 'deputies:document-list' %}">Law projects or texts</a></li>
+                <li><a href="{% url 'deputies:written-question-list' %}">Written questions</a></li>
+                <li><a href="{% url 'deputies:annual-report-list' %}">Annual reports</a></li>
               </ul>
             </div>
           </div>

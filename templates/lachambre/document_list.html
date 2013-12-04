@@ -11,7 +11,7 @@
 
 <ul>
 {% for document in object_list %}
-    <li><a href="{% url deputies:document document.lachambre_id %}">{{ document.lachambre_id }}</a></li>
+    <li><a href="{% url 'deputies:document' document.lachambre_id %}">{{ document.lachambre_id }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

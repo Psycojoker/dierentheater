@@ -41,14 +41,14 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_engine',
-        'NAME': 'dierentheater',
+        'NAME': 'dierentheater_pouet',
     }
 }
 
 TIME_ZONE = 'Europe/Brussels'
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+# SITE_ID = 1
 
 USE_I18N = True
 USE_L10N = True
@@ -94,7 +94,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'django.contrib.staticfiles',
     'django_extensions',
     'lachambre',

@@ -11,7 +11,7 @@
 
 <ul>
 {% for commission_membership in object_list %}
-  <li><a href="{% url deputies:commission-membership commission_membership.pk %}">[{{ commission_membership.commission.name.fr }} / {{ commission_membership.commission.name.nl }}] - {{ commission_membership.deputy.full_name }}</a></li>
+  <li><a href="{% url 'deputies:commission-membership' commission_membership.pk %}">[{{ commission_membership.commission.name.fr }} / {{ commission_membership.commission.name.nl }}] - {{ commission_membership.deputy.full_name }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

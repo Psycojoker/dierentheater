@@ -55,19 +55,19 @@ So far, this is only my personal initiative.
     <div class="span5">
         <h2>Available documents</h2>
         <ul>
-            <li><a href="{% url deputies:deputy-list %}">Deputies</a></li>
-            <li><a href="{% url deputies:commission-list %}">Commissions</a></li>
-            <li><a href="{% url deputies:commission-membership-list %}">Commissions Membership</a> (of deputies)</li>
-            <li><a href="{% url deputies:document-list %}">Law projects/texts</a></li>
-            <li><a href="{% url deputies:written-question-list %}">Written questions</a></li>
-            <li><a href="{% url deputies:annual-report-list %}">Annual reports</a></li>
+            <li><a href="{% url 'deputies:deputy-list' %}">Deputies</a></li>
+            <li><a href="{% url 'deputies:commission-list' %}">Commissions</a></li>
+            <li><a href="{% url 'deputies:commission-membership-list' %}">Commissions Membership</a> (of deputies)</li>
+            <li><a href="{% url 'deputies:document-list' %}">Law projects/texts</a></li>
+            <li><a href="{% url 'deputies:written-question-list' %}">Written questions</a></li>
+            <li><a href="{% url 'deputies:annual-report-list' %}">Annual reports</a></li>
         </ul>
     </div>
     <div class="span5">
         <h2><acronym title="Work In Progress">WIP</acronym> documents</h2>
         <ul>
-            <li><a href="{% url deputies:question-list %}">Others questions</a></li>
-            <li><a href="{% url deputies:analysis-list %}">Analysis</a></li>
+            <li><a href="{% url 'deputies:question-list' %}">Others questions</a></li>
+            <li><a href="{% url 'deputies:analysis-list' %}">Analysis</a></li>
         </ul>
     </div>
     <div class="span5">

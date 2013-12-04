@@ -11,7 +11,7 @@
 
 <ul>
 {% for analysis in object_list %}
-    <li><a href="{% url deputies:analysis analysis.lachambre_id %}">{{ analysis.lachambre_id }}</a></li>
+    <li><a href="{% url 'deputies:analysis' analysis.lachambre_id %}">{{ analysis.lachambre_id }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}
