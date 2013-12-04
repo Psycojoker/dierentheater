@@ -45,7 +45,7 @@ def clean_models():
 def deputies_list(reset=False):
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
 
-    for dep in soup('table')[4]('tr'):
+    for dep in soup.table('tr'):
         items = dep('td')
         full_name = re.sub('  +', ' ', items[0].a.text).strip()
         url = items[0].a['href']
@@ -75,12 +75,12 @@ def scrape():
         _handle_deputy(deputy)
 
 
-@retry_on_access_error
+#@retry_on_access_error
 def _handle_deputy(deputy, reset=False):
     soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
-    deputy.language = soup.i.parent.text.split(":")[1] if soup.i else None
-    deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[5].p.text)
-    deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[5].p.text)
+    deputy.language = soup.table.i.parent.text.split(":")[1] if soup.i else None
+    deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[1].p.text)
+    deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[1].p.text)
     if deputy.cv["fr"].encode("Utf-8").startswith("Députée"):
         deputy.sex = "F"
     elif deputy.cv["fr"].encode("Utf-8").startswith("Député"):
@@ -95,6 +95,7 @@ def _handle_deputy(deputy, reset=False):
 
 
 def _split_deputy_full_name(deputy, soup):
+    return
     # stupid special case
     if deputy.full_name == "Fernandez Fernandez Julie":
         deputy.first_name = "Julie"
