@@ -18,11 +18,12 @@ from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import TemplateView
 
 from tastypie.api import Api
-from lachambre.api import DeputyResource, CommissionMembershipRessource, CommissionResource, DocumentResource, WrittenQuestionResource, AnnualReportRessource
+from lachambre.api import DeputyResource, PartyResource, CommissionMembershipRessource, CommissionResource, DocumentResource, WrittenQuestionResource, AnnualReportRessource
 
 v1_api = Api(api_name='v1')
 v1_api.register(AnnualReportRessource())
 v1_api.register(DeputyResource())
+v1_api.register(PartyResource())
 v1_api.register(CommissionResource())
 v1_api.register(CommissionMembershipRessource())
 v1_api.register(DocumentResource())

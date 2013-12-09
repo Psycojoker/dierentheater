@@ -2,14 +2,20 @@ from tastypie_nonrel.resources import MongoResource
 from tastypie_nonrel.fields import ForeignKeysListField
 from tastypie.constants import ALL
 from tastypie import fields
-from models import Deputy, Document, Commission, WrittenQuestion, CommissionMembership, AnnualReport
+from models import (Deputy, Document, Commission, WrittenQuestion,
+                    CommissionMembership, AnnualReport, Party)
 
 class AnnualReportRessource(MongoResource):
     class Meta:
         queryset = AnnualReport.objects.all()
         resource_name = 'annual-report'
 
+class PartyResource(MongoResource):
+    class Meta:
+        queryset = Party.objects.all()
+
 class DeputyResource(MongoResource):
+    party = fields.ForeignKey(PartyResource, 'party')
     class Meta:
         queryset = Deputy.objects.all()
         filtering = {
