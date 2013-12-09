@@ -97,6 +97,7 @@ def _handle_deputy(deputy, reset=False):
 def _split_deputy_full_name(deputy, soup):
     return
     # stupid special case
+    from ipdb import set_trace; set_trace()
     if deputy.full_name == "Fernandez Fernandez Julie":
         deputy.first_name = "Julie"
         deputy.last_name = "Fernandez Fernandez"
