@@ -17,12 +17,14 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic import ListView, DetailView
 
-from models import Deputy, Commission, Document, Question, Analysis, WrittenQuestion, AnnualReport, CommissionMembership
+from models import Deputy, Party, Commission, Document, Question, Analysis, WrittenQuestion, AnnualReport, CommissionMembership
 
 urlpatterns = patterns('',
     url(r'^deputy/$', ListView.as_view(queryset=Deputy.objects.all()), name='deputy-list'),
     # yes, O in the regex, one deputy has an O instead of a 0 in it's lachambre_id, yes this is awfull
     url(r'^deputy/(?P<slug>[O0-9]+)/$', DetailView.as_view(queryset=Deputy.objects.all(), slug_field="lachambre_id"), name='deputy'),
+    url(r'^party/$', ListView.as_view(queryset=Party.objects.all()), name='party-list'),
+    url(r'^party/(?P<pk>[-a-zA-Z0-9]+)/$', DetailView.as_view(queryset=Party.objects.all(), slug_field="lachambre_id"), name='party'),
     url(r'^commission/$', ListView.as_view(queryset=Commission.objects.all()), name='commission-list'),
     url(r'^commission/(?P<slug>[0-9]+)/$', DetailView.as_view(queryset=Commission.objects.all(), slug_field="lachambre_id"), name='commission'),
     url(r'^commission-membership/$', ListView.as_view(queryset=CommissionMembership.objects.all()), name='commission-membership-list'),

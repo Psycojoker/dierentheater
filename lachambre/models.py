@@ -110,6 +110,9 @@ class Party(models.Model, Jsonify):
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
+    class Meta:
+        ordering = ["name"]
+
 
 @history
 class CommissionMembership(models.Model, Jsonify):

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+<h1>Parties</h1>
+{% endblock %}
+
+{% block content %}
+<div style="padding-top: 10px;" class="page-header">
+    <h1>List of available documents</h1>
+</div>
+
+<ul>
+{% for party in object_list %}
+    <li><a href="{% url 'deputies:party' party.id %}">{{ party.name }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
