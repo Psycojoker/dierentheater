@@ -14,3 +14,4 @@ git+git://github.com/Psycojoker/django-tastypie-nonrel.git
 pyyaml
 django-crontab
 ipdb
+mimeparse
