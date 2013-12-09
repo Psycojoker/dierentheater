@@ -20,20 +20,11 @@ import re
 import logging
 logger = logging.getLogger('')
 
-from lachambre.models import Party,\
-                            CommissionMembership,\
-                            Commission,\
-                            Question,\
-                            Analysis,\
-                            Deputy
+from lachambre.models import (Party, CommissionMembership, Commission,
+                              Question, Analysis, Deputy)
 
-from utils import retry_on_access_error,\
-                  LACHAMBRE_PREFIX,\
-                  get_or_create,\
-                  table2dic,\
-                  lame_url,\
-                  read_or_dl_with_nl,\
-                  read_or_dl
+from utils import (retry_on_access_error, LACHAMBRE_PREFIX, get_or_create,
+                   table2dic, lame_url, read_or_dl_with_nl, read_or_dl)
 
 
 def clean_models():
@@ -69,6 +60,7 @@ def deputies_list(reset=False):
 def check_for_new_deputies(reset=False):
     deputies_list(reset)
 
+
 def scrape():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         logger.debug("%s %s" % (index, deputy.full_name))
@@ -89,15 +81,16 @@ def _handle_deputy(deputy, reset=False):
         deputy.sex = None
 
     _split_deputy_full_name(deputy, soup)
-    #_get_deputie_commissions(soup, deputy)
-    #_deputy_documents(soup, deputy)
+    # _get_deputie_commissions(soup, deputy)
+    # _deputy_documents(soup, deputy)
     deputy.save()
 
 
 def _split_deputy_full_name(deputy, soup):
     return
     # stupid special case
-    from ipdb import set_trace; set_trace()
+    from ipdb import set_trace
+    set_trace()
     if deputy.full_name == "Fernandez Fernandez Julie":
         deputy.first_name = "Julie"
         deputy.last_name = "Fernandez Fernandez"
@@ -146,48 +139,48 @@ def _get_deputie_commissions(soup, deputy):
 
 
 #@retry_on_access_error
-#def _get_deputy_documents(url, deputy, role, type=None, reset=False):
-    #logger.debug("working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index]))
-    #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
-    #setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
-    #setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
-    #for i in soupsoup('table')[3]('tr', valign="top"):
-        #logger.debug("add %s %s %s" % (type if type else '', role, i.tr('td')[1].text))
-        #dico = table2dic(i.table('td'))
-        #logger.debug("%s" % dico)
-        #getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
-                #append(get_or_create(Document, _id="lachambre_id",
-                                     #lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
-                                     #url=i.a['href'],
-                                     #title=dico["Titre :"],
-                                     #status_chambre=dico.get("Chambre FR :"),
-                                     #status_senat=dico.get("Sénat FR :"),
-                                     #deposition_date=dico.get("Date :"),
-                                     #eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
-                                     #eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
-                                     #keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
+# def _get_deputy_documents(url, deputy, role, type=None, reset=False):
+    # logger.debug("working on %s %sdocuments" % (role, type + " " if type else '')  # , LACHAMBRE_PREFIX + lame_url(urls[index]))
+    # soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), '%s %s %s' % (deputy.full_name, type if type else '', role), reset)
+    # setattr(deputy, "documents_%s%s_url" % (role, type + "_" if type else ''), url)
+    # setattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else ''), [])
+    # for i in soupsoup('table')[3]('tr', valign="top"):
+        # logger.debug("add %s %s %s" % (type if type else '', role, i.tr('td')[1].text))
+        # dico = table2dic(i.table('td'))
+        # logger.debug("%s" % dico)
+        # getattr(deputy, "documents_%s%s_list" % (role, type + "_" if type else '')).\
+                # append(get_or_create(Document, _id="lachambre_id",
+                                     # lachambre_id=re.search("dossierID=(\d+)", i.a["href"]).groups()[0],
+                                     # url=i.a['href'],
+                                     # title=dico["Titre :"],
+                                     # status_chambre=dico.get("Chambre FR :"),
+                                     # status_senat=dico.get("Sénat FR :"),
+                                     # deposition_date=dico.get("Date :"),
+                                     # eurovoc_main_descriptor=dico.get("Desc. Eurovoc principal :"),
+                                     # eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc :", "").split('|')),
+                                     # keywords=map(lambda x: x.strip(), dico.get("Mots-clés libres :", "").split('|'))))
 
 
 #@retry_on_access_error
-#def _get_deputy_written_questions(url, deputy, reset=False):
-    #soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
-    #deputy.questions_written_url = url
-    #deputy.questions_written_list = []
-    #for i in soupsoup('table')[3]('tr', valign="top"):
-        #logger.debug("add", type, i.tr('td')[1].text.strip())
-        #dico = table2dic(i.table('td'))
-        #logger.debug("%s" % dico)
-        #deputy.questions_written_list.\
-                #append(get_or_create(WrittenQuestion,
-                                     #_id="lachambre_id",
-                                     #title=dico["Titre"],
-                                     #departement=dico.get(u"Département"),
-                                     #lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                     #deposition_date=dico.get(u"Date de dépôt"),
-                                     #delay_date=dico.get(u"Date de délai"),
-                                     #eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
-                                     #keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
-                                     #url=i.a['href']))
+# def _get_deputy_written_questions(url, deputy, reset=False):
+    # soupsoup = read_or_dl(LACHAMBRE_PREFIX + lame_url(url), deputy.full_name + " written questions", reset)
+    # deputy.questions_written_url = url
+    # deputy.questions_written_list = []
+    # for i in soupsoup('table')[3]('tr', valign="top"):
+        # logger.debug("add", type, i.tr('td')[1].text.strip())
+        # dico = table2dic(i.table('td'))
+        # logger.debug("%s" % dico)
+        # deputy.questions_written_list.\
+                # append(get_or_create(WrittenQuestion,
+                                     # _id="lachambre_id",
+                                     # title=dico["Titre"],
+                                     # departement=dico.get(u"Département"),
+                                     # lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+                                     # deposition_date=dico.get(u"Date de dépôt"),
+                                     # delay_date=dico.get(u"Date de délai"),
+                                     # eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
+                                     # keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
+                                     # url=i.a['href']))
 
 
 @retry_on_access_error
@@ -200,18 +193,18 @@ def _get_deputy_questions(url, deputy, type, reset=False):
         dico = table2dic(i.table('td'))
         logger.debug("%s" % dico)
         getattr(deputy, "questions_%s_list" % type).\
-                append(get_or_create(Question,
-                                     _id="lachambre_id",
-                                     title=dico["Titre"],
-                                     lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                     reunion_type=dico.get(u"Réunion"),
-                                     reunion_date=dico.get("Date discussion"),
-                                     session_id=dico.get("Session"),
-                                     pdf_url=dico.get(u"Compte rendu intégral", {"href": None})["href"],
-                                     eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
-                                     keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
-                                     url=i.a['href'],
-                                     type=type))
+            append(get_or_create(Question,
+            _id="lachambre_id",
+            title=dico["Titre"],
+                   lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+            reunion_type=dico.get(u"Réunion"),
+            reunion_date=dico.get("Date discussion"),
+            session_id=dico.get("Session"),
+            pdf_url=dico.get(u"Compte rendu intégral", {"href": None})["href"],
+            eurovoc_descriptors=map(lambda x: x.strip(), dico.get("Descripteurs Eurovoc", "").split('|')),
+            keywords=map(lambda x: x.strip(), dico.get(u"Mots-clés libres", "").split("|")),
+            url=i.a['href'],
+            type=type))
 
 
 @retry_on_access_error
@@ -224,25 +217,25 @@ def _get_deputy_analysis(url, deputy, type, reset=False):
         dico = table2dic(i.table('td'))
         logger.debug("%s" % dico)
         getattr(deputy, "analysis_%s_list" % type).\
-                append(get_or_create(Analysis,
-                                     _id="lachambre_id",
-                                     lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
-                                     title=dico["Titre"],
-                                     descriptor=dico["Descripteurs"],
-                                     url=i.a['href'],
-                                     type=type))
+            append(get_or_create(Analysis,
+            _id="lachambre_id",
+            lachambre_id=re.search("dossierID=([0-9A-Za-z-]+)", i.a["href"]).groups()[0],
+            title=dico["Titre"],
+                   descriptor=dico["Descripteurs"],
+            url=i.a['href'],
+            type=type))
 
 
 def _deputy_documents(soup, deputy):
     # here we are in the grey black box
     urls = map(lambda x: x['href'], soup('div', **{'class': 'linklist_1'})[1]('a'))
 
-    #_get_deputy_documents(urls[0], deputy, "author", "principal")
-    #_get_deputy_documents(urls[1], deputy, "signator", "principal")
-    #_get_deputy_documents(urls[2], deputy, "author", "next")
-    #_get_deputy_documents(urls[3], deputy, "signator", "next")
-    #_get_deputy_documents(urls[4], deputy, "rapporter")
-    #_get_deputy_written_questions(urls[5], deputy)
+    # _get_deputy_documents(urls[0], deputy, "author", "principal")
+    # _get_deputy_documents(urls[1], deputy, "signator", "principal")
+    # _get_deputy_documents(urls[2], deputy, "author", "next")
+    # _get_deputy_documents(urls[3], deputy, "signator", "next")
+    # _get_deputy_documents(urls[4], deputy, "rapporter")
+    # _get_deputy_written_questions(urls[5], deputy)
     # no one seems to do any interpellations nor motions or maybe the website is just broken
     _get_deputy_questions(urls[8], deputy, "oral_plenary")
     _get_deputy_questions(urls[9], deputy, "oral_commission")

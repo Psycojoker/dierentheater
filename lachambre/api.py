@@ -5,22 +5,27 @@ from tastypie import fields
 from models import (Deputy, Document, Commission, WrittenQuestion,
                     CommissionMembership, AnnualReport, Party)
 
+
 class AnnualReportRessource(MongoResource):
     class Meta:
         queryset = AnnualReport.objects.all()
         resource_name = 'annual-report'
 
+
 class PartyResource(MongoResource):
     class Meta:
         queryset = Party.objects.all()
 
+
 class DeputyResource(MongoResource):
     party = fields.ForeignKey(PartyResource, 'party')
+
     class Meta:
         queryset = Deputy.objects.all()
         filtering = {
             "lachambre_id": ALL,
         }
+
 
 class DocumentResource(MongoResource):
     class Meta:
@@ -29,20 +34,25 @@ class DocumentResource(MongoResource):
             "lachambre_id": ALL,
         }
 
+
 class CommissionResource(MongoResource):
     deputies = ForeignKeysListField('lachambre.api.CommissionMembershipRessource', 'deputies')
+
     class Meta:
         queryset = Commission.objects.all()
         filtering = {
             "lachambre_id": ALL,
         }
 
+
 class CommissionMembershipRessource(MongoResource):
     deputy = fields.ForeignKey(DeputyResource, 'deputy')
     commission = fields.ForeignKey(CommissionResource, 'commission')
+
     class Meta:
         queryset = CommissionMembership.objects.all()
         resource_name = 'commission-membership'
+
 
 class WrittenQuestionResource(MongoResource):
     class Meta:

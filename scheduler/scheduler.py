@@ -13,6 +13,7 @@ from history.utils import irc
 from operations import operations
 from models import Task
 
+
 def run_scheduler(continue_previous_tasks):
     settings.CACHE_SCRAPING = False
 
@@ -41,7 +42,8 @@ def loop():
                     irc("\x034%s didn't succed! Error: %s\x03" % (task, e))
                     irc("Bram: entering ipdb shell")
                     e, m, tb = sys.exc_info()
-                    from ipdb import post_mortem; post_mortem(tb)
+                    from ipdb import post_mortem
+                    post_mortem(tb)
 
             else:
                 logger.warn("/!\ unknow signal: %s" % task)
@@ -58,8 +60,8 @@ def retry(times):
                     return func(task)
                 except IOError:
                     # http Errors, sleep and retry
-                    sleep(i*i*60)
-                    logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i*i*60)))
+                    sleep(i * i * 60)
+                    logger.warning("IOError (httprelated error) on %s, retry in %s minutes" % (task, str(i * i * 60)))
             else:
                 raise Exception("can't perform %s because of IOError" % task)
             logger.warning("[x] WARNING: task didn't succeded due to IOError, %s" % task)

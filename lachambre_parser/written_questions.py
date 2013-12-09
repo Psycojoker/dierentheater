@@ -21,15 +21,10 @@ import logging
 logger = logging.getLogger('')
 
 from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
-from utils import read_or_dl,\
-                  read_or_dl_with_nl,\
-                  LACHAMBRE_PREFIX,\
-                  AccessControlDict,\
-                  get_or_create,\
-                  get_href_else_blank,\
-                  get_items_list_else_empty_list,\
-                  dico_get_text,\
-                  get_text_else_blank
+from utils import (read_or_dl, read_or_dl_with_nl, LACHAMBRE_PREFIX,
+                   AccessControlDict, get_or_create, get_href_else_blank,
+                   get_items_list_else_empty_list, dico_get_text,
+                   get_text_else_blank)
 
 
 def clean_models():

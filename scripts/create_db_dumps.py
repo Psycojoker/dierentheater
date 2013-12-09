@@ -16,5 +16,6 @@
 
 from lachambre.utils import dump_db
 
+
 def run():
     dump_db()

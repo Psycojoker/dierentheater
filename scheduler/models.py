@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField
 
+
 class Task(models.Model):
     function = models.CharField(max_length=1337)
     args = ListField()

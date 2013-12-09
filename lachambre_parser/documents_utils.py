@@ -16,8 +16,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from utils import clean_text,\
-                  AccessControlDict
+from utils import clean_text, AccessControlDict
 
 
 def document_pdf_part_cutter(soup):
@@ -49,7 +48,7 @@ def document_to_dico(table):
             sub_section = _build_sub_section(i, dico)
         elif is_pdf_section(i):
             _build_pdf_sub_section(i, dico, sub_section)
-        else: # is first level
+        else:  # is first level
             _build_first_level(i, dico)
     return dico
 

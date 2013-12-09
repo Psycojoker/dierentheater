@@ -25,9 +25,11 @@ from StringIO import StringIO
 
 SEPARATOR = "-------------------------------------------------------------------------------------------------------------------------------"
 
+
 def pdf_to_text(pdf_name):
     os.system("pdftotext -layout %s" % pdf_name)
     return open(pdf_name.replace(".pdf", ".txt"), "r").read()
+
 
 def remove_useless_informations(text):
     result = []
@@ -50,6 +52,7 @@ def remove_useless_informations(text):
             result.append(i)
     return "\n".join(result)
 
+
 def strip(text):
     work = text.split("\n")
     a = 0
@@ -61,6 +64,7 @@ def strip(text):
         b += 1
 
     return "\n".join(text.split("\n")[a:-b])
+
 
 def horizontal_split(text):
     result = [[]]
@@ -75,6 +79,7 @@ def horizontal_split(text):
                 blank_line = 0
     return filter(None, result)
 
+
 def remove_useless_blocks(text):
     # first one is "La Chambre blablabla"
     # second one is the date, we have it on the website
@@ -84,6 +89,7 @@ def remove_useless_blocks(text):
     if "SAMENVATTING" not in text[1][0]:
         text.pop(1)
     return text
+
 
 def split_horizontally(block):
     left, right = [], []
@@ -99,7 +105,7 @@ def split_horizontally(block):
     good = False
     while not good:
         for i in searchable_area:
-            if i[split_index:split_index+2] != "  ":
+            if i[split_index:split_index + 2] != "  ":
                 split_index += 1
                 break
         else:
@@ -108,9 +114,9 @@ def split_horizontally(block):
             raise Exception
 
     for i in map(lambda x: x.decode("Utf-8"), block):
-        if len(filter(lambda x: x.strip(), i.split(" "*split_size))) == 2:
+        if len(filter(lambda x: x.strip(), i.split(" " * split_size))) == 2:
             left.append(i[:split_index])
-            right.append(i[split_index+2:])
+            right.append(i[split_index + 2:])
         else:
             left_spaces = len(i) - len(i.lstrip())
 
@@ -121,16 +127,19 @@ def split_horizontally(block):
 
     return map(lambda x: x.encode("Utf-8"), left), map(lambda x: x.encode("Utf-8"), right)
 
+
 def rebuild_paragraphe(block):
     # '-' are at the end of a line when a word is split in two
     # after " ".join we have some "- " resulting of the join of 2 parts of a word
     # remove them
     return " ".join(map(lambda x: x.strip(), block)).replace("- ", "")
 
+
 def parse_abstract(abstract):
     # first line is useless
     abstract[0] = abstract[0].lower().strip()
     return map(lambda x: x.capitalize() + ".", map(rebuild_paragraphe, split_horizontally(abstract)))
+
 
 def left_egualize(block):
     # if I got empty text just strip it
@@ -141,6 +150,7 @@ def left_egualize(block):
         block = map(lambda x: x[1:], block)
     return block
 
+
 def split_raw_paragraph(block):
     block = left_egualize(block)
     result = [[]]
@@ -150,8 +160,10 @@ def split_raw_paragraph(block):
         result[-1].append(i)
     return result
 
+
 def parse_two_columns_text(text):
     return map(lambda x: map(rebuild_paragraphe, x), map(split_raw_paragraph, split_horizontally(text)))
+
 
 def prepare_document(pdf_name):
     text = pdf_to_text(pdf_name)
@@ -161,11 +173,13 @@ def prepare_document(pdf_name):
     text = remove_useless_blocks(text)
     return text
 
+
 def is_party_list(block):
     for i in block:
         if ":" not in i:
             return False
     return True
+
 
 def flaten_list(a_list):
     flat = []
@@ -173,6 +187,7 @@ def flaten_list(a_list):
         for j in i:
             flat.append(j)
     return flat
+
 
 def intelligent_parse(pdf_name):
     def store(key, data):
@@ -225,6 +240,7 @@ def intelligent_parse(pdf_name):
         store("articles", map(flaten_list, zip(*map(parse_two_columns_text, text))))
 
     return document
+
 
 def custom_parse(pdf_name):
     text = prepare_document(pdf_name)

@@ -4,6 +4,7 @@ logger = logging.getLogger('')
 
 from models import Task
 
+
 def send(function, args=None):
     if args is None:
         args = []

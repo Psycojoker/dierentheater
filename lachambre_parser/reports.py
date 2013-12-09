@@ -40,4 +40,4 @@ def scrape():
                           law_and_article={"fr": i('td')[4].text, "nl": j('td')[4].text},
                           periodicity=re.sub("[^0-9]", "", i('td')[5].text),
                           pdf_url=i('td')[1].a["href"] if i('td')[1].a else "",
-                         )
+                          )

@@ -25,37 +25,33 @@ logger = logging.getLogger('')
 from BeautifulSoup import BeautifulSoup
 from lxml import etree
 
-from lachambre.models import Document,\
-                            InChargeCommissions,\
-                            DocumentPlenary,\
-                            DocumentSenatPlenary,\
-                            DocumentTimeLine,\
-                            Analysis,\
-                            Deputy,\
-                            OtherDocumentChambrePdf,\
-                            DocumentChambre,\
-                            DocumentSenat,\
-                            DocumentChambrePdf,\
-                            DocumentSenatPdf,\
-                            OtherDocumentSenatPdf
+from lachambre.models import (Document, InChargeCommissions, DocumentPlenary,
+                              DocumentSenatPlenary, DocumentTimeLine, Analysis,
+                              Deputy, OtherDocumentChambrePdf, DocumentChambre,
+                              DocumentSenat, DocumentChambrePdf,
+                              DocumentSenatPdf, OtherDocumentSenatPdf)
 
-from utils import read_or_dl,\
-                  LACHAMBRE_PREFIX,\
-                  get_or_create,\
-                  clean_text,\
-                  read_or_dl_with_nl,\
-                  lxml_read_or_dl_with_nl,\
-                  get_text_else_blank
+from utils import (read_or_dl, LACHAMBRE_PREFIX, get_or_create, clean_text,
+                   read_or_dl_with_nl, lxml_read_or_dl_with_nl,
+                   get_text_else_blank)
 
-from documents_utils import document_pdf_part_cutter,\
-                            document_to_dico
+from documents_utils import document_pdf_part_cutter, document_to_dico
 
 from history.utils import irc
 
 
 def clean_models():
     logger.debug("cleaning documents models")
-    map(lambda x: x.objects.all().delete(), (Document, DocumentTimeLine, DocumentChambre, DocumentChambrePdf, DocumentSenat, DocumentSenatPdf, InChargeCommissions, DocumentPlenary, DocumentSenatPlenary, OtherDocumentSenatPdf, OtherDocumentChambrePdf))
+    map(lambda x: x.objects.all().delete(), (Document, DocumentTimeLine,
+                                             DocumentChambre,
+                                             DocumentChambrePdf,
+                                             DocumentSenat,
+                                             DocumentSenatPdf,
+                                             InChargeCommissions,
+                                             DocumentPlenary,
+                                             DocumentSenatPlenary,
+                                             OtherDocumentSenatPdf,
+                                             OtherDocumentChambrePdf))
 
 
 def scrape():
@@ -76,7 +72,8 @@ def parse_every_documents():
             irc("\x034%s didn't succed! Error: while reparsing document %s\x03" % (document.lachambre_id, e))
             irc("Bram: entering ipdb shell")
             e, m, tb = sys.exc_info()
-            from ipdb import post_mortem; post_mortem(tb)
+            from ipdb import post_mortem
+            post_mortem(tb)
 
 
 def get_new_documents():

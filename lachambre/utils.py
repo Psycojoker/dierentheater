@@ -39,6 +39,6 @@ def dump_db():
     print "XZing..."
     for model in MODELS:
         print "  %s" % model
-        system("cd %s && if [ -e %s.xz ]; then rm %s.xz; fi && xz %s" %(STATIC_FOLDER, model, model, model))
+        system("cd %s && if [ -e %s.xz ]; then rm %s.xz; fi && xz %s" % (STATIC_FOLDER, model, model, model))
     print "done"
     open("%s/LICENCE" % STATIC_FOLDER, "w").write(OBDL)
