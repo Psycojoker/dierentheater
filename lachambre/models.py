@@ -52,6 +52,7 @@ class Deputy(models.Model, Jsonify):
     lachambre_id = models.CharField(max_length=1337)
     language = models.CharField(max_length=1337, null=True)
     cv = DictField()
+    photo_uri = models.CharField(max_length=1337)
 
     with_history = models.Manager()
     objects = HistoryManager()

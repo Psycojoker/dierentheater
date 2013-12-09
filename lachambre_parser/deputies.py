@@ -70,6 +70,7 @@ def scrape():
 #@retry_on_access_error
 def _handle_deputy(deputy, reset=False):
     soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
+    deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
     deputy.language = soup.table.i.parent.text.split(":")[1] if soup.i else None
     deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[1].p.text)
     deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[1].p.text)
