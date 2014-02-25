@@ -38,22 +38,20 @@ def deputies_list(reset=False):
 
     for dep in soup.table('tr'):
         items = dep('td')
-        full_name = re.sub('  +', ' ', items[0].a.text).strip()
         url = items[0].a['href']
-        party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
-        email = items[2].a.text
-        website = items[3].a['href'] if items[3].a else None
-        # yes, one deputies key contains a O instead of an 0, I'm not joking
         lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
-        if not Deputy.objects.filter(lachambre_id=lachambre_id):
-            deputy = Deputy.objects.create(full_name=full_name,
-                                           party=party,
-                                           url=url,
-                                           websites=[website] if website else [],
-                                           lachambre_id=lachambre_id,
-                                           emails=[email])
-            logger.debug('adding new deputy %s %s %s %s %s' % (lachambre_id.encode("Utf-8"), full_name.encode("Utf-8"), party, email.encode("Utf-8"), website.encode("Utf-8") if website else ''))
+
+        deputy = Deputy.objects.filter(lachambre_id=lachambre_id)
+        if not deputy:
             logger.info("[NEW] deputy: %s" % deputy)
+        deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
+
+        deputy.full_name = re.sub('  +', ' ', items[0].a.text).strip()
+        deputy.url = url
+        deputy.party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
+        deputy.email = items[2].a.text
+        deputy.website = items[3].a['href'] if items[3].a else None
+        logger.debug('updating deputy %s %s %s %s %s' % (lachambre_id.encode("Utf-8"), deputy.full_name.encode("Utf-8"), deputy.party, deputy.email.encode("Utf-8"), deputy.website.encode("Utf-8") if deputy.website else ''))
 
 
 @retry_on_access_error
