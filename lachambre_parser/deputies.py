@@ -51,7 +51,10 @@ def deputies_list(reset=False):
         deputy.party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
         deputy.email = items[2].a.text
         deputy.website = items[3].a['href'] if items[3].a else None
+
         logger.debug('updating deputy %s %s %s %s %s' % (lachambre_id.encode("Utf-8"), deputy.full_name.encode("Utf-8"), deputy.party, deputy.email.encode("Utf-8"), deputy.website.encode("Utf-8") if deputy.website else ''))
+
+        deputy.save()
 
 
 @retry_on_access_error
