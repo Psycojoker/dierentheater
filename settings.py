@@ -96,7 +96,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     #'django.contrib.sites',
     'django.contrib.staticfiles',
-    'django_extensions',
     'lachambre',
     'lachambre_parser',
     'tastypie',
