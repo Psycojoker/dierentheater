@@ -58,5 +58,5 @@ class Command(BaseCommand):
         if deputies in parsers_to_run:
             deputies.deputies_list()
 
-        for parser in parsers:
+        for parser in parsers_to_run:
             parser.scrape()
