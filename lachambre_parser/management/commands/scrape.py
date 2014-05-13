@@ -23,6 +23,8 @@ logger.handlers[1].setLevel(logging.DEBUG)
 from optparse import make_option
 from django.core.management.base import BaseCommand
 
+from ipdb import launch_ipdb_on_exception
+
 from lachambre_parser import reports
 from lachambre_parser import commissions
 from lachambre_parser import written_questions
@@ -46,6 +48,11 @@ class Command(BaseCommand):
             default=False,
             help='Parse %s' % x)
         for x in parsers.keys()
+    ) + (make_option('--ipdb',
+            action='store_true',
+            dest='ipdb',
+            default=False,
+            help='Launch ipdb if an exception is encountered'),
     )
 
     def handle(self, *args, **options):
@@ -56,7 +63,15 @@ class Command(BaseCommand):
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
         if deputies in parsers_to_run:
-            deputies.deputies_list()
+            if options['ipdb']:
+                with launch_ipdb_on_exception():
+                    deputies.deputies_list()
+            else:
+                deputies.deputies_list()
 
         for parser in parsers_to_run:
-            parser.scrape()
+            if options['ipdb']:
+                with launch_ipdb_on_exception():
+                    parser.scrape()
+            else:
+                parser.scrape()
