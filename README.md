@@ -40,9 +40,23 @@ And install the indices:
 
 # Usage
 
-To launch the scraping (this is *long*, do this in a screen):
+To launch the scraping:
 
-    python manage.py total_scraping
+    python manage.py scrape
+
+By default this launch all the parser, if you want to only launch some parser
+you can specify them on the CLI:
+
+    python manage.py scrape --deputies
+
+Available options are:
+
+    --commissions         Parse commissions
+    --documents           Parse documents
+    --written_questions   Parse written_questions
+    --reports             Parse reports
+    --deputies            Parse deputies
+
 
 But aware that by default the parser store every page he has encountered in the
 folder dump but re-download it (for a maximum number of 2 more times) if it has
