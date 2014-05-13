@@ -42,7 +42,7 @@ And install the indices:
 
 To launch the scraping (this is *long*, do this in a screen):
 
-    python manage.py runscript total_scraping
+    python manage.py total_scraping
 
 But aware that by default the parser store every page he has encountered in the
 folder dump but re-download it (for a maximum number of 2 more times) if it has
