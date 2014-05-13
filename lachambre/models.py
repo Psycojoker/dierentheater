@@ -37,7 +37,6 @@ class Jsonify(object):
         return dumps(data, indent=4)
 
 
-@history
 class Deputy(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -95,7 +94,6 @@ class Deputy(models.Model, Jsonify):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
-@history
 class Party(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -115,7 +113,6 @@ class Party(models.Model, Jsonify):
         ordering = ["name"]
 
 
-@history
 class CommissionMembership(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -128,7 +125,6 @@ class CommissionMembership(models.Model, Jsonify):
     objects = HistoryManager()
 
 
-@history
 class Commission(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -155,7 +151,6 @@ class Commission(models.Model, Jsonify):
         ]
 
 
-@history
 class Document(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -286,7 +281,6 @@ class DocumentTimeLine(models.Model):
     date = models.CharField(max_length=1337)
 
 
-@history
 class WrittenQuestion(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -391,7 +385,6 @@ class WrittenQuestionBulletin(models.Model, Jsonify):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
-@history
 class AnnualReport(models.Model, Jsonify):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
