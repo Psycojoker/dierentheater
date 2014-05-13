@@ -32,7 +32,6 @@ def clean_models():
     map(lambda x: x.objects.all().delete(), (Deputy, Party, Analysis))
 
 
-@retry_on_access_error
 def deputies_list(reset=False):
     soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", reset)
 
@@ -46,14 +45,8 @@ def deputies_list(reset=False):
             logger.info("[NEW] deputy: %s" % deputy)
         deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
 
-        deputy.full_name = re.sub('  +', ' ', items[0].a.text).strip()
+        deputy.full_name = items[0].a.text.strip()
         deputy.url = url
-        deputy.party = get_or_create(Party, name=items[1].a.text, url=dict(items[1].a.attrs)['href'])
-        deputy.email = items[2].a.text
-        deputy.website = items[3].a['href'] if items[3].a else None
-
-        logger.debug('updating deputy %s %s %s %s %s' % (lachambre_id.encode("Utf-8"), deputy.full_name.encode("Utf-8"), deputy.party, deputy.email.encode("Utf-8"), deputy.website.encode("Utf-8") if deputy.website else ''))
-
         deputy.save()
 
 
