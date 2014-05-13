@@ -40,6 +40,8 @@ And install the indices:
 
 # Usage
 
+## Scraping
+
 To launch the scraping:
 
     python manage.py scrape
@@ -60,11 +62,15 @@ Available options are:
 If you have exception, remember that you need to passe the option
 <code>--traceback</code> to a django command to have the traceback (yes ...).
 
+## Dump
+
 But aware that by default the parser store every page he has encountered in the
 folder dump but re-download it (for a maximum number of 2 more times) if it has
 problems with it. If you want to reset the cache simply run:
 
     rm dump/*
+
+## Server
 
 To launch the dev server:
 
