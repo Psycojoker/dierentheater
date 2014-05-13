@@ -45,7 +45,7 @@ class Deputy(models.Model, Jsonify):
     last_name = models.CharField(max_length=1337)
     sex = models.CharField(max_length=1337, null=True)
     emails = ListField()
-    party = models.ForeignKey('Party')
+    party = models.ForeignKey('Party', null=True)
     url = models.CharField(max_length=1337)
     websites = ListField()
     lachambre_id = models.CharField(max_length=1337)
