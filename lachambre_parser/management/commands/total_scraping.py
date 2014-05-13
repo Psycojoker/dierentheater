@@ -20,6 +20,8 @@ import logging
 logger = logging.getLogger('')
 logger.handlers[1].setLevel(logging.DEBUG)
 
+from django.core.management.base import BaseCommand
+
 from lachambre_parser import reports
 from lachambre_parser import commissions
 from lachambre_parser import written_questions
@@ -27,9 +29,10 @@ from lachambre_parser import documents
 from lachambre_parser import deputies
 
 
-def run():
-    # modules = (reports, commissions, written_questions, documents, deputies)
-    modules = (deputies,)
-    # map(lambda x: x.clean_models(), modules)
-    deputies.deputies_list()
-    map(lambda x: x.scrape(), modules)
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        # modules = (reports, commissions, written_questions, documents, deputies)
+        modules = (deputies,)
+        # map(lambda x: x.clean_models(), modules)
+        deputies.deputies_list()
+        map(lambda x: x.scrape(), modules)
