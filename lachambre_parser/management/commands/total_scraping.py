@@ -20,6 +20,7 @@ import logging
 logger = logging.getLogger('')
 logger.handlers[1].setLevel(logging.DEBUG)
 
+from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from lachambre_parser import reports
@@ -29,10 +30,33 @@ from lachambre_parser import documents
 from lachambre_parser import deputies
 
 
+parsers = {
+    'reports': reports,
+    'commissions': commissions,
+    'written_questions': written_questions,
+    'documents': documents,
+    'deputies': deputies,
+}
+
 class Command(BaseCommand):
+    option_list = BaseCommand.option_list + tuple(
+        make_option('--%s' % x,
+            action='store_true',
+            dest='%s' % x,
+            default=False,
+            help='Parse %s' % x)
+        for x in parsers.keys()
+    )
+
     def handle(self, *args, **options):
-        # modules = (reports, commissions, written_questions, documents, deputies)
-        modules = (deputies,)
-        # map(lambda x: x.clean_models(), modules)
-        deputies.deputies_list()
-        map(lambda x: x.scrape(), modules)
+        parsers_to_run = filter(lambda x: options[x], parsers.keys())
+        if not parsers_to_run:
+            parsers_to_run = parsers.values()
+        else:
+            parsers_to_run = [parsers[x] for x in parsers_to_run]
+
+        if deputies in parsers_to_run:
+            deputies.deputies_list()
+
+        for parser in parsers:
+            parser.scrape()
