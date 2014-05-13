@@ -57,6 +57,8 @@ Available options are:
     --reports             Parse reports
     --deputies            Parse deputies
 
+If you have exception, remember that you need to passe the option
+<code>--traceback</code> to a django command to have the traceback (yes ...).
 
 But aware that by default the parser store every page he has encountered in the
 folder dump but re-download it (for a maximum number of 2 more times) if it has
