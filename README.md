@@ -62,6 +62,13 @@ Available options are:
 If you have exception, remember that you need to passe the option
 <code>--traceback</code> to a django command to have the traceback (yes ...).
 
+## Debugging
+
+If you want to end up in [ipdb](https://github.com/gotcha/ipdb) (a python
+interactive debugger) on exception, you can use the <code>--ipdb</code> option.
+
+    python manage.py scrape --ipdb
+
 ## Dump
 
 But aware that by default the parser store every page he has encountered in the
