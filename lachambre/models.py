@@ -22,7 +22,6 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
-from history import history, HistoryManager
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
@@ -53,8 +52,6 @@ class Deputy(models.Model, Jsonify):
     cv = DictField()
     photo_uri = models.CharField(max_length=1337)
 
-    with_history = models.Manager()
-    objects = HistoryManager()
     # commissions = ListField(EmbeddedModelField('CommissionMembership'))
 
     # documents_principal_author_url = models.URLField()
@@ -100,8 +97,6 @@ class Party(models.Model, Jsonify):
     name = models.CharField(max_length=1337)
     url = models.URLField()
 
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     def __unicode__(self):
         return self.name
@@ -121,8 +116,6 @@ class CommissionMembership(models.Model, Jsonify):
     commission = models.ForeignKey("Commission")
     deputy = models.ForeignKey("Deputy")
 
-    with_history = models.Manager()
-    objects = HistoryManager()
 
 
 class Commission(models.Model, Jsonify):
@@ -136,8 +129,6 @@ class Commission(models.Model, Jsonify):
     deputies = ListField(models.ForeignKey(CommissionMembership))
     seats = DictField()
 
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
@@ -182,8 +173,6 @@ class Document(models.Model, Jsonify):
     candidature_vote_date = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
 
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     def __unicode__(self):
         return "%s - %s" % (self.lachambre_id, self.title["fr"])
@@ -306,8 +295,6 @@ class WrittenQuestion(models.Model, Jsonify):
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
 
-    with_history = models.Manager()
-    objects = HistoryManager()
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
@@ -393,6 +380,3 @@ class AnnualReport(models.Model, Jsonify):
     law_and_article = DictField()
     periodicity = models.CharField(max_length=1337)
     pdf_url = models.URLField()
-
-    with_history = models.Manager()
-    objects = HistoryManager()
