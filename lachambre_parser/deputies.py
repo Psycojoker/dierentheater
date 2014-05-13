@@ -58,11 +58,11 @@ def check_for_new_deputies(reset=False):
 def scrape():
     for index, deputy in enumerate(list(Deputy.objects.all())):
         logger.debug("%s %s" % (index, deputy.full_name))
-        _handle_deputy(deputy)
+        handle_deputy(deputy)
 
 
 #@retry_on_access_error
-def _handle_deputy(deputy, reset=False):
+def handle_deputy(deputy, reset=False):
     soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, reset)
     deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
     # XXX can't get this anymore I guess :(
@@ -76,13 +76,13 @@ def _handle_deputy(deputy, reset=False):
     else:
         deputy.sex = None
 
-    _split_deputy_full_name(deputy, soup)
+    split_deputy_full_name(deputy, soup)
     # _get_deputie_commissions(soup, deputy)
     # _deputy_documents(soup, deputy)
     deputy.save()
 
 
-def _split_deputy_full_name(deputy, soup):
+def split_deputy_full_name(deputy, soup):
     return
     # stupid special case
     from ipdb import set_trace
