@@ -58,7 +58,7 @@ def handle_commission(commission):
     commission.full_name["nl"] = suppe.h1.text
     commission.deputies = []
     seats = {"fr": {}, "nl": {}}
-    for i, j in zip(soup('p'), suppe('p')):
+    for i, j in zip(soup('p')[2:], suppe('p')[2:]):
         role = i.b.text[:-1]
         role_nl = j.b.text[:-1]
         for dep in i('a'):
