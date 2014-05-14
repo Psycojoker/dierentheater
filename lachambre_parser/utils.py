@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger('')
 from os.path import exists
 from urllib import urlopen, quote
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from lxml import etree
 
 from django.conf import settings
@@ -144,7 +144,7 @@ def read_or_dl(url, name, reset=False):
     else:
         text = urlopen(url).read()
         open('dump/%s' % name, "w").write(text)
-    soup = BeautifulSoup(text)
+    soup = BeautifulSoup(text, "html5lib")
     if soup.title.text == "404 Not Found":
         raise IndexError
     return soup

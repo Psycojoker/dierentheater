@@ -2,7 +2,8 @@ git+https://github.com/django-nonrel/django@nonrel-1.5
 git+https://github.com/django-nonrel/djangotoolbox@6536b0e6080dce2ad89c22fa4ea671e1f7e817f5
 git+https://github.com/django-nonrel/mongodb-engine@cb2ff80f052b7551d6e9b79fa9333d63394b038b
 
-beautifulsoup
+beautifulsoup4
+html5lib
 json_diff
 lxml
 django-tastypie==0.10.0
