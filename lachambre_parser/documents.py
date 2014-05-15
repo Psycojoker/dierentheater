@@ -102,13 +102,16 @@ def parse_a_document(lachambre_id):
 
 def handle_document(document):
     soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
-    document.full_details_url = soup('table')[4].a["href"]
+    document.full_details_url = soup.table.a["href"]
     # fucking stupid hack because BeautifulSoup fails to parse correctly the html
     soup, suppe = lxml_read_or_dl_with_nl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
-    table = BeautifulSoup(etree.tostring(soup.xpath('//table')[4], pretty_print=True))
-    table_nl = BeautifulSoup(etree.tostring(suppe.xpath('//table')[4], pretty_print=True))
+    table = BeautifulSoup(etree.tostring(soup.xpath('//table')[0], pretty_print=True))
+    table_nl = BeautifulSoup(etree.tostring(suppe.xpath('//table')[0], pretty_print=True))
     dico = document_to_dico(list(table.table('tr', recursive=False)))
     dico_nl = document_to_dico(list(table_nl.table('tr', recursive=False)))
+
+    del dico[""]
+    del dico_nl[""]
 
     _get_first_level_data(dico, dico_nl, document)
     _get_in_charged_commissions(dico, dico_nl, document)
