@@ -22,7 +22,7 @@ logger = logging.getLogger('')
 
 from lachambre.models import Commission, CommissionMembership, Deputy
 from utils import read_or_dl_with_nl, get_or_create, LACHAMBRE_PREFIX
-from BeautifulSoup import NavigableString
+from bs4 import NavigableString
 
 
 def clean_models():
