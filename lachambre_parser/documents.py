@@ -79,7 +79,7 @@ def parse_every_documents():
 def get_new_documents():
     for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
         soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
-        for soup, suppe in zip(soup('table')[4]('tr', valign="top"), suppe('table')[4]('tr', valign="top")):
+        for soup, suppe in zip(soup.table('tr'), suppe.table('tr')):
             get_or_create(Document, _id="lachambre_id", title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=soup.div.text, url=soup.a["href"])
 
 
