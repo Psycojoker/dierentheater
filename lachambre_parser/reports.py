@@ -34,7 +34,6 @@ def scrape():
         soup, suppe = read_or_dl_with_nl(url, "annual repports %i" % a)
 
         for i, j in zip(soup.find('div', id="story")('table')[1].tbody('tr', recursive=False)[::5], suppe.find('div', id="story")('table')[1].tbody('tr', recursive=False)[::5]):
-            print "caca"
             get_or_create(AnnualReport,
                           title={"fr": i('td')[2].text, "nl": j('td')[2].text},
                           date=i('td')[0].text,
