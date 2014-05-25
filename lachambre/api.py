@@ -18,7 +18,7 @@ class PartyResource(MongoResource):
 
 
 class DeputyResource(MongoResource):
-    party = fields.ForeignKey(PartyResource, 'party')
+    party = fields.ForeignKey(PartyResource, 'party', null=True)
 
     class Meta:
         queryset = Deputy.objects.all()
