@@ -63,8 +63,8 @@ def _get_written_question_bulletin():
                     get_or_create(WrittenQuestionBulletin,
                                   legislature="53",
                                   lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                                  date=b('td')[2].text,
-                                  publication_date=b('td')[3].text,
+                                  date=None,
+                                  publication_date=b('td')[2].text.strip(),
                                   url=b('td')[1].a["href"],
                                   pdf_url=b('td')[0].a["href"],
                                  )
