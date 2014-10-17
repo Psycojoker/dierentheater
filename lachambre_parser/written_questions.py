@@ -59,12 +59,12 @@ def _get_written_question_bulletin():
         soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
         for b in soup.table('tr')[1:]:
             try:
-                if i == 53:
+                if i == 54:
                     get_or_create(WrittenQuestionBulletin,
                                   legislature="53",
                                   lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                                  date=None,
-                                  publication_date=b('td')[2].text.strip(),
+                                  date=b('td')[2].text,
+                                  publication_date=b('td')[3].text,
                                   url=b('td')[1].a["href"],
                                   pdf_url=b('td')[0].a["href"],
                                  )
