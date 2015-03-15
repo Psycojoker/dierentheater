@@ -80,7 +80,7 @@ class Deputy(models.Model, Jsonify):
         return '%s - %s' % (self.full_name, self.party)
 
     class Meta:
-        ordering = ["lachambre_id"]
+        ordering = ["full_name"]
 
     class MongoMeta:
         indexes = [
