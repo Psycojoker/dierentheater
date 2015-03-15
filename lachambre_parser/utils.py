@@ -144,7 +144,7 @@ def read_or_dl(url, name, reset=False):
     else:
         text = urlopen(url).read()
         open('dump/%s' % name, "w").write(text)
-    soup = BeautifulSoup(text, "html5lib")
+    soup = BeautifulSoup(text, "html5lib", from_encoding="latin1")
     if soup.title.text == "404 Not Found":
         raise IndexError
     return soup
