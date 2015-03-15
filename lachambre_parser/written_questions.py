@@ -41,14 +41,8 @@ def scrape():
         if not soup.find('table', 'txt'):
             continue
         for link in soup.find('table', 'txt').tbody('tr', recursive=False):
-            _id = re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0]
             if link.a is None:
-                print "----------------------------> caca"
-                continue
-            # tempory
-            if WrittenQuestion.objects.filter(lachambre_id=_id):
-                logger.debug("pass %s, already parsed" % (re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0]))
-                continue
+                raise Exception("I should check that")
             _save_a_written_question(link)
         bulletin.done = True
         bulletin.save()
