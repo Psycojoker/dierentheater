@@ -45,7 +45,7 @@ def deputies_list(reset=False):
             logger.info("[NEW] deputy: %s" % deputy)
         deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
 
-        deputy.full_name = items[0].a.text.strip()
+        deputy.full_name = re.sub(" +", " ", items[0].a.text.strip())
         deputy.url = url
         deputy.save()
 
