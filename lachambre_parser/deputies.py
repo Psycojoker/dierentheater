@@ -67,8 +67,8 @@ def handle_deputy(deputy, reset=False):
     deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
     # XXX can't get this anymore I guess :(
     # deputy.language = soup.table.i.parent.text.split(":")[1] if soup.i else None
-    deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[1].p.text)
-    deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[1].p.text)
+    deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[1].p.text).strip()
+    deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[1].p.text).strip()
     if deputy.cv["fr"].encode("Utf-8").startswith("Députée"):
         deputy.sex = "F"
     elif deputy.cv["fr"].encode("Utf-8").startswith("Député"):
