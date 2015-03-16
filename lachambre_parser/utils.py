@@ -46,6 +46,23 @@ def get_or_create(klass, _id=None, **kwargs):
         return result
 
 
+def update_or_create(klass, _id=None, **kwargs):
+    if _id is None:
+        object = klass.objects.filter(**kwargs)
+    else:
+        object = klass.objects.filter(**{_id: kwargs[_id]})
+    if object:
+        result = object[0]
+        for key, value in kwargs.items():
+            setattr(result, key, value)
+    else:
+        logger.debug("add new %s %s" % (klass.__name__, kwargs))
+        result = klass(**kwargs)
+
+    result.save()
+    return result
+
+
 def retry_on_access_error(function):
     "decorator to retry to download a page because La Chambre website sucks"
     def wrap(*args, **kwargs):
