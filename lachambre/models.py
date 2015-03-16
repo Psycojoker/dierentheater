@@ -280,6 +280,7 @@ class WrittenQuestion(models.Model, Jsonify):
     deposition_date = models.CharField(max_length=1337)
     delay_date = models.CharField(max_length=1337, null=True)
     eurovoc_descriptors = DictField()
+    eurovoc_principal_descriptors = DictField()
     eurovoc_candidats_descriptors = DictField()
     keywords = DictField()
     url = models.URLField()
