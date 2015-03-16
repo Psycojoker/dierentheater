@@ -24,7 +24,7 @@ from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 from utils import (read_or_dl, read_or_dl_with_nl, LACHAMBRE_PREFIX,
                    AccessControlDict, get_or_create, get_href_else_blank,
                    get_items_list_else_empty_list, dico_get_text,
-                   get_text_else_blank)
+                   get_text_else_blank, update_or_create)
 
 DOSSIER_ID_REGEX = "dossierID=([0-9A-Za-z-]+).xml"
 
@@ -81,7 +81,7 @@ def _save_a_written_question(link):
     data_nl = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in suppesuppe.find('table', 'txt')('tr') if x.td.text))
     print sorted(data.keys())
     print sorted(data_nl.keys())
-    get_or_create(WrittenQuestion,
+    update_or_create(WrittenQuestion,
                   _id="lachambre_id",
                   lachambre_id=re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0],
                   title={"fr": data["Titre"].text, "nl": data_nl["Titel"].text},
