@@ -55,6 +55,7 @@ def update_or_create(klass, _id=None, **kwargs):
         result = object[0]
         for key, value in kwargs.items():
             setattr(result, key, value)
+        logger.debug("update %s %s" % (klass.__name__, kwargs))
     else:
         logger.debug("add new %s %s" % (klass.__name__, kwargs))
         result = klass(**kwargs)
