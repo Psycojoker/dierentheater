@@ -103,6 +103,8 @@ def _save_a_written_question(link):
                   publication_question=get_text_else_blank(data, u"Publication question"),
                   eurovoc_descriptors={"fr": get_items_list_else_empty_list(data, "Descripteurs Eurovoc"),
                                        "nl": get_items_list_else_empty_list(data_nl, "Eurovoc-descriptoren")},
+                  eurovoc_principal_descriptors={"fr": get_items_list_else_empty_list(data, "Desc. Eurovoc principal"),
+                                       "nl": get_items_list_else_empty_list(data_nl, "Eurovoc-hoofddescriptor")},
                   eurovoc_candidats_descriptors={"fr": get_items_list_else_empty_list(data, "Candidats-descripteurs Eurovoc"),
                                                  "nl": get_items_list_else_empty_list(data_nl, "Eurovoc kandidaat-descriptoren")},
                   keywords={"fr": get_items_list_else_empty_list(data, u"Mots-cl\xe9s libres"),
