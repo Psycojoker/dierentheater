@@ -129,12 +129,12 @@ So far, this is only my personal initiative.
 </div>
 <p>Okay, lets start funny things, how to get data!</p>
 <p>Everything starts here:</p>
-<pre><a href="http://www.dierentheater.be/api/v1/?format=json">http://www.dierentheater.be/api/v1/?format=json</a></pre>
+<pre><a href="http://dierentheater.be/api/v1/?format=json">http://dierentheater.be/api/v1/?format=json</a></pre>
 <p>And in a more convenient way (in a shell if you are using an unix based operating system):</p>
-<pre>curl "<a href="http://www.dierentheater.be/api/v1/?format=json">http://www.dierentheater.be/api/v1/?format=json</a>" | python -m json.tool</pre>
+<pre>curl "<a href="http://dierentheater.be/api/v1/?format=json">http://dierentheater.be/api/v1/?format=json</a>" | python -m json.tool</pre>
 <p>The API is self describing so I won't write a lot here about the data in it. If you want to have and idea of what is available just browse it via the links in the previous section.</p>
 <p>An interesting possibility of the API is that you can add the GET argument "<i>lachambre_id</i>" to the url to query an exact data like this:</p>
-<pre>curl "<a href="http://www.dierentheater.be/api/v1/document/?format=json&lachambre_id=2005">http://www.dierentheater.be/api/v1/document/?format=json&lachambre_id=2005</a>" | python -m json.tool</pre>
+<pre>curl "<a href="http://dierentheater.be/api/v1/document/?format=json&lachambre_id=2005">http://dierentheater.be/api/v1/document/?format=json&lachambre_id=2005</a>" | python -m json.tool</pre>
 <p><b>Always use this way a querying an individual document whenever possible if you want to build something that is supposed to last</b>, the <i>id</i> field (coming from mongoDB) <b>isn't reliable at all</b> for the moment.</p>
 
 <p>You can find tastypie API <b>documentation</b> <a href="http://django-tastypie.readthedocs.org/en/latest/interacting.html#fetching-data">here</a></p>
