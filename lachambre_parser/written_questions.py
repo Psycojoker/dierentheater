@@ -71,7 +71,8 @@ def _get_written_question_bulletin():
                                   pdf_url=b('td')[0].a["href"],
                                  )
                     logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
-            except TypeError:
+            except TypeError, e:
+                logger.debug("Error on written question bulleting of legislation %s:" % i, e)
                 continue
 
 
