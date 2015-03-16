@@ -40,7 +40,7 @@ def get_or_create(klass, _id=None, **kwargs):
     if object:
         return object[0]
     else:
-        logger.debug("add new %s %s" % (klass.__name__, kwargs))
+        logger.debug("\033[0;36madd new %s %s\033[0m" % (klass.__name__, kwargs))
         result = klass(**kwargs)
         result.save()
         return result
@@ -55,9 +55,9 @@ def update_or_create(klass, _id=None, **kwargs):
         result = object[0]
         for key, value in kwargs.items():
             setattr(result, key, value)
-        logger.debug("update %s %s" % (klass.__name__, kwargs))
+        logger.debug("\033[0;36mupdate %s %s\033[0m" % (klass.__name__, kwargs))
     else:
-        logger.debug("add new %s %s" % (klass.__name__, kwargs))
+        logger.debug("\033[0;32add new %s %s\033[0m" % (klass.__name__, kwargs))
         result = klass(**kwargs)
 
     result.save()
@@ -156,7 +156,7 @@ def read_or_dl_with_nl(url, name, reset=False):
 
 
 def read_or_dl(url, name, reset=False):
-    logger.debug("parsing %s --- %s" % (url, name))
+    logger.debug("\033[0;33mparsing %s --- %s\033[0m" % (url, name))
     if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
         text = open('dump/%s' % name).read()
     else:
