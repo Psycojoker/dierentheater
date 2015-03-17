@@ -41,11 +41,13 @@ def deputies_list(reset=False):
         lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
 
         deputy = Deputy.objects.filter(lachambre_id=lachambre_id)
+        full_name = re.sub(" +", " ", items[0].a.text.strip())
+
         if not deputy:
-            logger.info("[NEW] deputy: %s" % deputy)
+            logger.info("[NEW] deputy: %s" % full_name)
         deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
 
-        deputy.full_name = re.sub(" +", " ", items[0].a.text.strip())
+        deputy.full_name = full_name
         deputy.url = url
         deputy.save()
 
