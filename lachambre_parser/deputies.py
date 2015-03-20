@@ -47,6 +47,17 @@ def deputies_list(reset=False):
             logger.info("[NEW] deputy: %s" % full_name)
         deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
 
+        if items[1].a.text.strip():
+            deputy.party = get_or_create(Party, name=items[1].a.text.strip(), url=dict(items[1].a.attrs)['href'])
+
+        email = items[2].a.text
+        website = items[3].a['href'] if items[3].a else None
+
+        if email not in deputy.emails:
+            deputy.emails.append(email)
+        if website not in deputy.websites:
+            deputy.websites.append(website)
+
         deputy.full_name = full_name
         deputy.url = url
         deputy.save()
