@@ -28,6 +28,7 @@ from utils import (read_or_dl, read_or_dl_with_nl, LACHAMBRE_PREFIX,
 
 DOSSIER_ID_REGEX = "dossierID=([0-9A-Za-z-]+).xml"
 
+
 def clean_models():
     logger.debug("cleaning written questions models")
     map(lambda x: x.objects.all().delete(), (WrittenQuestion, WrittenQuestionBulletin))
@@ -62,7 +63,7 @@ def _get_written_question_bulletin():
                                   publication_date=b('td')[3].text,
                                   url=b('td')[1].a["href"],
                                   pdf_url=b('td')[0].a["href"],
-                                 )
+                                  )
                 else:
                     get_or_create(WrittenQuestionBulletin,
                                   legislature=str(i),
@@ -70,7 +71,7 @@ def _get_written_question_bulletin():
                                   publication_date=b('td')[2].text,
                                   url=b('td')[1].a["href"] if b('td')[1].a else None,
                                   pdf_url=b('td')[0].a["href"],
-                                 )
+                                  )
                     logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
             except TypeError, e:
                 logger.debug("Error on written question bulleting of legislation %s:" % i, e)
@@ -112,6 +113,6 @@ def _save_a_written_question(link):
                   keywords={"fr": get_items_list_else_empty_list(data, u"Mots-cl\xe9s libres"),
                             "nl": get_items_list_else_empty_list(data_nl, u"Vrije trefwoorden")},
                   url=link.a["href"],
-                 )
+                     )
 
     data.die_if_got_not_accessed_keys()
