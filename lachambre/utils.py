@@ -42,20 +42,3 @@ def dump_db():
         system("cd %s && if [ -e %s.xz ]; then rm %s.xz; fi && xz %s" % (STATIC_FOLDER, model, model, model))
     print "done"
     open("%s/LICENCE" % STATIC_FOLDER, "w").write(OBDL)
-
-
-class Parsable(object):
-    @classmethod
-    def scrape(klass, only_new=False):
-        if only_new:
-            klass.fetch_new()
-        else:
-            klass.fetch_list()
-
-    @classmethod
-    def fetch_new(klass):
-        klass.get_list()
-
-    @classmethod
-    def fetch_list(klass):
-        raise NotImplementedError()

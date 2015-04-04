@@ -261,3 +261,20 @@ def _build_first_level(i, dico):
         if dico.get(key):
             raise Exception("'%s' is already use as a key for '%s'" % (key, dico[key]))
         dico[key] = i('td')[1]
+
+
+class Parsable(object):
+    @classmethod
+    def scrape(klass, only_new=False):
+        if only_new:
+            klass.fetch_new()
+        else:
+            klass.fetch_list()
+
+    @classmethod
+    def fetch_new(klass):
+        klass.get_list()
+
+    @classmethod
+    def fetch_list(klass):
+        raise NotImplementedError()
