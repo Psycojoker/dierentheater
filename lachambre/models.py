@@ -296,7 +296,6 @@ class WrittenQuestion(models.Model, Jsonify):
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
 
-
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
@@ -307,6 +306,27 @@ class WrittenQuestion(models.Model, Jsonify):
         indexes = [
             [("lachambre_id", 1)]
         ]
+
+
+class WrittenQuestionBulletin(models.Model, Jsonify):
+    lachambre_id = models.CharField(max_length=1337)
+    date = models.CharField(max_length=1337, null=True)
+    publication_date = models.CharField(max_length=1337)
+    url = models.URLField(null=True)
+    pdf_url = models.URLField()
+    legislature = models.CharField(max_length=1337)
+    done = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["lachambre_id"]
+
+    class MongoMeta:
+        indexes = [
+            [("lachambre_id", 1)]
+        ]
+
+    def get_url(self):
+        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
 class Question(models.Model, Jsonify):
@@ -339,27 +359,6 @@ class Analysis(models.Model, Jsonify):
     url = models.URLField()
     type = models.CharField(max_length=1337)
     lachambre_id = models.CharField(max_length=1337)
-
-    class Meta:
-        ordering = ["lachambre_id"]
-
-    class MongoMeta:
-        indexes = [
-            [("lachambre_id", 1)]
-        ]
-
-    def get_url(self):
-        return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
-
-
-class WrittenQuestionBulletin(models.Model, Jsonify):
-    lachambre_id = models.CharField(max_length=1337)
-    date = models.CharField(max_length=1337, null=True)
-    publication_date = models.CharField(max_length=1337)
-    url = models.URLField(null=True)
-    pdf_url = models.URLField()
-    legislature = models.CharField(max_length=1337)
-    done = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["lachambre_id"]
