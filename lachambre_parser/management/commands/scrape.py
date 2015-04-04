@@ -62,13 +62,6 @@ class Command(BaseCommand):
         else:
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
-        if deputies in parsers_to_run:
-            if options['ipdb']:
-                with launch_ipdb_on_exception():
-                    deputies.deputies_list()
-            else:
-                deputies.deputies_list()
-
         for parser in parsers_to_run:
             if options['ipdb']:
                 with launch_ipdb_on_exception():
