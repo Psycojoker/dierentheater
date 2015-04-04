@@ -31,12 +31,14 @@ from bs4 import NavigableString
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
-from lachambre_parser.utils import (read_or_dl, read_or_dl_with_nl, LACHAMBRE_PREFIX,
-                                    get_or_create, AccessControlDict, get_href_else_blank,
-                                    get_items_list_else_empty_list, dico_get_text,
-                                    get_text_else_blank, update_or_create, DOSSIER_ID_REGEX,
-                                   clean_text, lxml_read_or_dl_with_nl,
-                                    document_to_dico, document_pdf_part_cutter)
+from parser_core.utils import (read_or_dl, read_or_dl_with_nl,
+                               LACHAMBRE_PREFIX, get_or_create,
+                               AccessControlDict, get_href_else_blank,
+                               get_items_list_else_empty_list, dico_get_text,
+                               get_text_else_blank, update_or_create,
+                               DOSSIER_ID_REGEX, clean_text,
+                               lxml_read_or_dl_with_nl, document_to_dico,
+                               document_pdf_part_cutter)
 
 
 from .utils import Parsable
