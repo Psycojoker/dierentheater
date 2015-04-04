@@ -46,7 +46,7 @@ def dump_db():
 
 class Parsable(object):
     @classmethod
-    def fetch(klass, only_new=False):
+    def scrape(klass, only_new=False):
         if only_new:
             klass.fetch_new()
         else:
