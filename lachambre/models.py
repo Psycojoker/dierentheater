@@ -200,7 +200,7 @@ class CommissionMembership(models.Model, Jsonify):
 
 
 
-class Commission(models.Model, Jsonify):
+class Commission(models.Model, Jsonify, Parsable):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
     lachambre_id = models.IntegerField()
@@ -267,7 +267,7 @@ class Commission(models.Model, Jsonify):
         ]
 
 
-class Document(models.Model, Jsonify):
+class Document(models.Model, Jsonify, Parsable):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
     title = DictField()
@@ -890,7 +890,7 @@ class Analysis(models.Model, Jsonify):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
 
 
-class AnnualReport(models.Model, Jsonify):
+class AnnualReport(models.Model, Jsonify, Parsable):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
     title = DictField()
