@@ -29,7 +29,9 @@ from django.conf import settings
 
 from history.utils import irc
 
+
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
+DOSSIER_ID_REGEX = "dossierID=([0-9A-Za-z-]+).xml"
 
 
 def get_or_create(klass, _id=None, **kwargs):
