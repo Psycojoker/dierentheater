@@ -37,8 +37,9 @@ from parser_core.utils import (read_or_dl, read_or_dl_with_nl,
                                get_items_list_else_empty_list, dico_get_text,
                                get_text_else_blank, update_or_create,
                                DOSSIER_ID_REGEX, clean_text,
-                               lxml_read_or_dl_with_nl, document_to_dico,
-                               document_pdf_part_cutter, Parsable)
+                               lxml_read_or_dl_with_nl, Parsable)
+
+from .documents_parsing_utils import document_pdf_part_cutter, document_to_dico
 
 
 class Jsonify(object):
