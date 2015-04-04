@@ -301,7 +301,7 @@ class WrittenQuestion(models.Model, Jsonify, Parsable):
     publication_reponse = models.CharField(max_length=1337, null=True)
     publication_question = models.CharField(max_length=1337, null=True)
 
-    @staticmethod
+    @classmethod
     def fetch_list(klass):
         WrittenQuestionBulletin.fetch_list()
 
@@ -316,7 +316,7 @@ class WrittenQuestion(models.Model, Jsonify, Parsable):
             bulletin.done = True
             bulletin.save()
 
-    @staticmethod
+    @classmethod
     def fetch_one(klass, link):
         soupsoup, suppesuppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0])
         data = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
@@ -377,7 +377,7 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     legislature = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
 
-    @staticmethod
+    @classmethod
     def fetch_list(klass):
         for i in range(48, 55):
             soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
@@ -388,7 +388,7 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
                     logger.debug("Error on written question bulleting of legislation %s:" % i, e)
                     continue
 
-    @staticmethod
+    @classmethod
     def fetch_one(klass, soup, legislation):
         if legislation == 54:
             get_or_create(WrittenQuestionBulletin,

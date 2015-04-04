@@ -45,17 +45,17 @@ def dump_db():
 
 
 class Parsable(object):
-    @staticmethod
+    @classmethod
     def fetch(klass, only_new=False):
         if only_new:
             klass.fetch_new()
         else:
             klass.fetch_list()
 
-    @staticmethod
+    @classmethod
     def fetch_new(klass):
         klass.get_list()
 
-    @staticmethod
+    @classmethod
     def fetch_list(klass):
         raise NotImplementedError()
