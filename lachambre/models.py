@@ -22,6 +22,8 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
+from .utils import Parsable
+
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 
@@ -308,7 +310,7 @@ class WrittenQuestion(models.Model, Jsonify):
         ]
 
 
-class WrittenQuestionBulletin(models.Model, Jsonify):
+class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     lachambre_id = models.CharField(max_length=1337)
     date = models.CharField(max_length=1337, null=True)
     publication_date = models.CharField(max_length=1337)
