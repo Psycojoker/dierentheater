@@ -190,16 +190,6 @@ class Party(models.Model, Jsonify):
         ordering = ["name"]
 
 
-class CommissionMembership(models.Model, Jsonify):
-    current = models.BooleanField(default=True)
-    creation_datetime = models.DateTimeField(default=datetime.now)
-    role = models.CharField(max_length=1337)
-    role_en = models.CharField(max_length=1337)
-    commission = models.ForeignKey("Commission")
-    deputy = models.ForeignKey("Deputy")
-
-
-
 class Commission(models.Model, Jsonify, Parsable):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
@@ -265,6 +255,16 @@ class Commission(models.Model, Jsonify, Parsable):
         indexes = [
             [("lachambre_id", 1)]
         ]
+
+
+class CommissionMembership(models.Model, Jsonify):
+    current = models.BooleanField(default=True)
+    creation_datetime = models.DateTimeField(default=datetime.now)
+    role = models.CharField(max_length=1337)
+    role_en = models.CharField(max_length=1337)
+    commission = models.ForeignKey("Commission")
+    deputy = models.ForeignKey("Deputy")
+
 
 
 class Document(models.Model, Jsonify, Parsable):
