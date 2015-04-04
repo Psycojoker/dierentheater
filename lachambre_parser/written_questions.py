@@ -22,7 +22,7 @@ logger = logging.getLogger('')
 
 from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 from utils import (read_or_dl, read_or_dl_with_nl, LACHAMBRE_PREFIX,
-                   AccessControlDict, get_or_create, get_href_else_blank,
+                   AccessControlDict, get_href_else_blank,
                    get_items_list_else_empty_list, dico_get_text,
                    get_text_else_blank, update_or_create)
 
@@ -35,7 +35,7 @@ def clean_models():
 
 
 def scrape():
-    _get_written_question_bulletin()
+    WrittenQuestionBulletin.get_list()
 
     # for bulletin in list(WrittenQuestionBulletin.objects.filter(done=False, url__isnull=False)):
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
@@ -48,34 +48,6 @@ def scrape():
             _save_a_written_question(link)
         bulletin.done = True
         bulletin.save()
-
-
-def _get_written_question_bulletin():
-    for i in range(48, 55):
-        soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
-        for b in soup.table('tr')[1:]:
-            try:
-                if i == 54:
-                    get_or_create(WrittenQuestionBulletin,
-                                  legislature="53",
-                                  lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                                  date=b('td')[2].text,
-                                  publication_date=b('td')[3].text,
-                                  url=b('td')[1].a["href"],
-                                  pdf_url=b('td')[0].a["href"],
-                                  )
-                else:
-                    get_or_create(WrittenQuestionBulletin,
-                                  legislature=str(i),
-                                  lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
-                                  publication_date=b('td')[2].text,
-                                  url=b('td')[1].a["href"] if b('td')[1].a else None,
-                                  pdf_url=b('td')[0].a["href"],
-                                  )
-                    logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
-            except TypeError, e:
-                logger.debug("Error on written question bulleting of legislation %s:" % i, e)
-                continue
 
 
 def _save_a_written_question(link):

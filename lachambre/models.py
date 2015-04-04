@@ -22,6 +22,8 @@ from datetime import datetime
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
+from utils import read_or_dl, get_or_create
+
 from .utils import Parsable
 
 
@@ -318,6 +320,34 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     pdf_url = models.URLField()
     legislature = models.CharField(max_length=1337)
     done = models.BooleanField(default=False)
+
+    @staticmethod
+    def get_list(klass):
+        for i in range(48, 55):
+            soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
+            for b in soup.table('tr')[1:]:
+                try:
+                    if i == 54:
+                        get_or_create(WrittenQuestionBulletin,
+                                      legislature="53",
+                                      lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                                      date=b('td')[2].text,
+                                      publication_date=b('td')[3].text,
+                                      url=b('td')[1].a["href"],
+                                      pdf_url=b('td')[0].a["href"],
+                                      )
+                    else:
+                        get_or_create(WrittenQuestionBulletin,
+                                      legislature=str(i),
+                                      lachambre_id=b('td')[0]('a')[-1].text.split()[-1],
+                                      publication_date=b('td')[2].text,
+                                      url=b('td')[1].a["href"] if b('td')[1].a else None,
+                                      pdf_url=b('td')[0].a["href"],
+                                      )
+                        logger.debug("%s" % b('td')[0]('a')[-1].text.split()[-1])
+                except TypeError, e:
+                    logger.debug("Error on written question bulleting of legislation %s:" % i, e)
+                    continue
 
     class Meta:
         ordering = ["lachambre_id"]
