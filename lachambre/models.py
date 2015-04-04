@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 #  lachambre.be to json sausage machine
 #  Copyright (C) 2011  Laurent Peuch <cortex@worlddomination.be>
 #
