@@ -52,7 +52,7 @@ class Jsonify(object):
         return dumps(data, indent=4)
 
 
-class Deputy(models.Model, Jsonify):
+class Deputy(models.Model, Jsonify, Parsable):
     current = models.BooleanField(default=True)
     creation_datetime = models.DateTimeField(default=datetime.now)
     full_name = models.CharField(max_length=1337)
