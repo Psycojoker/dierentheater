@@ -95,7 +95,7 @@ class Deputy(models.Model, Jsonify):
             klass.fetch_one(deputy)
 
     @classmethod
-    def fetch_one(deputy):
+    def fetch_one(klass, deputy):
         soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
 
         deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
