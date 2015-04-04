@@ -57,6 +57,96 @@ class Deputy(models.Model, Jsonify):
     cv = DictField()
     photo_uri = models.CharField(max_length=1337)
 
+    @classmethod
+    def fetch_list(klass):
+        soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
+
+        for dep in soup.table('tr'):
+            items = dep('td')
+            url = items[0].a['href']
+            lachambre_id = re.search('key=([0-9O]+)', url).groups()[0]
+
+            deputy = Deputy.objects.filter(lachambre_id=lachambre_id)
+            full_name = re.sub(" +", " ", items[0].a.text.strip())
+
+            if not deputy:
+                logger.info("[NEW] deputy: %s" % full_name)
+            deputy = deputy[0] if deputy else Deputy(lachambre_id=lachambre_id)
+
+            if items[1].a.text.strip():
+                deputy.party = get_or_create(Party, name=items[1].a.text.strip(), url=dict(items[1].a.attrs)['href'])
+
+            email = items[2].a.text
+            website = items[3].a['href'] if items[3].a else None
+
+            if email not in deputy.emails:
+                deputy.emails.append(email)
+            if website not in deputy.websites:
+                deputy.websites.append(website)
+
+            deputy.full_name = full_name
+            deputy.url = url
+            deputy.save()
+
+        for index, deputy in enumerate(list(Deputy.objects.all())):
+            logger.debug("%s %s" % (index, deputy.full_name))
+            klass.fetch_one(deputy)
+
+    @classmethod
+    def fetch_one(deputy):
+        soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
+
+        deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
+        # XXX can't get this anymore I guess :(
+        # deputy.language = soup.table.i.parent.text.split(":")[1] if soup.i else None
+        deputy.cv["fr"] = re.sub('  +', ' ', soup('table')[1].p.text).strip()
+        deputy.cv["nl"] = re.sub('  +', ' ', suppe('table')[1].p.text).strip()
+        if deputy.cv["fr"].encode("Utf-8").startswith("Députée"):
+            deputy.sex = "F"
+        elif deputy.cv["fr"].encode("Utf-8").startswith("Député"):
+            deputy.sex = "M"
+        else:
+            deputy.sex = None
+
+        Deputy.split_deputy_full_name(deputy, soup)
+        deputy.save()
+
+    @staticmethod
+    def split_deputy_full_name(deputy, soup):
+        return
+        # stupid special case
+        from ipdb import set_trace
+        set_trace()
+        if deputy.full_name == "Fernandez Fernandez Julie":
+            deputy.first_name = "Julie"
+            deputy.last_name = "Fernandez Fernandez"
+        elif deputy.full_name == "Dedecker Jean Marie":
+            deputy.first_name = "Jean Marie"
+            deputy.last_name = "Dedecker"
+        # here we guess the first and last name, for that we compare
+        # deputy.full_name that is in the form of "de Donnea
+        # François-Xavier" and the name of the deputy page which is in the
+        # form of "François-Xavier de Donnea"
+        elif len(deputy.full_name.split(" ")) > 2:
+            it = 0
+            while it < len(deputy.full_name.split(" ")):
+                if soup.h2.text.split(" ")[it] != deputy.full_name.split(" ")[-(it + 1)]:
+                    break
+                it += 1
+                logger.debug("%s %s %s" % (it, soup.h2.text.split(" ")[it], deputy.full_name.split(" ")[-(it + 1)]))
+            if not it:
+                raise Exception
+            deputy.first_name = " ".join(soup.h2.text.split(" ")[:it]).strip()
+            deputy.last_name = " ".join(soup.h2.text.split(" ")[it:]).strip()
+            logger.debug("%s %s" % ([deputy.first_name], [deputy.last_name]))
+        else:
+            # if there is only 2 words just split this in 2
+            deputy.first_name = deputy.full_name.split(" ")[1].strip()
+            deputy.last_name = deputy.full_name.split(" ")[0].strip()
+            logger.debug("%s %s" % ([deputy.first_name], [deputy.last_name]))
+
+
+
     def __unicode__(self):
         return '%s - %s' % (self.full_name, self.party)
 
