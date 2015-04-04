@@ -35,7 +35,7 @@ def clean_models():
 
 
 def scrape():
-    WrittenQuestionBulletin.get_list()
+    WrittenQuestionBulletin.fetch_list()
 
     # for bulletin in list(WrittenQuestionBulletin.objects.filter(done=False, url__isnull=False)):
     for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):

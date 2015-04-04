@@ -45,11 +45,14 @@ def dump_db():
 
 
 class Parsable(object):
-    def scrape(self, only_new=False):
+    def fetch(self, only_new=False):
         if only_new:
-            self.get_new()
+            self.fetch_new()
         else:
-            self.get_list()
+            self.fetch_list()
 
-    def get_new(self):
+    def fetch_new(self):
         self.get_list()
+
+    def fetch_list(self):
+        raise NotImplementedError()

@@ -322,7 +322,7 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     done = models.BooleanField(default=False)
 
     @staticmethod
-    def get_list(klass):
+    def fetch_list(klass):
         for i in range(48, 55):
             soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
             for b in soup.table('tr')[1:]:
