@@ -51,7 +51,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        parsers_to_run = filter(lambda x: options[x], parsers.keys())
+        parsers_to_run = filter(options.__getitem__, parsers.keys())
         if not parsers_to_run:
             parsers_to_run = parsers.values()
         else:
