@@ -198,7 +198,7 @@ class Commission(models.Model, Jsonify, Parsable):
     full_name = DictField()
     url = models.URLField()
     type = DictField()
-    deputies = ListField(models.ForeignKey(CommissionMembership))
+    deputies = ListField(models.ForeignKey("CommissionMembership"))
     seats = DictField()
 
     @classmethod
