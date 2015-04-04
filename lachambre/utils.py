@@ -42,3 +42,14 @@ def dump_db():
         system("cd %s && if [ -e %s.xz ]; then rm %s.xz; fi && xz %s" % (STATIC_FOLDER, model, model, model))
     print "done"
     open("%s/LICENCE" % STATIC_FOLDER, "w").write(OBDL)
+
+
+class Parsable(object):
+    def scrape(self, only_new=False):
+        if only_new:
+            self.get_new()
+        else:
+            self.get_list()
+
+    def get_new(self):
+        self.get_list()
