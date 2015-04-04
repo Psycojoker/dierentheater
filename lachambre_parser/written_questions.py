@@ -21,6 +21,7 @@ logger = logging.getLogger('')
 
 from lachambre.models import WrittenQuestionBulletin, WrittenQuestion
 
+
 def clean_models():
     logger.debug("cleaning written questions models")
     map(lambda x: x.objects.all().delete(), (WrittenQuestion, WrittenQuestionBulletin))
