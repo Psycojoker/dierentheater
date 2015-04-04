@@ -25,19 +25,14 @@ from django.core.management.base import BaseCommand
 
 from ipdb import launch_ipdb_on_exception
 
-from lachambre_parser import reports
-from lachambre_parser import commissions
-from lachambre_parser import written_questions
-from lachambre_parser import documents
-from lachambre_parser import deputies
-
+from lachambre import models
 
 parsers = {
-    'reports': reports,
-    'commissions': commissions,
-    'written_questions': written_questions,
-    'documents': documents,
-    'deputies': deputies,
+    'reports': models.AnnualReport,
+    'commissions': models.Commission,
+    'written_questions': models.WrittenQuestion,
+    'documents': models.Document,
+    'deputies': models.Deputy,
 }
 
 class Command(BaseCommand):
