@@ -6,6 +6,7 @@ from urllib import urlopen
 from bs4 import BeautifulSoup
 from lxml import etree
 
+from .tasks import async_http
 
 
 class Scraper(object):
@@ -21,11 +22,7 @@ class Scraper(object):
 
     def get(self, url, name):
         logger.debug("\033[0;33mparsing %s --- %s\033[0m" % (url, name))
-        if not self.cache and exists('dump/%s' % name):
-            text = open('dump/%s' % name).read()
-        else:
-            text = self.http(url)
-            open('dump/%s' % name, "w").write(text)
+        text = self.retreive_content(url, name)
         soup = BeautifulSoup(text, "html5lib", from_encoding="latin1")
         if soup.title.text == "404 Not Found":
             raise IndexError
@@ -40,13 +37,18 @@ class Scraper(object):
 
     def lxml_get(self, url, name):
         logger.debug("LXML parsing %s --- %s" % (url, name))
-        if not self.cache and exists('dump/%s' % name):
-            text = open('dump/%s' % name)
-        else:
-            text = self.http(url)
-            open('dump/%s' % name, "w").write(text)
+        text = self.retreive_content(url)
         soup = etree.parse(text, etree.HTMLParser())
         return soup
 
-    def http(self, url):
-        return urlopen(url).read()
+    def retreive_content(self, url, key):
+        if self.cache and exists('dump/%s' % key):
+            return open('dump/%s' % key, "r").read()
+
+        if self.sync:
+            content = urlopen(url).read()
+        else:
+            content = async_http.delay(url).get()
+
+        open('dump/%s' % key, "w").write(content)
+        return content
