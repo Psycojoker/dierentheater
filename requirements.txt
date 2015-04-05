@@ -12,4 +12,4 @@ pyyaml
 django-crontab
 ipdb
 mimeparse
-celery
+django-celery

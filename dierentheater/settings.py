@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'tastypie_nonrel',
     'scheduler',
     'django_crontab',
+    'djcelery',
 )
 
 LOGGING = {
