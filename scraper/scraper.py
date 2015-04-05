@@ -14,15 +14,15 @@ class Scraper(object):
         self.sync = sync
         self.cache = cache
 
-    def get_with_nl(self, url, name, reset=False):
-        soup = self.get(url, name, reset=reset)
-        suppe = self.get(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
+    def get_with_nl(self, url, name):
+        soup = self.get(url, name)
+        suppe = self.get(url.replace("&language=fr", "&language=nl", 1), name + " nl")
         return soup, suppe
 
 
-    def get(self, url, name, reset=False):
+    def get(self, url, name):
         logger.debug("\033[0;33mparsing %s --- %s\033[0m" % (url, name))
-        if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
+        if not self.cache and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name).read()
         else:
             text = self.http(url)
@@ -33,15 +33,15 @@ class Scraper(object):
         return soup
 
 
-    def lxml_get_with_nl(self, url, name, reset=False):
-        soup = self.lxml_get(url, name, reset)
-        suppe = self.lxml_get(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
+    def lxml_get_with_nl(self, url, name):
+        soup = self.lxml_get(url, name)
+        suppe = self.lxml_get(url.replace("&language=fr", "&language=nl", 1), name + " nl")
         return soup, suppe
 
 
-    def lxml_get(self, url, name, reset=False):
+    def lxml_get(self, url, name):
         logger.debug("LXML parsing %s --- %s" % (url, name))
-        if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
+        if not self.cache and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name)
         else:
             text = self.http(url)
