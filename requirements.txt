@@ -12,3 +12,4 @@ pyyaml
 django-crontab
 ipdb
 mimeparse
+celery
