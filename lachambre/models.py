@@ -554,14 +554,14 @@ class Document(models.Model, Jsonify, Parsable):
         document_chambre.comments["fr"] = get_text_else_blank(chambre_dico, u'Commentaire').split(' ')
         document_chambre.comments["nl"] = get_text_else_blank(chambre_dico_nl, u'Commentaar').split(' ')
 
-        _get_authors(chambre_dico, chambre_dico_nl, document_chambre)
+        Document._get_authors(chambre_dico, chambre_dico_nl, document_chambre)
 
         url, tipe, session = clean_text(str(chambre_dico[u'head']).replace("&#160;", "")).split("<br />")
         _, tipe_nl, _ = clean_text(str(chambre_dico_nl[u'head']).replace("&#160;", "")).split("<br />")
         url = re.search('href="([^"]+)', url).groups()[0] if "href" in url else url
         document_chambre.pdf = DocumentChambrePdf.objects.create(url=url, type={"fr": tipe.strip(), "nl": tipe_nl.strip()}, session=session.split()[-2])
 
-        _get_next_documents(chambre_dico, chambre_dico_nl, document_chambre)
+        Document._get_next_documents(chambre_dico, chambre_dico_nl, document_chambre)
 
         if chambre_dico.get(u'Document(s) joint(s)/lié(s)'):
             document_chambre.joint_pdfs = [{"url": x.a["href"], "title": {"fr": x.contents[0][1:-1], "nl": y.contents[0][1:-1]}} for x, y in zip(chambre_dico[u'Document(s) joint(s)/lié(s)'],
