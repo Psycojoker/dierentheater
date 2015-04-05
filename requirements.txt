@@ -13,3 +13,4 @@ django-crontab
 ipdb
 mimeparse
 django-celery
+redis
