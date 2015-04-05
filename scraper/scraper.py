@@ -25,7 +25,7 @@ class Scraper(object):
         if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name).read()
         else:
-            text = urlopen(url).read()
+            text = self.http(url)
             open('dump/%s' % name, "w").write(text)
         soup = BeautifulSoup(text, "html5lib", from_encoding="latin1")
         if soup.title.text == "404 Not Found":
@@ -44,7 +44,10 @@ class Scraper(object):
         if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name)
         else:
-            text = urlopen(url)
-            open('dump/%s' % name, "w").write(urlopen(url).read())
+            text = self.http(url)
+            open('dump/%s' % name, "w").write(text)
         soup = etree.parse(text, etree.HTMLParser())
         return soup
+
+    def http(self, url):
+        return urlopen(url).read()
