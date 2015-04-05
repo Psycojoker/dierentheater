@@ -6,7 +6,6 @@ from urllib import urlopen
 from bs4 import BeautifulSoup
 from lxml import etree
 
-from django.conf import settings
 
 
 class Scraper(object):
@@ -22,7 +21,7 @@ class Scraper(object):
 
     def get(self, url, name):
         logger.debug("\033[0;33mparsing %s --- %s\033[0m" % (url, name))
-        if not self.cache and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
+        if not self.cache and exists('dump/%s' % name):
             text = open('dump/%s' % name).read()
         else:
             text = self.http(url)
@@ -41,7 +40,7 @@ class Scraper(object):
 
     def lxml_get(self, url, name):
         logger.debug("LXML parsing %s --- %s" % (url, name))
-        if not self.cache and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
+        if not self.cache and exists('dump/%s' % name):
             text = open('dump/%s' % name)
         else:
             text = self.http(url)
