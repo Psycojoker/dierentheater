@@ -10,8 +10,9 @@ from django.conf import settings
 
 
 class Scraper(object):
-    def __init__(self, sync=False):
+    def __init__(self, sync=False, cache=True):
         self.sync = sync
+        self.cache = cache
 
     def get_with_nl(self, url, name, reset=False):
         soup = self.get(url, name, reset=reset)
