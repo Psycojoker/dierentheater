@@ -54,6 +54,11 @@ class Command(BaseCommand):
             dest='cache',
             default=False,
             help='Usage local FS cache if present instead of requesting distant website'),
+         make_option('--sync',
+            action='store_true',
+            dest='sync',
+            default=False,
+            help='Don\'t use celery workers and do the scraping in a synchronous manner'),
     )
 
     def handle(self, *args, **options):
@@ -63,7 +68,7 @@ class Command(BaseCommand):
         else:
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
-        scraper = Scraper(cache=options["cache"])
+        scraper = Scraper(sync=options["sync"], cache=options["cache"])
 
         for parser in parsers_to_run:
             if options['ipdb']:
