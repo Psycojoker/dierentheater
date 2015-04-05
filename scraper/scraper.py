@@ -13,13 +13,13 @@ class Scraper(object):
     def __init__(self, sync=False):
         self.sync = sync
 
-    def read_or_dl_with_nl(self, url, name, reset=False):
+    def get_with_nl(self, url, name, reset=False):
         soup = self.read_or_dl(url, name, reset=reset)
         suppe = self.read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
         return soup, suppe
 
 
-    def read_or_dl(self, url, name, reset=False):
+    def get(self, url, name, reset=False):
         logger.debug("\033[0;33mparsing %s --- %s\033[0m" % (url, name))
         if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name).read()
@@ -32,13 +32,13 @@ class Scraper(object):
         return soup
 
 
-    def lxml_read_or_dl_with_nl(self, url, name, reset=False):
+    def lxml_get_with_nl(self, url, name, reset=False):
         soup = self.lxml_read_or_dl(url, name, reset)
         suppe = self.lxml_read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
         return soup, suppe
 
 
-    def lxml_read_or_dl(self, url, name, reset=False):
+    def lxml_get(self, url, name, reset=False):
         logger.debug("LXML parsing %s --- %s" % (url, name))
         if not reset and exists('dump/%s' % name) and settings.CACHE_SCRAPING:
             text = open('dump/%s' % name)
