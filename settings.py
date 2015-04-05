@@ -1,4 +1,4 @@
-# Django settings for dierentuin project.
+# Django settings for dierentheater project.
 
 import os
 PROJECT_PATH = os.path.abspath(os.path.split(__file__)[0])
