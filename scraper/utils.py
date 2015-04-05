@@ -66,20 +66,6 @@ def update_or_create(klass, _id=None, **kwargs):
     return result
 
 
-def retry_on_access_error(function):
-    "decorator to retry to download a page because La Chambre website sucks"
-    def wrap(*args, **kwargs):
-        reset = False
-        for i in xrange(4):
-            try:
-                return function(*args, reset=reset, **kwargs)
-            except (IndexError, AttributeError, TypeError), e:
-                logger.debug("%s" % e)
-                reset = True
-        logger.debug("WARNING, function keeps failling %s %s %s" % (function, args, kwargs))
-    return wrap
-
-
 def get_text_else_blank(dico, key):
     return dico[key].text if dico.get(key) and dico[key].a else ""
 
