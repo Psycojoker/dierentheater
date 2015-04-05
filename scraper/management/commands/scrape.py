@@ -49,6 +49,11 @@ class Command(BaseCommand):
             dest='ipdb',
             default=False,
             help='Launch ipdb if an exception is encountered'),
+         make_option('--cache',
+            action='store_true',
+            dest='cache',
+            default=False,
+            help='Usage local FS cache if present instead of requesting distant website'),
     )
 
     def handle(self, *args, **options):
@@ -58,7 +63,7 @@ class Command(BaseCommand):
         else:
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
-        scraper = Scraper()
+        scraper = Scraper(cache=options["cache"])
 
         for parser in parsers_to_run:
             if options['ipdb']:
