@@ -141,11 +141,11 @@ def table2dic(table):
 
 class Parsable(object):
     @classmethod
-    def scrape(klass, only_new=False):
+    def scrape(klass, scraper, only_new=False):
         if only_new:
-            klass.fetch_new()
+            klass.fetch_new(scraper)
         else:
-            klass.fetch_list()
+            klass.fetch_list(scraper)
 
     @classmethod
     def fetch_new(klass):

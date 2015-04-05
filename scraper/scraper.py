@@ -14,8 +14,8 @@ class Scraper(object):
         self.sync = sync
 
     def get_with_nl(self, url, name, reset=False):
-        soup = self.read_or_dl(url, name, reset=reset)
-        suppe = self.read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
+        soup = self.get(url, name, reset=reset)
+        suppe = self.get(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset=reset)
         return soup, suppe
 
 
@@ -33,8 +33,8 @@ class Scraper(object):
 
 
     def lxml_get_with_nl(self, url, name, reset=False):
-        soup = self.lxml_read_or_dl(url, name, reset)
-        suppe = self.lxml_read_or_dl(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
+        soup = self.lxml_get(url, name, reset)
+        suppe = self.lxml_get(url.replace("&language=fr", "&language=nl", 1), name + " nl", reset)
         return soup, suppe
 
 

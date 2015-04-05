@@ -31,13 +31,12 @@ from bs4 import NavigableString
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
-from scraper.utils import (read_or_dl, read_or_dl_with_nl,
-                               LACHAMBRE_PREFIX, get_or_create,
-                               AccessControlDict, get_href_else_blank,
-                               get_items_list_else_empty_list, dico_get_text,
-                               get_text_else_blank, update_or_create,
-                               DOSSIER_ID_REGEX, clean_text,
-                               lxml_read_or_dl_with_nl, Parsable)
+from scraper.utils import (LACHAMBRE_PREFIX, get_or_create,
+                           AccessControlDict, get_href_else_blank,
+                           get_items_list_else_empty_list, dico_get_text,
+                           get_text_else_blank, update_or_create,
+                           DOSSIER_ID_REGEX, clean_text,
+                           Parsable)
 
 from .documents_parsing_utils import document_pdf_part_cutter, document_to_dico
 
@@ -69,8 +68,8 @@ class Deputy(models.Model, Jsonify, Parsable):
     photo_uri = models.CharField(max_length=1337)
 
     @classmethod
-    def fetch_list(klass):
-        soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
+    def fetch_list(klass, scraper):
+        soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
 
         for dep in soup.table('tr'):
             items = dep('td')
@@ -101,11 +100,11 @@ class Deputy(models.Model, Jsonify, Parsable):
 
         for index, deputy in enumerate(list(Deputy.objects.all())):
             logger.debug("%s %s" % (index, deputy.full_name))
-            klass.fetch_one(deputy)
+            klass.fetch_one(scraper, deputy)
 
     @classmethod
-    def fetch_one(klass, deputy):
-        soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
+    def fetch_one(klass, scraper, deputy):
+        soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
 
         deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
         # XXX can't get this anymore I guess :(
@@ -202,8 +201,8 @@ class Commission(models.Model, Jsonify, Parsable):
     seats = DictField()
 
     @classmethod
-    def fetch_list(klass):
-        soup, suppe = read_or_dl_with_nl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
+    def fetch_list(klass, scraper):
+        soup, suppe = scraper.get_with_nl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
         _type = ""
         for i, j in zip(soup("div", id="story")[1], suppe("div", id="story")[1]):
             if not isinstance(i, NavigableString) and (i.h4 or i.a):
@@ -221,11 +220,11 @@ class Commission(models.Model, Jsonify, Parsable):
                     commission.save()
 
         for com in list(Commission.objects.all()):
-            klass.fetch_one(com)
+            klass.fetch_one(scraper, com)
 
     @classmethod
-    def fetch_one(klass, commission):
-        soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
+    def fetch_one(klass, scraper, commission):
+        soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
         commission.full_name["fr"] = soup.h1.text
         commission.full_name["nl"] = suppe.h1.text
         commission.deputies = []
@@ -299,9 +298,9 @@ class Document(models.Model, Jsonify, Parsable):
     done = models.BooleanField(default=False)
 
     @classmethod
-    def fetch_list(klass):
-        for document_page in read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
-            soup, suppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
+    def fetch_list(klass, scraper):
+        for document_page in scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
+            soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
             for soup, suppe in zip(soup.table('tr'), suppe.table('tr')):
                 get_or_create(Document, _id="lachambre_id", title={"fr": soup('div')[1].text, "nl": suppe('div')[1].text}, lachambre_id=soup.div.text, url=soup.a["href"])
 
@@ -310,18 +309,18 @@ class Document(models.Model, Jsonify, Parsable):
             if document.lachambre_id == 25:
                 continue
             try:
-                klass.fetch_one(document)
+                klass.fetch_one(scraper, document)
             except Exception, e:
                 traceback.print_exc(file=sys.stdout)
                 logger.error("/!\ %s didn't succed! Error: while reparsing document %s" % (document.lachambre_id, e))
 
 
     @staticmethod
-    def fetch_one(klass, document):
-        soup = read_or_dl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+    def fetch_one(klass, scraper, document):
+        soup = scraper.get(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
         document.full_details_url = soup.table.a["href"]
         # fucking stupid hack because BeautifulSoup fails to parse correctly the html
-        soup, suppe = lxml_read_or_dl_with_nl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
+        soup, suppe = scraper.lxml_get_with_nl(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
         table = BeautifulSoup(etree.tostring(soup.xpath('//table')[0], pretty_print=True))
         table_nl = BeautifulSoup(etree.tostring(suppe.xpath('//table')[0], pretty_print=True))
         dico = document_to_dico(list(table.table('tr', recursive=False)))
@@ -728,23 +727,23 @@ class WrittenQuestion(models.Model, Jsonify, Parsable):
     publication_question = models.CharField(max_length=1337, null=True)
 
     @classmethod
-    def fetch_list(klass):
+    def fetch_list(klass, scraper):
         WrittenQuestionBulletin.fetch_list()
 
         for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
-            soup = read_or_dl(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
+            soup = scraper.get(LACHAMBRE_PREFIX + bulletin.url, "bulletin %s %s" % (bulletin.lachambre_id, bulletin.legislature))
             if not soup.find('table', 'txt'):
                 continue
             for link in soup.find('table', 'txt').tbody('tr', recursive=False):
                 if link.a is None:
                     raise Exception("I should check that")
-                klass.fetch_one(link)
+                klass.fetch_one(scraper, link)
             bulletin.done = True
             bulletin.save()
 
     @classmethod
-    def fetch_one(klass, link):
-        soupsoup, suppesuppe = read_or_dl_with_nl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0])
+    def fetch_one(klass, scraper, link):
+        soupsoup, suppesuppe = scraper.get_with_nl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0])
         data = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
         data_nl = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in suppesuppe.find('table', 'txt')('tr') if x.td.text))
         print sorted(data.keys())
@@ -804,18 +803,18 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     done = models.BooleanField(default=False)
 
     @classmethod
-    def fetch_list(klass):
+    def fetch_list(klass, scraper):
         for i in range(48, 55):
-            soup = read_or_dl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
+            soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
             for b in soup.table('tr')[1:]:
                 try:
-                    klass.fetch_one(soup, legislation=i)
+                    klass.fetch_one(scraper, soup, legislation=i)
                 except TypeError, e:
                     logger.debug("Error on written question bulleting of legislation %s:" % i, e)
                     continue
 
     @classmethod
-    def fetch_one(klass, soup, legislation):
+    def fetch_one(klass, scraper, soup, legislation):
         if legislation == 54:
             get_or_create(WrittenQuestionBulletin,
                           legislature="53",
@@ -900,10 +899,10 @@ class AnnualReport(models.Model, Jsonify, Parsable):
     pdf_url = models.URLField()
 
     @classmethod
-    def fetch_list(klass):
+    def fetch_list(klass, scraper):
         for a, url in enumerate(('http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=y',
                              'http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=n')):
-            soup, suppe = read_or_dl_with_nl(url, "annual repports %i" % a)
+            soup, suppe = scraper.get_with_nl(url, "annual repports %i" % a)
 
             for i, j in zip(soup.find('div', id="story")('table')[1].tbody('tr', recursive=False)[::5], suppe.find('div', id="story")('table')[1].tbody('tr', recursive=False)[::5]):
                 get_or_create(AnnualReport,
