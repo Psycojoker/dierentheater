@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from parser_core.utils import clean_text, AccessControlDict
+from scraper.utils import clean_text, AccessControlDict
 
 
 def document_pdf_part_cutter(soup):

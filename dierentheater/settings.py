@@ -97,7 +97,7 @@ INSTALLED_APPS = (
     #'django.contrib.sites',
     'django.contrib.staticfiles',
     'lachambre',
-    'parser_core',
+    'scraper',
     'tastypie',
     'tastypie_nonrel',
     'scheduler',
