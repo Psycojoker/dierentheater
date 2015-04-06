@@ -16,9 +16,11 @@ app = Celery('dierentheater')
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+
 app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
     CELERY_TASK_SERIALIZER="json",
+    CELERY_RESULT_SERIALIZER="json",
     CELERY_ACCEPT_CONTENT=["json"],
     BROKER_URL='redis://localhost:6379/0'
 )
