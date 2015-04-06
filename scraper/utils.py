@@ -24,6 +24,8 @@ from urllib import quote
 
 from history.utils import irc
 
+from .tasks import app
+
 
 LACHAMBRE_PREFIX = "http://www.lachambre.be/kvvcr/"
 DOSSIER_ID_REGEX = "dossierID=([0-9A-Za-z-]+).xml"
@@ -141,16 +143,13 @@ def table2dic(table):
 
 class Parsable(object):
     @classmethod
-    def scrape(klass, only_new=False, cache=False, sync=False):
-        if only_new:
-            klass.fetch_new(cache=cache, sync=sync)
-        else:
+    def scrape(klass, cache=False, sync=False):
+        if sync:
             klass.fetch_list(cache=cache, sync=sync)
 
-    @classmethod
-    def fetch_new(klass):
-        klass.get_list()
+        else:
+            return klass.fetch_list.delay(cache=cache, sync=sync)
 
     @classmethod
-    def fetch_list(klass):
+    def fetch_list(klass, cache=False, sync=False):
         raise NotImplementedError()

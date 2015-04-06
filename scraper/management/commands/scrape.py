@@ -67,9 +67,21 @@ class Command(BaseCommand):
         else:
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
+        tasks = []
+
         for parser in parsers_to_run:
             if options['ipdb']:
                 with launch_ipdb_on_exception():
-                    parser.scrape(sync=options["sync"], cache=options["cache"])
+                    if options["sync"]:
+                        parser.scrape(sync=options["sync"], cache=options["cache"])
+                    else:
+                        tasks.append(parser.scrape(sync=options["sync"], cache=options["cache"]))
+
             else:
-                parser.scrape(sync=options["sync"], cache=options["cache"])
+                if options["sync"]:
+                    parser.scrape(sync=options["sync"], cache=options["cache"])
+                else:
+                    tasks.append(parser.scrape(sync=options["sync"], cache=options["cache"]))
+
+        if not options["sync"]:
+            map(lambda x: x.get(), tasks)

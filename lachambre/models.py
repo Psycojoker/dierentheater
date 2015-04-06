@@ -40,6 +40,7 @@ from scraper.utils import (LACHAMBRE_PREFIX, get_or_create,
                            Parsable)
 
 from .documents_parsing_utils import document_pdf_part_cutter, document_to_dico
+from .tasks import app
 
 
 class Jsonify(object):
@@ -99,9 +100,17 @@ class Deputy(models.Model, Jsonify, Parsable):
             deputy.url = url
             deputy.save()
 
+        tasks = []
+
         for index, deputy in enumerate(list(Deputy.objects.all())):
             logger.debug("%s %s" % (index, deputy.full_name))
-            klass.fetch_one(deputy, cache=cache, sync=sync)
+            if sync:
+                klass.fetch_one(deputy, cache=cache, sync=sync)
+            else:
+                klass.fetch_one.delay(deputy, cache=cache, sync=sync)
+
+        if not sync:
+            map(lambda x: x.get, tasks)
 
     @classmethod
     def fetch_one(klass, deputy, cache=False, sync=False):
@@ -171,6 +180,10 @@ class Deputy(models.Model, Jsonify, Parsable):
 
     def get_url(self):
         return LACHAMBRE_PREFIX + self.url if not self.url.startswith("http") else self.url
+
+
+Deputy.fetch_list = app.task(Deputy.fetch_list)
+Deputy.fetch_one = app.task(Deputy.fetch_one)
 
 
 class Party(models.Model, Jsonify):
