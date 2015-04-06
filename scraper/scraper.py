@@ -39,6 +39,7 @@ def lxml_get(url, name, cache, sync):
     soup = etree.parse(text, etree.HTMLParser())
     return soup
 
+
 def retreive_content(url, key, cache, sync):
     if cache and exists('dump/%s' % key):
         return open('dump/%s' % key, "r").read()
