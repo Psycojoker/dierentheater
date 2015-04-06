@@ -71,7 +71,7 @@ class Deputy(models.Model, Jsonify, Parsable):
 
     @classmethod
     def fetch_list(klass, cache=False, sync=False):
-        soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
+        soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies", cache=cache, sync=sync)
 
         for dep in soup.table('tr'):
             items = dep('td')
@@ -114,7 +114,7 @@ class Deputy(models.Model, Jsonify, Parsable):
 
     @classmethod
     def fetch_one(klass, deputy, cache=False, sync=False):
-        soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
+        soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name, cache=cache, sync=sync)
 
         deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
         # XXX can't get this anymore I guess :(
