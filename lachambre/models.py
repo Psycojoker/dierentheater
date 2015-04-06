@@ -31,6 +31,7 @@ from bs4 import NavigableString
 from django.db import models
 from djangotoolbox.fields import ListField, EmbeddedModelField, DictField
 
+from scraper import scraper
 from scraper.utils import (LACHAMBRE_PREFIX, get_or_create,
                            AccessControlDict, get_href_else_blank,
                            get_items_list_else_empty_list, dico_get_text,
@@ -68,7 +69,7 @@ class Deputy(models.Model, Jsonify, Parsable):
     photo_uri = models.CharField(max_length=1337)
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/depute&language=fr&rightmenu=right_depute&cfm=/site/wwwcfm/depute/cvlist.cfm", "deputies")
 
         for dep in soup.table('tr'):
@@ -100,10 +101,10 @@ class Deputy(models.Model, Jsonify, Parsable):
 
         for index, deputy in enumerate(list(Deputy.objects.all())):
             logger.debug("%s %s" % (index, deputy.full_name))
-            klass.fetch_one(scraper, deputy)
+            klass.fetch_one(deputy, cache=cache, sync=sync)
 
     @classmethod
-    def fetch_one(klass, scraper, deputy):
+    def fetch_one(klass, deputy, cache=False, sync=False):
         soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + deputy.url, deputy.full_name)
 
         deputy.photo_uri = "http://www.lachambre.be" + soup.table.img["src"]
@@ -201,7 +202,7 @@ class Commission(models.Model, Jsonify, Parsable):
     seats = DictField()
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         soup, suppe = scraper.get_with_nl("http://www.lachambre.be/kvvcr/showpage.cfm?section=/comm/commissions&language=fr&cfm=/site/wwwcfm/comm/LstCom.cfm&rightmenu=right_cricra", "commissions list")
         _type = ""
         for i, j in zip(soup("div", id="story")[1], suppe("div", id="story")[1]):
@@ -220,10 +221,10 @@ class Commission(models.Model, Jsonify, Parsable):
                     commission.save()
 
         for com in list(Commission.objects.all()):
-            klass.fetch_one(scraper, com)
+            klass.fetch_one(com, cache=cache, sync=sync)
 
     @classmethod
-    def fetch_one(klass, scraper, commission):
+    def fetch_one(klass, commission, cache=False, sync=False):
         soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + commission.url, "commission %s" % commission.lachambre_id)
         commission.full_name["fr"] = soup.h1.text
         commission.full_name["nl"] = suppe.h1.text
@@ -298,7 +299,7 @@ class Document(models.Model, Jsonify, Parsable):
     done = models.BooleanField(default=False)
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         for document_page in scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/flwb&language=fr&rightmenu=right&cfm=ListDocument.cfm", "all documents")('div', **{'class': re.compile("linklist_[01]")}):
             soup, suppe = scraper.get_with_nl(LACHAMBRE_PREFIX + document_page.a["href"], "document %s" % document_page.a.text)
             for soup, suppe in zip(soup.table('tr'), suppe.table('tr')):
@@ -309,14 +310,14 @@ class Document(models.Model, Jsonify, Parsable):
             if document.lachambre_id == 25:
                 continue
             try:
-                klass.fetch_one(scraper, document)
+                klass.fetch_one(document)
             except Exception, e:
                 traceback.print_exc(file=sys.stdout)
                 logger.error("/!\ %s didn't succed! Error: while reparsing document %s" % (document.lachambre_id, e))
 
 
     @staticmethod
-    def fetch_one(klass, scraper, document):
+    def fetch_one(klass, document, cache=False, sync=False):
         soup = scraper.get(LACHAMBRE_PREFIX + document.url if not document.url.startswith("http") else document.url, "a document %s" % document.lachambre_id)
         document.full_details_url = soup.table.a["href"]
         # fucking stupid hack because BeautifulSoup fails to parse correctly the html
@@ -727,7 +728,7 @@ class WrittenQuestion(models.Model, Jsonify, Parsable):
     publication_question = models.CharField(max_length=1337, null=True)
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         WrittenQuestionBulletin.fetch_list()
 
         for bulletin in list(WrittenQuestionBulletin.objects.filter(url__isnull=False)):
@@ -737,12 +738,12 @@ class WrittenQuestion(models.Model, Jsonify, Parsable):
             for link in soup.find('table', 'txt').tbody('tr', recursive=False):
                 if link.a is None:
                     raise Exception("I should check that")
-                klass.fetch_one(scraper, link)
+                klass.fetch_one(link)
             bulletin.done = True
             bulletin.save()
 
     @classmethod
-    def fetch_one(klass, scraper, link):
+    def fetch_one(klass, link, cache=False, sync=False):
         soupsoup, suppesuppe = scraper.get_with_nl(LACHAMBRE_PREFIX + link.a["href"], "written question %s" % re.search(DOSSIER_ID_REGEX, link.a["href"]).groups()[0])
         data = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in soupsoup.find('table', 'txt')('tr') if x.td.text))
         data_nl = AccessControlDict(((x.td.text.strip(), x('td')[1]) for x in suppesuppe.find('table', 'txt')('tr') if x.td.text))
@@ -803,18 +804,18 @@ class WrittenQuestionBulletin(models.Model, Jsonify, Parsable):
     done = models.BooleanField(default=False)
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         for i in range(48, 55):
             soup = scraper.get("http://www.lachambre.be/kvvcr/showpage.cfm?section=/qrva&language=fr&rightmenu=right?legislat=52&cfm=/site/wwwcfm/qrva/qrvaList.cfm?legislat=%i" % i, "bulletin list %i" % i)
             for b in soup.table('tr')[1:]:
                 try:
-                    klass.fetch_one(scraper, soup, legislation=i)
+                    klass.fetch_one(soup, legislation=i)
                 except TypeError, e:
                     logger.debug("Error on written question bulleting of legislation %s:" % i, e)
                     continue
 
     @classmethod
-    def fetch_one(klass, scraper, soup, legislation):
+    def fetch_one(klass, soup, legislation, cache=False, sync=False):
         if legislation == 54:
             get_or_create(WrittenQuestionBulletin,
                           legislature="53",
@@ -899,7 +900,7 @@ class AnnualReport(models.Model, Jsonify, Parsable):
     pdf_url = models.URLField()
 
     @classmethod
-    def fetch_list(klass, scraper):
+    def fetch_list(klass, cache=False, sync=False):
         for a, url in enumerate(('http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=y',
                              'http://www.lachambre.be/kvvcr/showpage.cfm?section=none&language=fr&cfm=/site/wwwcfm/rajv/rajvlist.cfm?lastreports=n')):
             soup, suppe = scraper.get_with_nl(url, "annual repports %i" % a)

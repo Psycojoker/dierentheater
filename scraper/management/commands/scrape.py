@@ -22,7 +22,6 @@ logger.handlers[1].setLevel(logging.DEBUG)
 
 from optparse import make_option
 from django.core.management.base import BaseCommand
-from scraper import Scraper
 
 from ipdb import launch_ipdb_on_exception
 
@@ -68,11 +67,9 @@ class Command(BaseCommand):
         else:
             parsers_to_run = [parsers[x] for x in parsers_to_run]
 
-        scraper = Scraper(sync=options["sync"], cache=options["cache"])
-
         for parser in parsers_to_run:
             if options['ipdb']:
                 with launch_ipdb_on_exception():
-                    parser.scrape(scraper)
+                    parser.scrape(sync=options["sync"], cache=options["cache"])
             else:
-                parser.scrape(scraper)
+                parser.scrape(sync=options["sync"], cache=options["cache"])
